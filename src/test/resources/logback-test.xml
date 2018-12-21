@@ -7,7 +7,7 @@
     </appender>
 
     <root>
-        <level value="WARN"/>
+        <level value="ERROR"/>
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
