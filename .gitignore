@@ -4,3 +4,5 @@ local_env
 pics/
 target/
 .DS_Store
+pom.xml.releaseBackup
+release.properties
