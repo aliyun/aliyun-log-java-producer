@@ -1,0 +1,6 @@
+.idea/
+local_env
+.local_producerrc
+pics/
+target/
+.DS_Store
