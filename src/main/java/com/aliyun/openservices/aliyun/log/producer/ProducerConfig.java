@@ -28,7 +28,7 @@ public class ProducerConfig {
 
     public static final long DEFAULT_MAX_RETRY_BACKOFF_MS = 600 * 1000L;
 
-    public static final String DEFAULT_USER_AGENT = "aliyun-log-producer-java";
+    public static final String DEFAULT_USER_AGENT = "aliyun-log-java-producer";
 
     public enum LogFormat {
         PROTOBUF, JSON
