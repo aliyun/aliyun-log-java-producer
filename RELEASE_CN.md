@@ -1,7 +1,7 @@
 # Aliyun LOG Java Producer 新版本发布流程
 
 ## 前提条件
-确保 [master](https://github.com/aliyun/aliyun-log-producer) 分支最新一次提交的单元测试全部通过([链接](https://travis-ci.org/aliyun/aliyun-log-producer))。
+确保 [master](https://github.com/aliyun/aliyun-log-producer) 分支最新 commit 中的单元测试全部通过（[链接](https://travis-ci.org/aliyun/aliyun-log-producer)）。
 
 ## 发布
 1. 进入`aliyun-log-producer`项目的根目录。
