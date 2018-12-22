@@ -3,7 +3,7 @@ deploy:
 	mvn clean deploy -Dmaven.test.skip=true
 
 .PHONY: release
-clean:
+release: deploy
 	mvn -Darguments="-DskipTests" release:clean release:prepare release:perform
 
 
