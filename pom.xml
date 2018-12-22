@@ -12,9 +12,9 @@
     <artifactId>aliyun-log-producer</artifactId>
     <version>0.0.4-SNAPSHOT</version>
 
-    <name>Aliyun LOG Producer Library</name>
+    <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
-    <description>Aliyun LOG Producer Library</description>
+    <description>Aliyun LOG Java Producer</description>
     <licenses>
         <license>
             <name />
