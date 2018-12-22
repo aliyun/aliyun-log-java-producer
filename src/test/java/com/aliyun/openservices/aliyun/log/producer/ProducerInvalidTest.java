@@ -2,6 +2,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.log.common.LogItem;
+import com.google.common.math.LongMath;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -95,7 +96,7 @@ public class ProducerInvalidTest {
     @Test
     public void testSendWithRequestError() throws InterruptedException {
         ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
-        int retries = 3;
+        int retries = 5;
         producerConfig.setRetries(retries);
         Producer producer = new LogProducer(producerConfig);
         ListenableFuture<Result> f = producer.send("project", "logStore", ProducerTest.buildLogItem());
@@ -111,10 +112,25 @@ public class ProducerInvalidTest {
             Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
             List<Attempt> attempts = result.getAttempts();
             Assert.assertEquals(retries + 1, attempts.size());
-            for (Attempt attempt : attempts) {
+            long t1;
+            long t2 = -1;
+            for (int i = 0; i < attempts.size(); ++i) {
+                Attempt attempt = attempts.get(i);
                 Assert.assertFalse(attempt.isSuccess());
                 Assert.assertEquals("RequestError", attempt.getErrorCode());
                 Assert.assertTrue(attempt.getErrorMessage().startsWith("Web request failed: project.endpoint"));
+                t1 = t2;
+                t2 = attempt.getTimestampMs();
+                if (i == 0)
+                    continue;
+                long diff = t2 - t1;
+                long retryBackoffMs = producerConfig.getBaseRetryBackoffMs() * LongMath.pow(2, i - 1);
+                long low = retryBackoffMs - (long) (producerConfig.getBaseRetryBackoffMs() * 0.1);
+                long high = retryBackoffMs + (long) (producerConfig.getBaseRetryBackoffMs() * 0.2);
+                if (i == 1)
+                    Assert.assertTrue(low <= diff && diff <= retryBackoffMs * 2);
+                else
+                    Assert.assertTrue(low <= diff && diff <= high);
             }
         }
         producer.close();
