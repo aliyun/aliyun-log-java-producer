@@ -108,13 +108,13 @@ public class ProducerInvalidTest {
             Assert.assertEquals("logStore", result.getLogStore());
             Assert.assertFalse(result.isSuccessful());
             Assert.assertEquals("RequestError", result.getErrorCode());
-            Assert.assertEquals("Web request failed: project.endpoint", result.getErrorMessage());
+            Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
             List<Attempt> attempts = result.getAttempts();
             Assert.assertEquals(retries + 1, attempts.size());
             for (Attempt attempt : attempts) {
                 Assert.assertFalse(attempt.isSuccess());
                 Assert.assertEquals("RequestError", attempt.getErrorCode());
-                Assert.assertEquals("Web request failed: project.endpoint", attempt.getErrorMessage());
+                Assert.assertTrue(attempt.getErrorMessage().startsWith("Web request failed: project.endpoint"));
             }
         }
         producer.close();
@@ -150,7 +150,7 @@ public class ProducerInvalidTest {
                 Assert.assertEquals("logStore", result.getLogStore());
                 Assert.assertFalse(result.isSuccessful());
                 Assert.assertEquals("RequestError", result.getErrorCode());
-                Assert.assertEquals("Web request failed: project.endpoint", result.getErrorMessage());
+                Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
                 List<Attempt> attempts = result.getAttempts();
                 Assert.assertTrue(attempts.size() >= 1);
                 for (Attempt attempt : attempts) {
@@ -191,13 +191,13 @@ public class ProducerInvalidTest {
                 Assert.assertEquals("logStore", result.getLogStore());
                 Assert.assertFalse(result.isSuccessful());
                 Assert.assertEquals("RequestError", result.getErrorCode());
-                Assert.assertEquals("Web request failed: project.endpoint", result.getErrorMessage());
+                Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
                 List<Attempt> attempts = result.getAttempts();
                 Assert.assertTrue(attempts.size() >= 1);
                 for (Attempt attempt : attempts) {
                     Assert.assertFalse(attempt.isSuccess());
                     Assert.assertEquals("RequestError", attempt.getErrorCode());
-                    Assert.assertEquals("Web request failed: project.endpoint", attempt.getErrorMessage());
+                    Assert.assertTrue(attempt.getErrorMessage().startsWith("Web request failed: project.endpoint"));
                 }
             }
         }
