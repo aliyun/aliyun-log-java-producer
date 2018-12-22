@@ -69,8 +69,16 @@ public class ProducerConfigTest {
     public void testInvalidLingerMs() {
         ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("lingerMs must be greater than 0, got 0");
-        producerConfig.setLingerMs(0);
+        thrown.expectMessage("lingerMs must be greater than or equal to 100, got -1");
+        producerConfig.setLingerMs(-1);
+    }
+
+    @Test
+    public void testInvalidLingerMs2() {
+        ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("lingerMs must be greater than or equal to 100, got 99");
+        producerConfig.setLingerMs(99);
     }
 
     @Test

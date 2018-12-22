@@ -20,6 +20,8 @@ public class ProducerConfig {
 
     public static final int DEFAULT_LINGER_MS = 2000;
 
+    public static final int LINGER_MS_LOWER_LIMIT = 100;
+
     public static final int DEFAULT_RETRIES = 10;
 
     public static final long DEFAULT_BASE_RETRY_BACKOFF_MS = 100L;
@@ -124,8 +126,8 @@ public class ProducerConfig {
     }
 
     public void setLingerMs(int lingerMs) {
-        if (lingerMs <= 0) {
-            throw new IllegalArgumentException("lingerMs must be greater than 0, got " + lingerMs);
+        if (lingerMs < LINGER_MS_LOWER_LIMIT) {
+            throw new IllegalArgumentException(String.format("lingerMs must be greater than or equal to %d, got %d", LINGER_MS_LOWER_LIMIT, lingerMs));
         }
         this.lingerMs = lingerMs;
     }
