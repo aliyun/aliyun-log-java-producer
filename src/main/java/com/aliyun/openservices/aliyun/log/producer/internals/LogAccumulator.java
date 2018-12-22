@@ -162,6 +162,7 @@ public final class LogAccumulator {
             drainTo(remainingBatches);
         }
         drainTo(remainingBatches);
+        batches.clear();
         return remainingBatches;
     }
 
