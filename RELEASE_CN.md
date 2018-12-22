@@ -6,7 +6,7 @@
 ## 发布
 1. 进入`aliyun-log-producer`项目的根目录。
 2. 运行命令`make release`。
-3. 根据提示输入新版本信息，等待命令执行完成。
+3. 确认弹出的新版本信息后，等待命令执行完成（该命令执行完成后，会自动生成下一个版本的信息）。
 4. 登陆 [stagingRepositories](https://oss.sonatype.org/#stagingRepositories)，close 提交的 repository。
 5. 将 close 的 repository release。
 
