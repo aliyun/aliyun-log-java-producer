@@ -42,16 +42,26 @@ public class RetryQueueTest {
         retryQueue.put(b3);
         retryQueue.put(b4);
         retryQueue.put(b5);
-        List<ProducerBatch> expiredBatches = retryQueue.expiredBatches(3010);
-        Assert.assertEquals(3, expiredBatches.size());
+        Thread.sleep(1000);
+        List<ProducerBatch> expiredBatches = retryQueue.expiredBatches(10);
+        Assert.assertEquals(1, expiredBatches.size());
         Assert.assertEquals("3", expiredBatches.get(0).getPackageId());
-        Assert.assertEquals("5", expiredBatches.get(1).getPackageId());
-        Assert.assertEquals("1", expiredBatches.get(2).getPackageId());
-        retryQueue.close();
-        List<ProducerBatch> remainingBatches = retryQueue.remainingBatches();
-        Assert.assertEquals(2, remainingBatches.size());
-        Assert.assertEquals("4", remainingBatches.get(0).getPackageId());
-        Assert.assertEquals("2", remainingBatches.get(1).getPackageId());
+        Thread.sleep(1000);
+        expiredBatches = retryQueue.expiredBatches(10);
+        Assert.assertEquals(1, expiredBatches.size());
+        Assert.assertEquals("5", expiredBatches.get(0).getPackageId());
+        Thread.sleep(1000);
+        expiredBatches = retryQueue.expiredBatches(10);
+        Assert.assertEquals(1, expiredBatches.size());
+        Assert.assertEquals("1", expiredBatches.get(0).getPackageId());
+        Thread.sleep(1000);
+        expiredBatches = retryQueue.expiredBatches(10);
+        Assert.assertEquals(1, expiredBatches.size());
+        Assert.assertEquals("4", expiredBatches.get(0).getPackageId());
+        Thread.sleep(1000);
+        expiredBatches = retryQueue.expiredBatches(10);
+        Assert.assertEquals(1, expiredBatches.size());
+        Assert.assertEquals("2", expiredBatches.get(0).getPackageId());
     }
 
     @Test
