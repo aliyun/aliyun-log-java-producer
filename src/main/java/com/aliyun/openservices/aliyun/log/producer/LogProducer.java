@@ -53,7 +53,7 @@ public class LogProducer implements Producer {
         this.producerHash = Utils.generateProducerHash(this.instanceId);
         this.producerConfig = producerConfig;
         this.memoryController = new Semaphore(producerConfig.getTotalSizeInBytes());
-        this.retryQueue = new RetryQueue(producerConfig.getBaseRetryBackoffMs());
+        this.retryQueue = new RetryQueue();
         BlockingQueue<ProducerBatch> successQueue = new LinkedBlockingQueue<ProducerBatch>();
         BlockingQueue<ProducerBatch> failureQueue = new LinkedBlockingQueue<ProducerBatch>();
         this.ioThreadPool = new IOThreadPool(producerConfig.getIoThreadCount(), this.name);

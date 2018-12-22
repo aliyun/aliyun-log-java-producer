@@ -49,13 +49,7 @@ public class Mover extends LogThread {
 
     @Override
     public void run() {
-        while (!closed) {
-            try {
-                runOnce();
-            } catch (Exception e) {
-                LOGGER.error("Uncaught exception in mover, e=", e);
-            }
-        }
+        loopMoveBatches();
         LOGGER.debug("Beginning shutdown of mover thread");
         List<ProducerBatch> incompleteBatches = incompleteBatches();
         LOGGER.debug("Submit incomplete batches, size={}", incompleteBatches.size());
@@ -63,30 +57,33 @@ public class Mover extends LogThread {
         LOGGER.debug("Shutdown of mover thread has completed");
     }
 
-    private void runOnce() {
-        long sleepTimeMs = moveBatches(System.currentTimeMillis());
-        doSleep(sleepTimeMs);
+    private void loopMoveBatches() {
+        while (!closed) {
+            try {
+                moveBatches();
+            } catch (Exception e) {
+                LOGGER.error("Uncaught exception in mover, e=", e);
+            }
+        }
     }
 
-    private long moveBatches(long nowMs) {
+    private void moveBatches() {
         LOGGER.debug("Prepare to move expired batches from accumulator and retry queue to ioThreadPool");
-        long remainingMs = doMoveBatches(nowMs);
+        doMoveBatches();
         LOGGER.debug("Move expired batches successfully");
-        return remainingMs;
     }
 
-    private long doMoveBatches(long nowMs) {
-        ExpiredBatches expiredBatches = accumulator.expiredBatches(nowMs);
-        LOGGER.debug("Expired batches from accumulator, size={}", expiredBatches.getBatches().size());
-        ExpiredBatches expiredRetryBatches = retryQueue.expiredBatches(nowMs);
-        LOGGER.debug("Expired batches from retryQueue, size={}", expiredRetryBatches.getBatches().size());
+    private void doMoveBatches() {
+        ExpiredBatches expiredBatches = accumulator.expiredBatches();
+        LOGGER.debug("Expired batches from accumulator, size={}, remainingMs={}", expiredBatches.getBatches().size(), expiredBatches.getRemainingMs());
         for (ProducerBatch b : expiredBatches.getBatches()) {
             ioThreadPool.submit(createSendProducerBatchTask(b));
         }
-        for (ProducerBatch b : expiredRetryBatches.getBatches()) {
+        List<ProducerBatch> expiredRetryBatches = retryQueue.expiredBatches(expiredBatches.getRemainingMs());
+        LOGGER.debug("Expired batches from retry queue, size={}", expiredRetryBatches.size());
+        for (ProducerBatch b : expiredRetryBatches) {
             ioThreadPool.submit(createSendProducerBatchTask(b));
         }
-        return Math.min(expiredBatches.getRemainingMs(), expiredRetryBatches.getRemainingMs());
     }
 
     private List<ProducerBatch> incompleteBatches() {
@@ -108,15 +105,6 @@ public class Mover extends LogThread {
                 successQueue,
                 failureQueue,
                 batchCount);
-    }
-
-    private void doSleep(long sleepTimeMs) {
-        LOGGER.debug("Prepare to sleep, sleepTimeMs={}", sleepTimeMs);
-        try {
-            Thread.sleep(sleepTimeMs);
-        } catch (InterruptedException e) {
-            LOGGER.info("The mover has been interrupted from sleeping");
-        }
     }
 
     public void close() {

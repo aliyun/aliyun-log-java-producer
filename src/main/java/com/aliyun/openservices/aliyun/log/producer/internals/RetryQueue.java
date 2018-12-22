@@ -1,33 +1,25 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RetryQueue {
 
-    private static final int DEFAULT_INITIAL_CAPACITY = 11;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RetryQueue.class);
 
-    private final PriorityBlockingQueue<ProducerBatch> retryBatches;
-
-    private final long baseRetryBackoffMs;
+    private final DelayQueue<ProducerBatch> retryBatches = new DelayQueue<ProducerBatch>();
 
     private final AtomicInteger putsInProgress;
 
     private volatile boolean closed;
 
-    public RetryQueue(long baseRetryBackoffMs) {
-        this.retryBatches = new PriorityBlockingQueue<ProducerBatch>(
-                DEFAULT_INITIAL_CAPACITY,
-                new Comparator<ProducerBatch>() {
-                    @Override
-                    public int compare(ProducerBatch p1, ProducerBatch p2) {
-                        return (int) (p1.getNextRetryMs() - p2.getNextRetryMs());
-                    }
-                });
-        this.baseRetryBackoffMs = baseRetryBackoffMs;
+    public RetryQueue() {
         this.putsInProgress = new AtomicInteger(0);
         this.closed = false;
     }
@@ -43,34 +35,37 @@ public class RetryQueue {
         }
     }
 
-    public ExpiredBatches expiredBatches(long nowMs) {
-        ExpiredBatches expiredBatches = new ExpiredBatches();
-        long remainingMs = baseRetryBackoffMs;
-        while (!retryBatches.isEmpty()) {
-            ProducerBatch b = retryBatches.peek();
-            if (b == null) {
-                throw new IllegalStateException("got a null reference from retryBatches");
-            }
-            long curRemainingMs = b.retryRemainingMs(nowMs);
-            if (curRemainingMs <= 0) {
-                expiredBatches.add(b);
-                retryBatches.remove(b);
-            } else {
-                remainingMs = Math.min(remainingMs, curRemainingMs);
+    public List<ProducerBatch> expiredBatches(long timeoutMs) {
+        long deadline = System.currentTimeMillis() + timeoutMs;
+        List<ProducerBatch> expiredBatches = new ArrayList<ProducerBatch>();
+        while (true) {
+            if (timeoutMs < 0)
+                break;
+            ProducerBatch batch;
+            try {
+                batch = retryBatches.poll(timeoutMs, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                LOGGER.info("Interrupted when poll batch from the retry batches");
                 break;
             }
+            if (batch == null)
+                break;
+            expiredBatches.add(batch);
+            timeoutMs = deadline - System.currentTimeMillis();
         }
-        expiredBatches.setRemainingMs(remainingMs);
         return expiredBatches;
     }
 
     public List<ProducerBatch> remainingBatches() {
-        List<ProducerBatch> batches = new ArrayList<ProducerBatch>();
-        while (putsInProgress()) {
-            retryBatches.drainTo(batches);
+        if (!closed)
+            throw new IllegalStateException("cannot get the remaining batches before the retry queue is closed");
+        while (true) {
+            if (!putsInProgress())
+                break;
         }
-        retryBatches.drainTo(batches);
-        return batches;
+        List<ProducerBatch> remainingBatches = new ArrayList<ProducerBatch>(retryBatches);
+        retryBatches.clear();
+        return remainingBatches;
     }
 
     public boolean isClosed() {

@@ -133,7 +133,8 @@ public final class LogAccumulator {
         }
     }
 
-    public ExpiredBatches expiredBatches(long nowMs) {
+    public ExpiredBatches expiredBatches() {
+        long nowMs = System.currentTimeMillis();
         ExpiredBatches expiredBatches = new ExpiredBatches();
         long remainingMs = producerConfig.getLingerMs();
         for (Map.Entry<GroupKey, ProducerBatchHolder> entry : batches.entrySet()) {
@@ -154,6 +155,8 @@ public final class LogAccumulator {
     }
 
     public List<ProducerBatch> remainingBatches() {
+        if (!closed)
+            throw new IllegalStateException("cannot get the remaining batches before the log accumulator is closed");
         List<ProducerBatch> remainingBatches = new ArrayList<ProducerBatch>();
         while (appendsInProgress()) {
             drainTo(remainingBatches);
@@ -162,14 +165,14 @@ public final class LogAccumulator {
         return remainingBatches;
     }
 
-    public int drainTo(List<ProducerBatch> allBatches) {
+    private int drainTo(List<ProducerBatch> c) {
         int n = 0;
         for (Map.Entry<GroupKey, ProducerBatchHolder> entry : batches.entrySet()) {
             ProducerBatchHolder holder = entry.getValue();
             synchronized (holder) {
                 if (holder.producerBatch == null)
                     continue;
-                allBatches.add(holder.producerBatch);
+                c.add(holder.producerBatch);
                 ++n;
                 holder.producerBatch = null;
             }

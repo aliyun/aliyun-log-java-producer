@@ -9,10 +9,13 @@ import com.google.common.util.concurrent.SettableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 
-public class ProducerBatch {
+public class ProducerBatch implements Delayed {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProducerBatch.class);
 
@@ -171,6 +174,16 @@ public class ProducerBatch {
                 LOGGER.error("Failed to set future, groupKey={}, e=", groupKey, e);
             }
         }
+    }
+
+    @Override
+    public long getDelay(@Nonnull TimeUnit unit) {
+        return unit.convert(nextRetryMs - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public int compareTo(@Nonnull Delayed o) {
+        return (int) (nextRetryMs - ((ProducerBatch) o).getNextRetryMs());
     }
 
     @Override
