@@ -38,6 +38,9 @@ public class RetryQueue {
     public List<ProducerBatch> expiredBatches(long timeoutMs) {
         long deadline = System.currentTimeMillis() + timeoutMs;
         List<ProducerBatch> expiredBatches = new ArrayList<ProducerBatch>();
+        retryBatches.drainTo(expiredBatches);
+        if (!expiredBatches.isEmpty())
+            return expiredBatches;
         while (true) {
             if (timeoutMs < 0)
                 break;
@@ -51,6 +54,9 @@ public class RetryQueue {
             if (batch == null)
                 break;
             expiredBatches.add(batch);
+            retryBatches.drainTo(expiredBatches);
+            if (!expiredBatches.isEmpty())
+                break;
             timeoutMs = deadline - System.currentTimeMillis();
         }
         return expiredBatches;
