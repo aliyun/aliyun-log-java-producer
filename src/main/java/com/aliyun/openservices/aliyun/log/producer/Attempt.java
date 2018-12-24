@@ -4,14 +4,17 @@ public class Attempt {
 
     private final boolean success;
 
+    private final String requestId;
+
     private final String errorCode;
 
     private final String errorMessage;
 
     private final long timestampMs;
 
-    public Attempt(boolean success, String errorCode, String errorMessage, long timestampMs) {
+    public Attempt(boolean success, String requestId, String errorCode, String errorMessage, long timestampMs) {
         this.success = success;
+        this.requestId = requestId;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
         this.timestampMs = timestampMs;
@@ -19,6 +22,10 @@ public class Attempt {
 
     public boolean isSuccess() {
         return success;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 
     public String getErrorCode() {
@@ -37,10 +44,11 @@ public class Attempt {
     public String toString() {
         return "Attempt{" +
                 "success=" + success +
+                ", requestId='" + requestId + '\'' +
                 ", errorCode='" + errorCode + '\'' +
                 ", errorMessage='" + errorMessage + '\'' +
                 ", timestampMs=" + timestampMs +
                 '}';
     }
-
+    
 }

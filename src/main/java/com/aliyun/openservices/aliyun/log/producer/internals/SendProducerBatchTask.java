@@ -8,6 +8,7 @@ import com.aliyun.openservices.log.common.Consts;
 import com.aliyun.openservices.log.common.TagContent;
 import com.aliyun.openservices.log.exception.LogException;
 import com.aliyun.openservices.log.request.PutLogsRequest;
+import com.aliyun.openservices.log.response.PutLogsResponse;
 import com.google.common.math.LongMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,15 +67,17 @@ public class SendProducerBatchTask implements Runnable {
             LOGGER.error("Failed to get client, project={}", project);
             Attempt attempt = new Attempt(
                     false,
+                    "",
                     ErrorCode.PROJECT_CONFIG_NOT_EXIST,
                     "Cannot get the projectConfig for project " + project,
                     nowMs);
             batch.appendAttempt(attempt);
             failureQueue.put(batch);
         } else {
+            PutLogsResponse response;
             try {
                 PutLogsRequest request = buildPutLogsRequest(batch);
-                client.PutLogs(request);
+                response = client.PutLogs(request);
             } catch (Exception e) {
                 LOGGER.error("Failed to put logs, e=", e);
                 Attempt attempt = buildAttempt(e, nowMs);
@@ -99,7 +102,12 @@ public class SendProducerBatchTask implements Runnable {
                 }
                 return;
             }
-            Attempt attempt = new Attempt(true, "", "", nowMs);
+            Attempt attempt = new Attempt(
+                    true,
+                    response.GetRequestId(),
+                    "",
+                    "",
+                    nowMs);
             batch.appendAttempt(attempt);
             successQueue.put(batch);
             LOGGER.trace("Send producer batch successfully, batch={}", batch);
@@ -146,12 +154,14 @@ public class SendProducerBatchTask implements Runnable {
             LogException logException = (LogException) e;
             return new Attempt(
                     false,
+                    logException.GetRequestId(),
                     logException.GetErrorCode(),
                     logException.GetErrorMessage(),
                     nowMs);
         } else
             return new Attempt(
                     false,
+                    "",
                     e.getClass().getSimpleName(),
                     e.getMessage(),
                     nowMs);
