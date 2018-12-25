@@ -110,7 +110,7 @@ public class ProducerInvalidTest {
             Assert.assertFalse(result.isSuccessful());
             Assert.assertEquals("RequestError", result.getErrorCode());
             Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
-            List<Attempt> attempts = result.getAttempts();
+            List<Attempt> attempts = result.getReservedAttempts();
             Assert.assertEquals(retries + 1, attempts.size());
             long t1;
             long t2 = -1;
@@ -168,7 +168,7 @@ public class ProducerInvalidTest {
                 Assert.assertFalse(result.isSuccessful());
                 Assert.assertEquals("RequestError", result.getErrorCode());
                 Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
-                List<Attempt> attempts = result.getAttempts();
+                List<Attempt> attempts = result.getReservedAttempts();
                 Assert.assertTrue(attempts.size() >= 1);
                 for (Attempt attempt : attempts) {
                     Assert.assertFalse(attempt.isSuccess());
@@ -209,7 +209,7 @@ public class ProducerInvalidTest {
                 Assert.assertFalse(result.isSuccessful());
                 Assert.assertEquals("RequestError", result.getErrorCode());
                 Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
-                List<Attempt> attempts = result.getAttempts();
+                List<Attempt> attempts = result.getReservedAttempts();
                 Assert.assertTrue(attempts.size() >= 1);
                 for (Attempt attempt : attempts) {
                     Assert.assertFalse(attempt.isSuccess());

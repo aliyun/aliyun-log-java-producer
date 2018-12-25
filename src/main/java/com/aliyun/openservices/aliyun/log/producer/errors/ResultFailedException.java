@@ -34,7 +34,7 @@ public class ResultFailedException extends ProducerException {
     }
 
     public List<Attempt> getAttempts() {
-        return result.getAttempts();
+        return result.getReservedAttempts();
     }
 
 }

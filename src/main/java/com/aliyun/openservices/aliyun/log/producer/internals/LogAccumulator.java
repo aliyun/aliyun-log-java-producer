@@ -110,6 +110,7 @@ public final class LogAccumulator {
                         Utils.generatePackageId(producerHash, BATCH_ID),
                         producerConfig.getMaxBatchSizeInBytes(),
                         producerConfig.getMaxBatchCount(),
+                        producerConfig.getMaxReservedAttempts(),
                         System.currentTimeMillis());
                 ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItem, sizeInBytes, callback);
                 if (f == null)

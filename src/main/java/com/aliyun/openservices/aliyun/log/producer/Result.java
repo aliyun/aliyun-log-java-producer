@@ -14,20 +14,24 @@ public class Result {
 
     private final String errorMessage;
 
-    private final List<Attempt> attempts;
+    private final List<Attempt> reservedAttempts;
+
+    private final int attemptCount;
 
     public Result(String project,
                   String logStore,
                   boolean successful,
                   String errorCode,
                   String errorMessage,
-                  List<Attempt> attempts) {
+                  List<Attempt> reservedAttempts,
+                  int attemptCount) {
         this.project = project;
         this.logStore = logStore;
         this.successful = successful;
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
-        this.attempts = attempts;
+        this.reservedAttempts = reservedAttempts;
+        this.attemptCount = attemptCount;
     }
 
     public String getProject() {
@@ -50,8 +54,8 @@ public class Result {
         return errorMessage;
     }
 
-    public List<Attempt> getAttempts() {
-        return attempts;
+    public List<Attempt> getReservedAttempts() {
+        return reservedAttempts;
     }
 
     @Override
@@ -62,7 +66,8 @@ public class Result {
                 ", successful=" + successful +
                 ", errorCode='" + errorCode + '\'' +
                 ", errorMessage='" + errorMessage + '\'' +
-                ", attempts=" + attempts +
+                ", reservedAttempts=" + reservedAttempts +
+                ", attemptCount=" + attemptCount +
                 '}';
     }
 

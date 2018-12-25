@@ -3,6 +3,7 @@ package com.aliyun.openservices.aliyun.log.producer.internals;
 import com.aliyun.openservices.aliyun.log.producer.*;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.log.common.LogItem;
+import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
@@ -39,9 +40,16 @@ public class ProducerBatch implements Delayed {
 
     private int curBatchCount;
 
-    private final List<Attempt> attempts = new ArrayList<Attempt>();
+    private final EvictingQueue<Attempt> reservedAttempts;
 
-    public ProducerBatch(GroupKey groupKey, String packageId, int maxBatchSizeInBytes, int maxBatchCount, long nowMs) {
+    private int attemptCount;
+
+    public ProducerBatch(GroupKey groupKey,
+                         String packageId,
+                         int maxBatchSizeInBytes,
+                         int maxBatchCount,
+                         int maxReservedAttempts,
+                         long nowMs) {
         this.groupKey = groupKey;
         this.packageId = packageId;
         this.createdMs = nowMs;
@@ -49,6 +57,8 @@ public class ProducerBatch implements Delayed {
         this.maxBatchCount = maxBatchCount;
         this.curBatchCount = 0;
         this.curBatchSizeInBytes = 0;
+        this.reservedAttempts = EvictingQueue.create(maxReservedAttempts);
+        this.attemptCount = 0;
     }
 
     public ListenableFuture<Result> tryAppend(LogItem logItem, int logSizeInBytes, Callback callback) {
@@ -65,8 +75,8 @@ public class ProducerBatch implements Delayed {
     }
 
     public void appendAttempt(Attempt attempt) {
-        if (!attempts.add(attempt))
-            throw new IllegalStateException("failed to add attempt to attempts");
+        reservedAttempts.add(attempt);
+        this.attemptCount++;
     }
 
     public boolean isFull() {
@@ -77,11 +87,8 @@ public class ProducerBatch implements Delayed {
         return lingerMs - createdTimeMs(nowMs);
     }
 
-    public long retryRemainingMs(long nowMs) {
-        return nextRetryMs - nowMs;
-    }
-
     public void fireCallbacksAndSetFutures() {
+        List<Attempt> attempts = new ArrayList<Attempt>(reservedAttempts);
         Attempt attempt = Iterables.getLast(attempts);
         Result result = new Result(
                 groupKey.getProject(),
@@ -89,7 +96,8 @@ public class ProducerBatch implements Delayed {
                 attempt.isSuccess(),
                 attempt.getErrorCode(),
                 attempt.getErrorMessage(),
-                attempts);
+                attempts,
+                attemptCount);
         fireCallbacks(result);
         setFutures(result);
     }
@@ -139,7 +147,7 @@ public class ProducerBatch implements Delayed {
     }
 
     public int getRetries() {
-        return Math.max(0, attempts.size() - 1);
+        return Math.max(0, attemptCount - 1);
     }
 
     private boolean hasRoomFor(int sizeInBytes, int count) {
@@ -199,7 +207,8 @@ public class ProducerBatch implements Delayed {
                 ", nextRetryMs=" + nextRetryMs +
                 ", curBatchSizeInBytes=" + curBatchSizeInBytes +
                 ", curBatchCount=" + curBatchCount +
-                ", attempts=" + attempts +
+                ", reservedAttempts=" + reservedAttempts +
+                ", attemptCount=" + attemptCount +
                 '}';
     }
 

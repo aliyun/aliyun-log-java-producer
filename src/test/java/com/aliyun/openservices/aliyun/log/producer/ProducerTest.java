@@ -25,8 +25,8 @@ public class ProducerTest {
         Assert.assertTrue(result.isSuccessful());
         Assert.assertEquals("", result.getErrorCode());
         Assert.assertEquals("", result.getErrorMessage());
-        Assert.assertEquals(1, result.getAttempts().size());
-        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+        Assert.assertEquals(1, result.getReservedAttempts().size());
+        Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -38,8 +38,8 @@ public class ProducerTest {
         Assert.assertTrue(result.isSuccessful());
         Assert.assertEquals("", result.getErrorCode());
         Assert.assertEquals("", result.getErrorMessage());
-        Assert.assertEquals(1, result.getAttempts().size());
-        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+        Assert.assertEquals(1, result.getReservedAttempts().size());
+        Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -51,8 +51,8 @@ public class ProducerTest {
         Assert.assertTrue(result.isSuccessful());
         Assert.assertEquals("", result.getErrorCode());
         Assert.assertEquals("", result.getErrorMessage());
-        Assert.assertEquals(1, result.getAttempts().size());
-        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+        Assert.assertEquals(1, result.getReservedAttempts().size());
+        Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -64,8 +64,8 @@ public class ProducerTest {
         Assert.assertTrue(result.isSuccessful());
         Assert.assertEquals("", result.getErrorCode());
         Assert.assertEquals("", result.getErrorMessage());
-        Assert.assertEquals(1, result.getAttempts().size());
-        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+        Assert.assertEquals(1, result.getReservedAttempts().size());
+        Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
         producer.close();
         assertProducerFinalState(producer);
@@ -92,8 +92,8 @@ public class ProducerTest {
         Assert.assertTrue(result.isSuccessful());
         Assert.assertEquals("", result.getErrorCode());
         Assert.assertEquals("", result.getErrorMessage());
-        Assert.assertEquals(1, result.getAttempts().size());
-        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+        Assert.assertEquals(1, result.getReservedAttempts().size());
+        Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -130,8 +130,8 @@ public class ProducerTest {
         Assert.assertTrue(result.isSuccessful());
         Assert.assertEquals("", result.getErrorCode());
         Assert.assertEquals("", result.getErrorMessage());
-        Assert.assertEquals(1, result.getAttempts().size());
-        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+        Assert.assertEquals(1, result.getReservedAttempts().size());
+        Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -151,8 +151,8 @@ public class ProducerTest {
         Assert.assertTrue(result.isSuccessful());
         Assert.assertEquals("", result.getErrorCode());
         Assert.assertEquals("", result.getErrorMessage());
-        Assert.assertEquals(1, result.getAttempts().size());
-        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+        Assert.assertEquals(1, result.getReservedAttempts().size());
+        Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
         Assert.assertEquals(4, successCount.get());
 
@@ -180,7 +180,7 @@ public class ProducerTest {
             Assert.assertFalse(result.isSuccessful());
             Assert.assertEquals("SignatureNotMatch", result.getErrorCode());
             Assert.assertTrue(!result.getErrorMessage().isEmpty());
-            List<Attempt> attempts = result.getAttempts();
+            List<Attempt> attempts = result.getReservedAttempts();
             Assert.assertEquals(1, attempts.size());
             for (Attempt attempt : attempts) {
                 Assert.assertFalse(attempt.isSuccess());

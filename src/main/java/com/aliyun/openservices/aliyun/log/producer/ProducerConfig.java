@@ -52,6 +52,8 @@ public class ProducerConfig {
 
     private int retries = DEFAULT_RETRIES;
 
+    private int maxReservedAttempts = DEFAULT_RETRIES;
+
     private long baseRetryBackoffMs = DEFAULT_BASE_RETRY_BACKOFF_MS;
 
     private long maxRetryBackoffMs = DEFAULT_MAX_RETRY_BACKOFF_MS;
@@ -138,6 +140,17 @@ public class ProducerConfig {
 
     public void setRetries(int retries) {
         this.retries = retries;
+    }
+
+    public int getMaxReservedAttempts() {
+        return maxReservedAttempts;
+    }
+
+    public void setMaxReservedAttempts(int maxReservedAttempts) {
+        if (maxReservedAttempts <= 0) {
+            throw new IllegalArgumentException("maxReservedAttempts must be greater than 0, got " + baseRetryBackoffMs);
+        }
+        this.maxReservedAttempts = maxReservedAttempts;
     }
 
     public long getBaseRetryBackoffMs() {

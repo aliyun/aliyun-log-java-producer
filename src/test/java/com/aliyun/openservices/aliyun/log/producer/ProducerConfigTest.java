@@ -20,6 +20,7 @@ public class ProducerConfigTest {
         Assert.assertEquals(ProducerConfig.DEFAULT_MAX_BATCH_COUNT, producerConfig.getMaxBatchCount());
         Assert.assertEquals(ProducerConfig.DEFAULT_LINGER_MS, producerConfig.getLingerMs());
         Assert.assertEquals(ProducerConfig.DEFAULT_RETRIES, producerConfig.getRetries());
+        Assert.assertEquals(ProducerConfig.DEFAULT_RETRIES, producerConfig.getMaxReservedAttempts());
         Assert.assertEquals(ProducerConfig.DEFAULT_BASE_RETRY_BACKOFF_MS, producerConfig.getBaseRetryBackoffMs());
         Assert.assertEquals(ProducerConfig.DEFAULT_MAX_RETRY_BACKOFF_MS, producerConfig.getMaxRetryBackoffMs());
         Assert.assertEquals(ProducerConfig.DEFAULT_USER_AGENT, producerConfig.getUserAgent());
@@ -79,6 +80,14 @@ public class ProducerConfigTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("lingerMs must be greater than or equal to 100, got 99");
         producerConfig.setLingerMs(99);
+    }
+
+    @Test
+    public void testInvalidMaxReservedAttempts() {
+        ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("lingerMs must be greater than 0, got -1");
+        producerConfig.setMaxReservedAttempts(-1);
     }
 
     @Test
