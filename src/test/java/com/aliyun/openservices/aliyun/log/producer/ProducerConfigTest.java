@@ -86,7 +86,7 @@ public class ProducerConfigTest {
     public void testInvalidMaxReservedAttempts() {
         ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("lingerMs must be greater than 0, got -1");
+        thrown.expectMessage("maxReservedAttempts must be greater than 0, got -1");
         producerConfig.setMaxReservedAttempts(-1);
     }
 

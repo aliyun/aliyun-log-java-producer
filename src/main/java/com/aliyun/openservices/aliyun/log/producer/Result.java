@@ -58,6 +58,10 @@ public class Result {
         return reservedAttempts;
     }
 
+    public int getAttemptCount() {
+        return attemptCount;
+    }
+
     @Override
     public String toString() {
         return "Result{" +

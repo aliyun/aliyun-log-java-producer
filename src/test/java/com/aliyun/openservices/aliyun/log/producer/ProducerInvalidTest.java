@@ -98,6 +98,7 @@ public class ProducerInvalidTest {
         ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
         int retries = 5;
         producerConfig.setRetries(retries);
+        producerConfig.setMaxReservedAttempts(retries);
         Producer producer = new LogProducer(producerConfig);
         ListenableFuture<Result> f = producer.send("project", "logStore", ProducerTest.buildLogItem());
         try {
@@ -132,6 +133,39 @@ public class ProducerInvalidTest {
                     Assert.assertTrue(low <= diff);
                 else
                     Assert.assertTrue(low <= diff && diff <= high);
+            }
+        }
+        producer.close();
+        ProducerTest.assertProducerFinalState(producer);
+    }
+
+    @Test
+    public void testSendWithRequestError2() throws InterruptedException {
+        ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+        int retries = 5;
+        int maxReservedAttempts = 2;
+        producerConfig.setRetries(retries);
+        producerConfig.setMaxReservedAttempts(maxReservedAttempts);
+        Producer producer = new LogProducer(producerConfig);
+        ListenableFuture<Result> f = producer.send("project", "logStore", ProducerTest.buildLogItem());
+        try {
+            f.get();
+        } catch (ExecutionException e) {
+            ResultFailedException resultFailedException = (ResultFailedException) e.getCause();
+            Result result = resultFailedException.getResult();
+            Assert.assertEquals("project", result.getProject());
+            Assert.assertEquals("logStore", result.getLogStore());
+            Assert.assertFalse(result.isSuccessful());
+            Assert.assertEquals("RequestError", result.getErrorCode());
+            Assert.assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
+            List<Attempt> attempts = result.getReservedAttempts();
+            Assert.assertEquals(maxReservedAttempts, attempts.size());
+            Assert.assertEquals(retries + 1, result.getAttemptCount());
+            for(Attempt attempt: attempts) {
+                Assert.assertFalse(attempt.isSuccess());
+                Assert.assertEquals("RequestError", attempt.getErrorCode());
+                Assert.assertTrue(attempt.getErrorMessage().startsWith("Web request failed: project.endpoint"));
+                Assert.assertEquals("", attempt.getRequestId());
             }
         }
         producer.close();
