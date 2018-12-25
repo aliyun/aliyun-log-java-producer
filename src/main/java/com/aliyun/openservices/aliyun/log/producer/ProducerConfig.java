@@ -148,7 +148,7 @@ public class ProducerConfig {
 
     public void setMaxReservedAttempts(int maxReservedAttempts) {
         if (maxReservedAttempts <= 0) {
-            throw new IllegalArgumentException("maxReservedAttempts must be greater than 0, got " + baseRetryBackoffMs);
+            throw new IllegalArgumentException("maxReservedAttempts must be greater than 0, got " + maxReservedAttempts);
         }
         this.maxReservedAttempts = maxReservedAttempts;
     }
