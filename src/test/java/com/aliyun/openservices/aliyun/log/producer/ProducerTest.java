@@ -22,6 +22,10 @@ public class ProducerTest {
                 buildLogItem());
         Result result = f.get();
         Assert.assertTrue(result.isSuccessful());
+        Assert.assertEquals("", result.getErrorCode());
+        Assert.assertEquals("", result.getErrorMessage());
+        Assert.assertEquals(1, result.getAttempts().size());
+        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -31,6 +35,10 @@ public class ProducerTest {
                 buildLogItem());
         result = f.get();
         Assert.assertTrue(result.isSuccessful());
+        Assert.assertEquals("", result.getErrorCode());
+        Assert.assertEquals("", result.getErrorMessage());
+        Assert.assertEquals(1, result.getAttempts().size());
+        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -40,6 +48,10 @@ public class ProducerTest {
                 buildLogItem());
         result = f.get();
         Assert.assertTrue(result.isSuccessful());
+        Assert.assertEquals("", result.getErrorCode());
+        Assert.assertEquals("", result.getErrorMessage());
+        Assert.assertEquals(1, result.getAttempts().size());
+        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -49,6 +61,10 @@ public class ProducerTest {
                 buildLogItem());
         result = f.get();
         Assert.assertTrue(result.isSuccessful());
+        Assert.assertEquals("", result.getErrorCode());
+        Assert.assertEquals("", result.getErrorMessage());
+        Assert.assertEquals(1, result.getAttempts().size());
+        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
 
         producer.close();
         assertProducerFinalState(producer);
@@ -73,6 +89,10 @@ public class ProducerTest {
                 });
         Result result = f.get();
         Assert.assertTrue(result.isSuccessful());
+        Assert.assertEquals("", result.getErrorCode());
+        Assert.assertEquals("", result.getErrorMessage());
+        Assert.assertEquals(1, result.getAttempts().size());
+        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -107,6 +127,10 @@ public class ProducerTest {
                 });
         result = f.get();
         Assert.assertTrue(result.isSuccessful());
+        Assert.assertEquals("", result.getErrorCode());
+        Assert.assertEquals("", result.getErrorMessage());
+        Assert.assertEquals(1, result.getAttempts().size());
+        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
 
         f = producer.send(
                 System.getenv("PROJECT"),
@@ -124,6 +148,11 @@ public class ProducerTest {
                 });
         result = f.get();
         Assert.assertTrue(result.isSuccessful());
+        Assert.assertEquals("", result.getErrorCode());
+        Assert.assertEquals("", result.getErrorMessage());
+        Assert.assertEquals(1, result.getAttempts().size());
+        Assert.assertTrue(!result.getAttempts().get(0).getRequestId().isEmpty());
+
         Assert.assertEquals(4, successCount.get());
 
         producer.close();

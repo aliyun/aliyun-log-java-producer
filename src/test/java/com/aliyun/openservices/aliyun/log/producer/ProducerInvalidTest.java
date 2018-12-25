@@ -119,6 +119,7 @@ public class ProducerInvalidTest {
                 Assert.assertFalse(attempt.isSuccess());
                 Assert.assertEquals("RequestError", attempt.getErrorCode());
                 Assert.assertTrue(attempt.getErrorMessage().startsWith("Web request failed: project.endpoint"));
+                Assert.assertEquals("", attempt.getRequestId());
                 t1 = t2;
                 t2 = attempt.getTimestampMs();
                 if (i == 0)
@@ -128,7 +129,7 @@ public class ProducerInvalidTest {
                 long low = retryBackoffMs - (long) (producerConfig.getBaseRetryBackoffMs() * 0.1);
                 long high = retryBackoffMs + (long) (producerConfig.getBaseRetryBackoffMs() * 0.2);
                 if (i == 1)
-                    Assert.assertTrue(low <= diff && diff <= retryBackoffMs * 2);
+                    Assert.assertTrue(low <= diff);
                 else
                     Assert.assertTrue(low <= diff && diff <= high);
             }
