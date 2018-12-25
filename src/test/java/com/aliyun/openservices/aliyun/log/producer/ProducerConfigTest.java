@@ -20,7 +20,7 @@ public class ProducerConfigTest {
         Assert.assertEquals(ProducerConfig.DEFAULT_MAX_BATCH_COUNT, producerConfig.getMaxBatchCount());
         Assert.assertEquals(ProducerConfig.DEFAULT_LINGER_MS, producerConfig.getLingerMs());
         Assert.assertEquals(ProducerConfig.DEFAULT_RETRIES, producerConfig.getRetries());
-        Assert.assertEquals(ProducerConfig.DEFAULT_RETRIES, producerConfig.getMaxReservedAttempts());
+        Assert.assertEquals(ProducerConfig.DEFAULT_RETRIES + 1, producerConfig.getMaxReservedAttempts());
         Assert.assertEquals(ProducerConfig.DEFAULT_BASE_RETRY_BACKOFF_MS, producerConfig.getBaseRetryBackoffMs());
         Assert.assertEquals(ProducerConfig.DEFAULT_MAX_RETRY_BACKOFF_MS, producerConfig.getMaxRetryBackoffMs());
         Assert.assertEquals(ProducerConfig.DEFAULT_USER_AGENT, producerConfig.getUserAgent());
