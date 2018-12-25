@@ -161,9 +161,63 @@ public class ProducerTest {
     }
 
     @Test
-    public void testSendWithInvalidAK() throws InterruptedException {
+    public void testSendWithInvalidAccessKeyId() throws InterruptedException {
         ProjectConfigs projectConfigs = new ProjectConfigs();
-        projectConfigs.put(buildInvalidAKProjectConfig());
+        projectConfigs.put(buildInvalidAccessKeyIdProjectConfig());
+        ProducerConfig producerConfig = new ProducerConfig(projectConfigs);
+        producerConfig.setRetries(4);
+        final Producer producer = new LogProducer(producerConfig);
+        ListenableFuture<Result> f = producer.send(
+                System.getenv("PROJECT"),
+                System.getenv("LOG_STORE"),
+                buildLogItem());
+        Thread.sleep(1000 * 3);
+        projectConfigs.put(buildProjectConfig());
+        try {
+            Result result = f.get();
+            Assert.assertTrue(result.isSuccessful());
+            Assert.assertEquals(System.getenv("PROJECT"), result.getProject());
+            Assert.assertEquals(System.getenv("LOG_STORE"), result.getLogStore());
+            Assert.assertTrue(result.getErrorCode().isEmpty());
+            Assert.assertTrue(result.getErrorMessage().isEmpty());
+            List<Attempt> attempts = result.getReservedAttempts();
+            System.out.println(attempts.size());
+            for (int i = 0; i < attempts.size(); ++i) {
+                Attempt attempt = attempts.get(i);
+                if (i == attempts.size() - 1) {
+                    Assert.assertTrue(attempt.isSuccess());
+                    Assert.assertTrue(result.getErrorCode().isEmpty());
+                    Assert.assertTrue(result.getErrorMessage().isEmpty());
+                } else {
+                    Assert.assertFalse(attempt.isSuccess());
+                    Assert.assertEquals("Unauthorized", attempt.getErrorCode());
+                    Assert.assertFalse(attempt.getErrorMessage().isEmpty());
+                }
+            }
+
+        } catch (ExecutionException e) {
+            ResultFailedException resultFailedException = (ResultFailedException) e.getCause();
+            Result result = resultFailedException.getResult();
+            Assert.assertEquals(System.getenv("PROJECT"), result.getProject());
+            Assert.assertEquals(System.getenv("LOG_STORE"), result.getLogStore());
+            Assert.assertFalse(result.isSuccessful());
+            Assert.assertEquals("SignatureNotMatch", result.getErrorCode());
+            Assert.assertTrue(!result.getErrorMessage().isEmpty());
+            List<Attempt> attempts = result.getReservedAttempts();
+            Assert.assertEquals(1, attempts.size());
+            for (Attempt attempt : attempts) {
+                Assert.assertFalse(attempt.isSuccess());
+                Assert.assertEquals("SignatureNotMatch", attempt.getErrorCode());
+                Assert.assertTrue(!attempt.getErrorMessage().isEmpty());
+                Assert.assertTrue(!attempt.getRequestId().isEmpty());
+            }
+        }
+    }
+
+    @Test
+    public void testSendWithInvalidAccessKeySecret() throws InterruptedException {
+        ProjectConfigs projectConfigs = new ProjectConfigs();
+        projectConfigs.put(buildInvalidAccessKeySecretProjectConfig());
         ProducerConfig producerConfig = new ProducerConfig(projectConfigs);
         final Producer producer = new LogProducer(producerConfig);
         ListenableFuture<Result> f = producer.send(
@@ -290,7 +344,15 @@ public class ProducerTest {
         return new ProjectConfig(project, endpoint, accessKeyId, accessKeySecret);
     }
 
-    private ProjectConfig buildInvalidAKProjectConfig() {
+    private ProjectConfig buildInvalidAccessKeyIdProjectConfig() {
+        String project = System.getenv("PROJECT");
+        String endpoint = System.getenv("ENDPOINT");
+        String accessKeyId = System.getenv("ACCESS_KEY_ID") + "XXX";
+        String accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
+        return new ProjectConfig(project, endpoint, accessKeyId, accessKeySecret);
+    }
+
+    private ProjectConfig buildInvalidAccessKeySecretProjectConfig() {
         String project = System.getenv("PROJECT");
         String endpoint = System.getenv("ENDPOINT");
         String accessKeyId = System.getenv("ACCESS_KEY_ID");
