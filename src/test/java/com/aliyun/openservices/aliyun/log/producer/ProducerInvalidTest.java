@@ -98,7 +98,7 @@ public class ProducerInvalidTest {
         ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
         int retries = 5;
         producerConfig.setRetries(retries);
-        producerConfig.setMaxReservedAttempts(retries);
+        producerConfig.setMaxReservedAttempts(retries + 1);
         Producer producer = new LogProducer(producerConfig);
         ListenableFuture<Result> f = producer.send("project", "logStore", ProducerTest.buildLogItem());
         try {
@@ -161,7 +161,7 @@ public class ProducerInvalidTest {
             List<Attempt> attempts = result.getReservedAttempts();
             Assert.assertEquals(maxReservedAttempts, attempts.size());
             Assert.assertEquals(retries + 1, result.getAttemptCount());
-            for(Attempt attempt: attempts) {
+            for (Attempt attempt : attempts) {
                 Assert.assertFalse(attempt.isSuccess());
                 Assert.assertEquals("RequestError", attempt.getErrorCode());
                 Assert.assertTrue(attempt.getErrorMessage().startsWith("Web request failed: project.endpoint"));

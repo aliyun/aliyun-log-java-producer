@@ -52,7 +52,7 @@ public class ProducerConfig {
 
     private int retries = DEFAULT_RETRIES;
 
-    private int maxReservedAttempts = DEFAULT_RETRIES;
+    private int maxReservedAttempts = DEFAULT_RETRIES + 1;
 
     private long baseRetryBackoffMs = DEFAULT_BASE_RETRY_BACKOFF_MS;
 
