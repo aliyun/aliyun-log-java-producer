@@ -26,6 +26,27 @@ Aliyun LOG Java Producer 是一个易于使用且高度可配置的 Java 类库�
 ### 资源可控制
 可以通过参数控制 producer 用于缓存待发送数据的内存大小，同时还可以配置用于执行数据发送任务的线程数量。这样做一方面避免了 producer 无限制地消耗资源，另一方面可以让您根据实际情况平衡资源消耗和写入吞吐量。
 
+## 安装
+在 Maven 工程中使用 Aliyun LOG Java Producer 只需在 pom.xml 中加入相应依赖即可。以 0.0.5 版本为例，在 <dependencies> 内加入如下内容：
+
+```
+<dependency>
+    <groupId>com.aliyun.openservices</groupId>
+    <artifactId>aliyun-log-producer</artifactId>
+    <version>0.0.5</version>
+</dependency>
+<dependency>
+    <groupId>com.aliyun.openservices</groupId>
+    <artifactId>aliyun-log</artifactId>
+    <version>0.6.28</version>
+</dependency>
+<dependency>
+    <groupId>com.google.protobuf</groupId>
+    <artifactId>protobuf-java</artifactId>
+    <version>2.5.0</version>
+</dependency>
+```
+
 ## 快速入门
 
 参考教程 [Aliyun LOG Java Producer 快速入门]()。
