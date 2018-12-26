@@ -59,11 +59,11 @@ compile 'com.google.protobuf:protobuf-java:2.5.0'
 
 ## 快速入门
 
-参考教程 [Aliyun LOG Java Producer 快速入门]()。
+参考教程 [Aliyun LOG Java Producer 快速入门](https://yq.aliyun.com/articles/682761)。
 
 ## 原理剖析
 
-参考文章 [Aliyun LOG Java Producer 原理剖析]()。
+参考文章 [日志上云利器 - Aliyun LOG Java Producer](https://yq.aliyun.com/articles/682762)。
 
 ## 应用示例
 
