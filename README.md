@@ -26,3 +26,13 @@ Aliyun LOG Java Producer 是一个易于使用且高度可配置的 Java 类库�
 ### 资源可控制
 可以通过参数控制 producer 用于缓存待发送数据的内存大小，同时还可以配置用于执行数据发送任务的线程数量。这样做一方面避免了 producer 无限制地消耗资源，另一方面可以让您根据实际情况平衡资源消耗和写入吞吐量。
 
+## 快速入门
+
+参考教程 [Aliyun LOG Java Producer 快速入门]()。
+
+## 原理剖析
+
+参考文章 [Aliyun LOG Java Producer 原理剖析]()。
+
+## 问题反馈
+如果您在使用过程中遇到了问题，可以创建 [GitHub Issue](https://github.com/aliyun/aliyun-log-producer/issues) 或者前往阿里云支持中心[提交工单](https://workorder.console.aliyun.com/#/ticket/createIndex)。
