@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/aliyun/aliyun-log-producer.svg?branch=master)](https://travis-ci.org/aliyun/aliyun-log-producer-java)
 [![License](https://img.shields.io/badge/license-Apache2.0-blue.svg)](/LICENSE)
 
-[README in English](/README_CN.md)
+[README in English](/README_EN.md)
 
 Aliyun LOG Java Producer 是一个易于使用且高度可配置的 Java 类库，专门为运行在大数据、高并发场景下的 Java 应用量身打造。
 
