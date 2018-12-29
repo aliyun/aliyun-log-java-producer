@@ -59,15 +59,19 @@ compile 'com.google.protobuf:protobuf-java:2.5.0'
 
 ## 快速入门
 
-参考教程 [Aliyun LOG Java Producer 快速入门]()。
+参考教程 [Aliyun LOG Java Producer 快速入门](https://yq.aliyun.com/articles/682761)。
 
 ## 原理剖析
 
-参考文章 [Aliyun LOG Java Producer 原理剖析]()。
+参考文章 [日志上云利器 - Aliyun LOG Java Producer](https://yq.aliyun.com/articles/682762)。
 
 ## 应用示例
 
 https://github.com/aliyun/aliyun-log-producer-sample
+
+## 关于升级
+
+Aliyun LOG Java Producer 是对老版 log-loghub-producer 的全面升级，解决了上一版存在的多个问题，包括网络异常情况下 CPU 占用率过高、关闭 producer 可能出现少量数据丢失等问题。另外，在容错方面也进行了加强，即使您存在误用，在资源、吞吐、隔离等方面都有较好的保证。基于上述原因，强烈建议使用老版 producer 的用户进行升级。
 
 ## 问题反馈
 如果您在使用过程中遇到了问题，可以创建 [GitHub Issue](https://github.com/aliyun/aliyun-log-producer/issues) 或者前往阿里云支持中心[提交工单](https://workorder.console.aliyun.com/#/ticket/createIndex)。
