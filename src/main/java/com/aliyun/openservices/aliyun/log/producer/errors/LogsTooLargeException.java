@@ -1,5 +1,6 @@
 package com.aliyun.openservices.aliyun.log.producer.errors;
 
+/** The logs is larger than the maximum allowable size. */
 public class LogsTooLargeException extends ProducerException {
 
   public LogsTooLargeException() {

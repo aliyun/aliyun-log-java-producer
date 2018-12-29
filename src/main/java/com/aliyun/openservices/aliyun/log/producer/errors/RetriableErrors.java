@@ -1,5 +1,6 @@
 package com.aliyun.openservices.aliyun.log.producer.errors;
 
+/** The errors below are transient exceptions that if retried may succeed. */
 public class RetriableErrors {
 
   public static final String REQUEST_ERROR = "RequestError";

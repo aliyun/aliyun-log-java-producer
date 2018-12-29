@@ -1,5 +1,6 @@
 package com.aliyun.openservices.aliyun.log.producer.errors;
 
+/** The base class of all other producer exceptions. */
 public class ProducerException extends Exception {
 
   public ProducerException(String message, Throwable cause) {

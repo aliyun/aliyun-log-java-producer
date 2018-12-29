@@ -1,5 +1,6 @@
 package com.aliyun.openservices.aliyun.log.producer.errors;
 
+/** Indicates that a request timed out. */
 public class TimeoutException extends ProducerException {
 
   public TimeoutException() {

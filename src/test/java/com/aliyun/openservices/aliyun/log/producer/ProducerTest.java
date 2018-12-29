@@ -320,6 +320,14 @@ public class ProducerTest {
     return logItem;
   }
 
+  public static List<LogItem> buildLogItems(int n) {
+    List<LogItem> logItems = new ArrayList<LogItem>();
+    for (int i = 0; i < n; ++i) {
+      logItems.add(buildLogItem());
+    }
+    return logItems;
+  }
+
   private ProjectConfigs buildProjectConfigs() {
     ProjectConfigs projectConfigs = new ProjectConfigs();
     projectConfigs.put(buildProjectConfig());
