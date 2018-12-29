@@ -23,7 +23,6 @@ public class ProducerConfigTest {
         Assert.assertEquals(ProducerConfig.DEFAULT_RETRIES + 1, producerConfig.getMaxReservedAttempts());
         Assert.assertEquals(ProducerConfig.DEFAULT_BASE_RETRY_BACKOFF_MS, producerConfig.getBaseRetryBackoffMs());
         Assert.assertEquals(ProducerConfig.DEFAULT_MAX_RETRY_BACKOFF_MS, producerConfig.getMaxRetryBackoffMs());
-        Assert.assertEquals(ProducerConfig.DEFAULT_USER_AGENT, producerConfig.getUserAgent());
         Assert.assertEquals(ProducerConfig.DEFAULT_LOG_FORMAT, producerConfig.getLogFormat());
     }
 
@@ -86,8 +85,8 @@ public class ProducerConfigTest {
     public void testInvalidMaxReservedAttempts() {
         ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("maxReservedAttempts must be greater than 0, got -1");
-        producerConfig.setMaxReservedAttempts(-1);
+        thrown.expectMessage("maxReservedAttempts must be greater than 0, got 0");
+        producerConfig.setMaxReservedAttempts(0);
     }
 
     @Test

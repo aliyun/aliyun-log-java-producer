@@ -5,25 +5,26 @@ import java.util.List;
 
 public class ExpiredBatches {
 
-    private final List<ProducerBatch> batches = new ArrayList<ProducerBatch>();
+  private final List<ProducerBatch> batches = new ArrayList<ProducerBatch>();
 
-    private long remainingMs;
+  private long remainingMs;
 
-    public List<ProducerBatch> getBatches() {
-        return batches;
+  public List<ProducerBatch> getBatches() {
+    return batches;
+  }
+
+  public void add(ProducerBatch producerBatch) {
+    if (!batches.add(producerBatch)) {
+      throw new IllegalStateException("failed to add producer batch to expired batches");
     }
+  }
 
-    public void add(ProducerBatch producerBatch) {
-        if (!batches.add(producerBatch))
-            throw new IllegalStateException("failed to add producer batch to expired batches");
-    }
+  public long getRemainingMs() {
+    return remainingMs;
+  }
 
-    public long getRemainingMs() {
-        return remainingMs;
-    }
-
-    public void setRemainingMs(long remainingMs) {
-        this.remainingMs = remainingMs;
-    }
+  public void setRemainingMs(long remainingMs) {
+    this.remainingMs = remainingMs;
+  }
 
 }

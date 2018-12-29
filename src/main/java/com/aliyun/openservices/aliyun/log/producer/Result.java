@@ -1,78 +1,68 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
+import com.google.common.collect.Iterables;
+
 import java.util.List;
 
+/**
+ * The result of a {@link LogProducer#send} operation. A list of {@link Attempt}s is provided with
+ * details about each attempt made.
+ *
+ * @see Attempt
+ */
 public class Result {
 
-    private final String project;
+  private final boolean successful;
 
-    private final String logStore;
+  private final List<Attempt> reservedAttempts;
 
-    private final boolean successful;
+  private final int attemptCount;
 
-    private final String errorCode;
+  public Result(boolean successful,
+      List<Attempt> reservedAttempts,
+      int attemptCount) {
+    this.successful = successful;
+    this.reservedAttempts = reservedAttempts;
+    this.attemptCount = attemptCount;
+  }
 
-    private final String errorMessage;
+  /**
+   * @return Whether the send operation was successful. If true, then the log(s) has been confirmed
+   * by the backend.
+   */
+  public boolean isSuccessful() {
+    return successful;
+  }
 
-    private final List<Attempt> reservedAttempts;
+  /**
+   * @return List of {@link Attempt}s, in the order they were made. If the attempts exceed {@link
+   * ProducerConfig#getMaxReservedAttempts()}, the oldest one will be removed.
+   */
+  public List<Attempt> getReservedAttempts() {
+    return reservedAttempts;
+  }
 
-    private final int attemptCount;
+  /**
+   * @return Attempt count for the log(s) being sent.
+   */
+  public int getAttemptCount() {
+    return attemptCount;
+  }
 
-    public Result(String project,
-                  String logStore,
-                  boolean successful,
-                  String errorCode,
-                  String errorMessage,
-                  List<Attempt> reservedAttempts,
-                  int attemptCount) {
-        this.project = project;
-        this.logStore = logStore;
-        this.successful = successful;
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-        this.reservedAttempts = reservedAttempts;
-        this.attemptCount = attemptCount;
-    }
+  /**
+   * @return Error code of the last attempt. Empty string if no error (i.e. successful).
+   */
+  public String getErrorCode() {
+    Attempt lastAttempt = Iterables.getLast(reservedAttempts);
+    return lastAttempt.getErrorCode();
+  }
 
-    public String getProject() {
-        return project;
-    }
-
-    public String getLogStore() {
-        return logStore;
-    }
-
-    public boolean isSuccessful() {
-        return successful;
-    }
-
-    public String getErrorCode() {
-        return errorCode;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public List<Attempt> getReservedAttempts() {
-        return reservedAttempts;
-    }
-
-    public int getAttemptCount() {
-        return attemptCount;
-    }
-
-    @Override
-    public String toString() {
-        return "Result{" +
-                "project='" + project + '\'' +
-                ", logStore='" + logStore + '\'' +
-                ", successful=" + successful +
-                ", errorCode='" + errorCode + '\'' +
-                ", errorMessage='" + errorMessage + '\'' +
-                ", reservedAttempts=" + reservedAttempts +
-                ", attemptCount=" + attemptCount +
-                '}';
-    }
+  /**
+   * @return Error message of the last attempt. Empty string if no error (i.e. successful).
+   */
+  public String getErrorMessage() {
+    Attempt lastAttempt = Iterables.getLast(reservedAttempts);
+    return lastAttempt.getErrorMessage();
+  }
 
 }

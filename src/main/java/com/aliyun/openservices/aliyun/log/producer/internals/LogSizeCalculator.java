@@ -7,20 +7,20 @@ import java.util.List;
 
 public abstract class LogSizeCalculator {
 
-    public static int calculate(LogItem logItem) {
-        int sizeInBytes = 4;
-        for (LogContent content : logItem.GetLogContents()) {
-            sizeInBytes += content.mKey.length() + content.mValue.length();
-        }
-        return sizeInBytes;
+  public static int calculate(LogItem logItem) {
+    int sizeInBytes = 4;
+    for (LogContent content : logItem.GetLogContents()) {
+      sizeInBytes += content.mKey.length() + content.mValue.length();
     }
+    return sizeInBytes;
+  }
 
-    public static int calculate(List<LogItem> logItems) {
-        int sizeInBytes = 0;
-        for (LogItem logItem : logItems) {
-            sizeInBytes += calculate(logItem);
-        }
-        return sizeInBytes;
+  public static int calculate(List<LogItem> logItems) {
+    int sizeInBytes = 0;
+    for (LogItem logItem : logItems) {
+      sizeInBytes += calculate(logItem);
     }
+    return sizeInBytes;
+  }
 
 }

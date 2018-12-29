@@ -7,34 +7,26 @@ import java.util.List;
 
 public class ResultFailedException extends ProducerException {
 
-    private final Result result;
+  private final Result result;
 
-    public ResultFailedException(Result result) {
-        this.result = result;
-    }
+  public ResultFailedException(Result result) {
+    this.result = result;
+  }
 
-    public Result getResult() {
-        return result;
-    }
+  public Result getResult() {
+    return result;
+  }
 
-    public String getProject() {
-        return result.getProject();
-    }
+  public String getErrorCode() {
+    return result.getErrorCode();
+  }
 
-    public String getLogStore() {
-        return result.getLogStore();
-    }
+  public String getErrorMessage() {
+    return result.getErrorMessage();
+  }
 
-    public String getErrorCode() {
-        return result.getErrorCode();
-    }
-
-    public String getErrorMessage() {
-        return result.getErrorMessage();
-    }
-
-    public List<Attempt> getAttempts() {
-        return result.getReservedAttempts();
-    }
+  public List<Attempt> getReservedAttempts() {
+    return result.getReservedAttempts();
+  }
 
 }
