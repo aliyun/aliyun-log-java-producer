@@ -1,13 +1,12 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BatchHandler extends LogThread {
 
@@ -21,7 +20,10 @@ public class BatchHandler extends LogThread {
 
   private volatile boolean closed;
 
-  public BatchHandler(String name, BlockingQueue<ProducerBatch> batches, AtomicInteger batchCount,
+  public BatchHandler(
+      String name,
+      BlockingQueue<ProducerBatch> batches,
+      AtomicInteger batchCount,
       Semaphore memoryController) {
     super(name, true);
     this.batches = batches;
@@ -74,5 +76,4 @@ public class BatchHandler extends LogThread {
     this.closed = true;
     interrupt();
   }
-
 }

@@ -19,8 +19,8 @@ public class Attempt {
 
   private final long timestampMs;
 
-  public Attempt(boolean success, String requestId, String errorCode, String errorMessage,
-      long timestampMs) {
+  public Attempt(
+      boolean success, String requestId, String errorCode, String errorMessage, long timestampMs) {
     this.success = success;
     this.requestId = requestId;
     this.errorCode = errorCode;
@@ -30,7 +30,7 @@ public class Attempt {
 
   /**
    * @return Whether the attempt was successful. If true, then the batch has been confirmed by the
-   * backend.
+   *     backend.
    */
   public boolean isSuccess() {
     return success;
@@ -38,7 +38,7 @@ public class Attempt {
 
   /**
    * @return Request id associated with this attempt. Empty string if the request did not reach the
-   * backend.
+   *     backend.
    */
   public String getRequestId() {
     return requestId;
@@ -58,22 +58,27 @@ public class Attempt {
     return errorMessage;
   }
 
-  /**
-   * @return The time when this attempt happened.
-   */
+  /** @return The time when this attempt happened. */
   public long getTimestampMs() {
     return timestampMs;
   }
 
   @Override
   public String toString() {
-    return "Attempt{" +
-        "success=" + success +
-        ", requestId='" + requestId + '\'' +
-        ", errorCode='" + errorCode + '\'' +
-        ", errorMessage='" + errorMessage + '\'' +
-        ", timestampMs=" + timestampMs +
-        '}';
+    return "Attempt{"
+        + "success="
+        + success
+        + ", requestId='"
+        + requestId
+        + '\''
+        + ", errorCode='"
+        + errorCode
+        + '\''
+        + ", errorMessage='"
+        + errorMessage
+        + '\''
+        + ", timestampMs="
+        + timestampMs
+        + '}';
   }
-
 }

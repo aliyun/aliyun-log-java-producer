@@ -12,8 +12,8 @@ public class ProducerConfig {
 
   public static final long DEFAULT_MAX_BLOCK_MS = 60 * 1000L;
 
-  public static final int DEFAULT_IO_THREAD_COUNT = Math
-      .max(Runtime.getRuntime().availableProcessors() * 2, 1);
+  public static final int DEFAULT_IO_THREAD_COUNT =
+      Math.max(Runtime.getRuntime().availableProcessors() * 2, 1);
 
   public static final int DEFAULT_MAX_BATCH_SIZE_IN_BYTES = 3 * 1024 * 1024;
 
@@ -34,7 +34,8 @@ public class ProducerConfig {
   public static final long DEFAULT_MAX_RETRY_BACKOFF_MS = 600 * 1000L;
 
   public enum LogFormat {
-    PROTOBUF, JSON
+    PROTOBUF,
+    JSON
   }
 
   public static final LogFormat DEFAULT_LOG_FORMAT = LogFormat.PROTOBUF;
@@ -63,22 +64,19 @@ public class ProducerConfig {
 
   private LogFormat logFormat = DEFAULT_LOG_FORMAT;
 
-
   public ProducerConfig(ProjectConfigs projectConfigs) {
     Utils.assertArgumentNotNull(projectConfigs, "projectConfigs");
     this.projectConfigs = projectConfigs;
   }
 
-  /**
-   * @return {@link ProjectConfigs} of this configuration.
-   */
+  /** @return {@link ProjectConfigs} of this configuration. */
   public ProjectConfigs getProjectConfigs() {
     return projectConfigs;
   }
 
   /**
    * @return The total bytes of memory the producer can use to buffer logs waiting to be sent to the
-   * server.
+   *     server.
    */
   public int getTotalSizeInBytes() {
     return totalSizeInBytes;
@@ -96,30 +94,22 @@ public class ProducerConfig {
     this.totalSizeInBytes = totalSizeInBytes;
   }
 
-  /**
-   * @return How long <code>LogProducer.send()</code> will block.
-   */
+  /** @return How long <code>LogProducer.send()</code> will block. */
   public long getMaxBlockMs() {
     return maxBlockMs;
   }
 
-  /**
-   * Set how long <code>LogProducer.send()</code> will block.
-   */
+  /** Set how long <code>LogProducer.send()</code> will block. */
   public void setMaxBlockMs(long maxBlockMs) {
     this.maxBlockMs = maxBlockMs;
   }
 
-  /**
-   * @return The thread count of the background I/O thread pool.
-   */
+  /** @return The thread count of the background I/O thread pool. */
   public int getIoThreadCount() {
     return ioThreadCount;
   }
 
-  /**
-   * Set the thread count of the background I/O thread pool.
-   */
+  /** Set the thread count of the background I/O thread pool. */
   public void setIoThreadCount(int ioThreadCount) {
     if (ioThreadCount <= 0) {
       throw new IllegalArgumentException(
@@ -128,66 +118,55 @@ public class ProducerConfig {
     this.ioThreadCount = ioThreadCount;
   }
 
-  /**
-   * @return The upper limit of batch size.
-   */
+  /** @return The upper limit of batch size. */
   public int getMaxBatchSizeInBytes() {
     return maxBatchSizeInBytes;
   }
 
-  /**
-   * Set the upper limit of batch size.
-   */
+  /** Set the upper limit of batch size. */
   public void setMaxBatchSizeInBytes(int maxBatchSizeInBytes) {
     if (maxBatchSizeInBytes < 1 || maxBatchSizeInBytes > MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT) {
-      throw new IllegalArgumentException(String
-          .format("maxBatchSizeInBytes must be between 1 and %d, got %d",
+      throw new IllegalArgumentException(
+          String.format(
+              "maxBatchSizeInBytes must be between 1 and %d, got %d",
               MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT, maxBatchSizeInBytes));
     }
     this.maxBatchSizeInBytes = maxBatchSizeInBytes;
   }
 
-  /**
-   * @return The upper limit of batch count.
-   */
+  /** @return The upper limit of batch count. */
   public int getMaxBatchCount() {
     return maxBatchCount;
   }
 
-  /**
-   * Set the upper limit of batch count.
-   */
+  /** Set the upper limit of batch count. */
   public void setMaxBatchCount(int maxBatchCount) {
     if (maxBatchCount < 1 || maxBatchCount > MAX_BATCH_COUNT_UPPER_LIMIT) {
-      throw new IllegalArgumentException(String
-          .format("maxBatchCount must be between 1 and %d, got %d", MAX_BATCH_COUNT_UPPER_LIMIT,
-              maxBatchCount));
+      throw new IllegalArgumentException(
+          String.format(
+              "maxBatchCount must be between 1 and %d, got %d",
+              MAX_BATCH_COUNT_UPPER_LIMIT, maxBatchCount));
     }
     this.maxBatchCount = maxBatchCount;
   }
 
-  /**
-   * @return The max linger time of a log.
-   */
+  /** @return The max linger time of a log. */
   public int getLingerMs() {
     return lingerMs;
   }
 
-  /**
-   * Set the max linger time of a log.
-   */
+  /** Set the max linger time of a log. */
   public void setLingerMs(int lingerMs) {
     if (lingerMs < LINGER_MS_LOWER_LIMIT) {
-      throw new IllegalArgumentException(String
-          .format("lingerMs must be greater than or equal to %d, got %d", LINGER_MS_LOWER_LIMIT,
-              lingerMs));
+      throw new IllegalArgumentException(
+          String.format(
+              "lingerMs must be greater than or equal to %d, got %d",
+              LINGER_MS_LOWER_LIMIT, lingerMs));
     }
     this.lingerMs = lingerMs;
   }
 
-  /**
-   * @return The retry times for transient error.
-   */
+  /** @return The retry times for transient error. */
   public int getRetries() {
     return retries;
   }
@@ -200,16 +179,12 @@ public class ProducerConfig {
     this.retries = retries;
   }
 
-  /**
-   * @return How many {@link Attempt}s will be reserved in a {@link Result}.
-   */
+  /** @return How many {@link Attempt}s will be reserved in a {@link Result}. */
   public int getMaxReservedAttempts() {
     return maxReservedAttempts;
   }
 
-  /**
-   * Set how many {@link Attempt}s will be reserved in a {@link Result}.
-   */
+  /** Set how many {@link Attempt}s will be reserved in a {@link Result}. */
   public void setMaxReservedAttempts(int maxReservedAttempts) {
     if (maxReservedAttempts <= 0) {
       throw new IllegalArgumentException(
@@ -220,7 +195,7 @@ public class ProducerConfig {
 
   /**
    * @return The amount of time to wait before attempting to retry a failed request for the first
-   * time.
+   *     time.
    */
   public long getBaseRetryBackoffMs() {
     return baseRetryBackoffMs;
@@ -237,16 +212,12 @@ public class ProducerConfig {
     this.baseRetryBackoffMs = baseRetryBackoffMs;
   }
 
-  /**
-   * @return The upper limit of time to wait before attempting to retry a failed request.
-   */
+  /** @return The upper limit of time to wait before attempting to retry a failed request. */
   public long getMaxRetryBackoffMs() {
     return maxRetryBackoffMs;
   }
 
-  /**
-   * Set the upper limit of time to wait before attempting to retry a failed request.
-   */
+  /** Set the upper limit of time to wait before attempting to retry a failed request. */
   public void setMaxRetryBackoffMs(long maxRetryBackoffMs) {
     if (maxRetryBackoffMs <= 0) {
       throw new IllegalArgumentException(
@@ -255,18 +226,13 @@ public class ProducerConfig {
     this.maxRetryBackoffMs = maxRetryBackoffMs;
   }
 
-  /**
-   * @return The content type of the request.
-   */
+  /** @return The content type of the request. */
   public LogFormat getLogFormat() {
     return logFormat;
   }
 
-  /**
-   * Set the content type of the request.
-   */
+  /** Set the content type of the request. */
   public void setLogFormat(LogFormat logFormat) {
     this.logFormat = logFormat;
   }
-
 }

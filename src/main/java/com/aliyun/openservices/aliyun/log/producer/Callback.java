@@ -15,5 +15,4 @@ public interface Callback {
    * @param result The result of a {@link LogProducer#send} operation.
    */
   void onCompletion(Result result);
-
 }

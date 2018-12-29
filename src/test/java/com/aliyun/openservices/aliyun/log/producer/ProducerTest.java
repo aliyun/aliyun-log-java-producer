@@ -4,13 +4,12 @@ import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ProducerTest {
 
@@ -18,10 +17,8 @@ public class ProducerTest {
   public void testSend() throws InterruptedException, ProducerException, ExecutionException {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     final Producer producer = new LogProducer(producerConfig);
-    ListenableFuture<Result> f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        buildLogItem());
+    ListenableFuture<Result> f =
+        producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
     Result result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -29,12 +26,9 @@ public class ProducerTest {
     Assert.assertEquals(1, result.getReservedAttempts().size());
     Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
-    f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        null,
-        null,
-        buildLogItem());
+    f =
+        producer.send(
+            System.getenv("PROJECT"), System.getenv("LOG_STORE"), null, null, buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -42,12 +36,7 @@ public class ProducerTest {
     Assert.assertEquals(1, result.getReservedAttempts().size());
     Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
-    f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        "",
-        "",
-        buildLogItem());
+    f = producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), "", "", buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -55,12 +44,13 @@ public class ProducerTest {
     Assert.assertEquals(1, result.getReservedAttempts().size());
     Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
-    f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        "topic",
-        "source",
-        buildLogItem());
+    f =
+        producer.send(
+            System.getenv("PROJECT"),
+            System.getenv("LOG_STORE"),
+            "topic",
+            "source",
+            buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -78,18 +68,19 @@ public class ProducerTest {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     final Producer producer = new LogProducer(producerConfig);
     final AtomicInteger successCount = new AtomicInteger(0);
-    ListenableFuture<Result> f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        buildLogItem(),
-        new Callback() {
-          @Override
-          public void onCompletion(Result result) {
-            if (result.isSuccessful()) {
-              successCount.incrementAndGet();
-            }
-          }
-        });
+    ListenableFuture<Result> f =
+        producer.send(
+            System.getenv("PROJECT"),
+            System.getenv("LOG_STORE"),
+            buildLogItem(),
+            new Callback() {
+              @Override
+              public void onCompletion(Result result) {
+                if (result.isSuccessful()) {
+                  successCount.incrementAndGet();
+                }
+              }
+            });
     Result result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -97,37 +88,39 @@ public class ProducerTest {
     Assert.assertEquals(1, result.getReservedAttempts().size());
     Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
-    f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        null,
-        null,
-        buildLogItem(),
-        new Callback() {
-          @Override
-          public void onCompletion(Result result) {
-            if (result.isSuccessful()) {
-              successCount.incrementAndGet();
-            }
-          }
-        });
+    f =
+        producer.send(
+            System.getenv("PROJECT"),
+            System.getenv("LOG_STORE"),
+            null,
+            null,
+            buildLogItem(),
+            new Callback() {
+              @Override
+              public void onCompletion(Result result) {
+                if (result.isSuccessful()) {
+                  successCount.incrementAndGet();
+                }
+              }
+            });
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        "",
-        "",
-        buildLogItem(),
-        new Callback() {
-          @Override
-          public void onCompletion(Result result) {
-            if (result.isSuccessful()) {
-              successCount.incrementAndGet();
-            }
-          }
-        });
+    f =
+        producer.send(
+            System.getenv("PROJECT"),
+            System.getenv("LOG_STORE"),
+            "",
+            "",
+            buildLogItem(),
+            new Callback() {
+              @Override
+              public void onCompletion(Result result) {
+                if (result.isSuccessful()) {
+                  successCount.incrementAndGet();
+                }
+              }
+            });
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -135,20 +128,21 @@ public class ProducerTest {
     Assert.assertEquals(1, result.getReservedAttempts().size());
     Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
 
-    f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        "topic",
-        "source",
-        buildLogItem(),
-        new Callback() {
-          @Override
-          public void onCompletion(Result result) {
-            if (result.isSuccessful()) {
-              successCount.incrementAndGet();
-            }
-          }
-        });
+    f =
+        producer.send(
+            System.getenv("PROJECT"),
+            System.getenv("LOG_STORE"),
+            "topic",
+            "source",
+            buildLogItem(),
+            new Callback() {
+              @Override
+              public void onCompletion(Result result) {
+                if (result.isSuccessful()) {
+                  successCount.incrementAndGet();
+                }
+              }
+            });
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -169,10 +163,8 @@ public class ProducerTest {
     ProducerConfig producerConfig = new ProducerConfig(projectConfigs);
     producerConfig.setRetries(4);
     final Producer producer = new LogProducer(producerConfig);
-    ListenableFuture<Result> f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        buildLogItem());
+    ListenableFuture<Result> f =
+        producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
     Thread.sleep(1000 * 3);
     projectConfigs.put(buildProjectConfig());
     try {
@@ -218,10 +210,8 @@ public class ProducerTest {
     projectConfigs.put(buildInvalidAccessKeySecretProjectConfig());
     ProducerConfig producerConfig = new ProducerConfig(projectConfigs);
     final Producer producer = new LogProducer(producerConfig);
-    ListenableFuture<Result> f = producer.send(
-        System.getenv("PROJECT"),
-        System.getenv("LOG_STORE"),
-        buildLogItem());
+    ListenableFuture<Result> f =
+        producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
     try {
       f.get();
     } catch (ExecutionException e) {
@@ -250,18 +240,19 @@ public class ProducerTest {
     int n = 100000;
     List<ListenableFuture> futures = new ArrayList<ListenableFuture>();
     for (int i = 0; i < n; ++i) {
-      ListenableFuture<Result> f = producer.send(
-          System.getenv("PROJECT"),
-          System.getenv("LOG_STORE"),
-          buildLogItem(),
-          new Callback() {
-            @Override
-            public void onCompletion(Result result) {
-              if (result.isSuccessful()) {
-                successCount.incrementAndGet();
-              }
-            }
-          });
+      ListenableFuture<Result> f =
+          producer.send(
+              System.getenv("PROJECT"),
+              System.getenv("LOG_STORE"),
+              buildLogItem(),
+              new Callback() {
+                @Override
+                public void onCompletion(Result result) {
+                  if (result.isSuccessful()) {
+                    successCount.incrementAndGet();
+                  }
+                }
+              });
       futures.add(f);
     }
     producer.close();
@@ -276,7 +267,8 @@ public class ProducerTest {
   }
 
   @Test
-  public void testCloseInCallback() throws InterruptedException, ProducerException, ExecutionException {
+  public void testCloseInCallback()
+      throws InterruptedException, ProducerException, ExecutionException {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     final Producer producer = new LogProducer(producerConfig);
     final AtomicInteger successCount = new AtomicInteger(0);
@@ -284,23 +276,24 @@ public class ProducerTest {
     int n = 10000;
     List<ListenableFuture> futures = new ArrayList<ListenableFuture>();
     for (int i = 0; i < n; ++i) {
-      ListenableFuture<Result> f = producer.send(
-          System.getenv("PROJECT"),
-          System.getenv("LOG_STORE"),
-          buildLogItem(),
-          new Callback() {
-            @Override
-            public void onCompletion(Result result) {
-              if (result.isSuccessful()) {
-                successCount.incrementAndGet();
-              }
-              try {
-                producer.close();
-              } catch (Exception e) {
-                e.printStackTrace();
-              }
-            }
-          });
+      ListenableFuture<Result> f =
+          producer.send(
+              System.getenv("PROJECT"),
+              System.getenv("LOG_STORE"),
+              buildLogItem(),
+              new Callback() {
+                @Override
+                public void onCompletion(Result result) {
+                  if (result.isSuccessful()) {
+                    successCount.incrementAndGet();
+                  }
+                  try {
+                    producer.close();
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                  }
+                }
+              });
       futures.add(f);
     }
     producer.close();
@@ -316,8 +309,8 @@ public class ProducerTest {
 
   public static void assertProducerFinalState(Producer producer) {
     Assert.assertEquals(0, producer.getBatchCount());
-    Assert.assertEquals(producer.getProducerConfig().getTotalSizeInBytes(),
-        producer.availableMemoryInBytes());
+    Assert.assertEquals(
+        producer.getProducerConfig().getTotalSizeInBytes(), producer.availableMemoryInBytes());
   }
 
   public static LogItem buildLogItem() {
@@ -356,5 +349,4 @@ public class ProducerTest {
     String accessKeySecret = System.getenv("ACCESS_KEY_SECRET") + "XXX";
     return new ProjectConfig(project, endpoint, accessKeyId, accessKeySecret);
   }
-
 }

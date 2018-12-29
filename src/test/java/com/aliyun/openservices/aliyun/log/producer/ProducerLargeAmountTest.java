@@ -1,14 +1,13 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ProducerLargeAmountTest {
 
@@ -24,32 +23,33 @@ public class ProducerLargeAmountTest {
     ExecutorService executorService = Executors.newFixedThreadPool(nTasks);
     final CountDownLatch latch = new CountDownLatch(nTasks);
     for (int i = 0; i < nTasks; ++i) {
-      executorService.submit(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            for (int i = 0; i < times; ++i) {
-              producer.send(
-                  System.getenv("PROJECT"),
-                  System.getenv("LOG_STORE"),
-                  getTopic(),
-                  getSource(),
-                  ProducerTest.buildLogItem(),
-                  new Callback() {
-                    @Override
-                    public void onCompletion(Result result) {
-                      if (result.isSuccessful()) {
-                        successCount.incrementAndGet();
-                      }
-                    }
-                  });
+      executorService.submit(
+          new Runnable() {
+            @Override
+            public void run() {
+              try {
+                for (int i = 0; i < times; ++i) {
+                  producer.send(
+                      System.getenv("PROJECT"),
+                      System.getenv("LOG_STORE"),
+                      getTopic(),
+                      getSource(),
+                      ProducerTest.buildLogItem(),
+                      new Callback() {
+                        @Override
+                        public void onCompletion(Result result) {
+                          if (result.isSuccessful()) {
+                            successCount.incrementAndGet();
+                          }
+                        }
+                      });
+                }
+              } catch (Exception e) {
+                e.printStackTrace();
+              }
+              latch.countDown();
             }
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-          latch.countDown();
-        }
-      });
+          });
     }
     latch.await();
     executorService.shutdown();
@@ -80,5 +80,4 @@ public class ProducerLargeAmountTest {
   private String getSource() {
     return "source-" + random.nextInt(10);
   }
-
 }

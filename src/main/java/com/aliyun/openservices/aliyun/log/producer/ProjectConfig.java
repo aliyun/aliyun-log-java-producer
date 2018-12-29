@@ -20,14 +20,13 @@ public class ProjectConfig {
 
   private final String userAgent;
 
-  public ProjectConfig(String project,
-      String endpoint,
-      String accessKeyId,
-      String accessKeySecret) {
+  public ProjectConfig(
+      String project, String endpoint, String accessKeyId, String accessKeySecret) {
     this(project, endpoint, accessKeyId, accessKeySecret, null, DEFAULT_USER_AGENT);
   }
 
-  public ProjectConfig(String project,
+  public ProjectConfig(
+      String project,
       String endpoint,
       String accessKeyId,
       String accessKeySecret,
@@ -35,7 +34,8 @@ public class ProjectConfig {
     this(project, endpoint, accessKeyId, accessKeySecret, stsToken, DEFAULT_USER_AGENT);
   }
 
-  public ProjectConfig(String project,
+  public ProjectConfig(
+      String project,
       String endpoint,
       String accessKeyId,
       String accessKeySecret,
@@ -84,6 +84,4 @@ public class ProjectConfig {
   public String getUserAgent() {
     return userAgent;
   }
-
 }
-

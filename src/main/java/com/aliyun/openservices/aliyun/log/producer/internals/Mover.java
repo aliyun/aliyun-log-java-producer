@@ -1,12 +1,11 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
 import com.aliyun.openservices.aliyun.log.producer.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Mover extends LogThread {
 
@@ -28,7 +27,8 @@ public class Mover extends LogThread {
 
   private volatile boolean closed;
 
-  public Mover(String name,
+  public Mover(
+      String name,
       ProducerConfig producerConfig,
       LogAccumulator accumulator,
       RetryQueue retryQueue,
@@ -68,21 +68,23 @@ public class Mover extends LogThread {
   }
 
   private void moveBatches() {
-    LOGGER
-        .debug("Prepare to move expired batches from accumulator and retry queue to ioThreadPool");
+    LOGGER.debug(
+        "Prepare to move expired batches from accumulator and retry queue to ioThreadPool");
     doMoveBatches();
     LOGGER.debug("Move expired batches successfully");
   }
 
   private void doMoveBatches() {
     ExpiredBatches expiredBatches = accumulator.expiredBatches();
-    LOGGER.debug("Expired batches from accumulator, size={}, remainingMs={}",
-        expiredBatches.getBatches().size(), expiredBatches.getRemainingMs());
+    LOGGER.debug(
+        "Expired batches from accumulator, size={}, remainingMs={}",
+        expiredBatches.getBatches().size(),
+        expiredBatches.getRemainingMs());
     for (ProducerBatch b : expiredBatches.getBatches()) {
       ioThreadPool.submit(createSendProducerBatchTask(b));
     }
-    List<ProducerBatch> expiredRetryBatches = retryQueue
-        .expiredBatches(expiredBatches.getRemainingMs());
+    List<ProducerBatch> expiredRetryBatches =
+        retryQueue.expiredBatches(expiredBatches.getRemainingMs());
     LOGGER.debug("Expired batches from retry queue, size={}", expiredRetryBatches.size());
     for (ProducerBatch b : expiredRetryBatches) {
       ioThreadPool.submit(createSendProducerBatchTask(b));
@@ -103,17 +105,11 @@ public class Mover extends LogThread {
 
   private SendProducerBatchTask createSendProducerBatchTask(ProducerBatch batch) {
     return new SendProducerBatchTask(
-        batch,
-        producerConfig,
-        retryQueue,
-        successQueue,
-        failureQueue,
-        batchCount);
+        batch, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
   }
 
   public void close() {
     this.closed = true;
     interrupt();
   }
-
 }

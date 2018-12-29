@@ -13,5 +13,4 @@ public class Errors {
   public static final String REQUEST_TIME_TOO_SKEWED = "RequestTimeTooSkewed";
 
   public static final String PRODUCER_EXCEPTION = "ProducerException";
-
 }

@@ -8,13 +8,12 @@ import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class LogAccumulator {
 
@@ -44,7 +43,8 @@ public final class LogAccumulator {
 
   private volatile boolean closed;
 
-  public LogAccumulator(String producerHash,
+  public LogAccumulator(
+      String producerHash,
       ProducerConfig producerConfig,
       Semaphore memoryController,
       RetryQueue retryQueue,
@@ -65,8 +65,14 @@ public final class LogAccumulator {
     this.closed = false;
   }
 
-  public ListenableFuture<Result> append(String project, String logStore, String topic,
-      String source, String shardHash, List<LogItem> logItems, Callback callback)
+  public ListenableFuture<Result> append(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      String shardHash,
+      List<LogItem> logItems,
+      Callback callback)
       throws InterruptedException, ProducerException {
     appendsInProgress.incrementAndGet();
     try {
@@ -76,8 +82,14 @@ public final class LogAccumulator {
     }
   }
 
-  private ListenableFuture<Result> doAppend(String project, String logStore, String topic,
-      String source, String shardHash, List<LogItem> logItems, Callback callback)
+  private ListenableFuture<Result> doAppend(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      String shardHash,
+      List<LogItem> logItems,
+      Callback callback)
       throws InterruptedException, ProducerException {
     if (closed) {
       throw new IllegalStateException("cannot append after the log accumulator was closed");
@@ -85,16 +97,20 @@ public final class LogAccumulator {
     int sizeInBytes = LogSizeCalculator.calculate(logItems);
     ensureValidLogSize(sizeInBytes);
     long maxBlockMs = producerConfig.getMaxBlockMs();
-    LOGGER.trace("Prepare to acquire bytes, sizeInBytes={}, maxBlockMs={}, project={}, logStore={}",
-        sizeInBytes, maxBlockMs, project, logStore);
+    LOGGER.trace(
+        "Prepare to acquire bytes, sizeInBytes={}, maxBlockMs={}, project={}, logStore={}",
+        sizeInBytes,
+        maxBlockMs,
+        project,
+        logStore);
     if (maxBlockMs >= 0) {
-      boolean acquired = memoryController
-          .tryAcquire(sizeInBytes, maxBlockMs, TimeUnit.MILLISECONDS);
+      boolean acquired =
+          memoryController.tryAcquire(sizeInBytes, maxBlockMs, TimeUnit.MILLISECONDS);
       if (!acquired) {
         throw new TimeoutException(
             "failed to acquire memory within the configured max blocking time "
-                + producerConfig
-                .getMaxBlockMs() + " ms");
+                + producerConfig.getMaxBlockMs()
+                + " ms");
       }
     } else {
       memoryController.acquire(sizeInBytes);
@@ -111,39 +127,34 @@ public final class LogAccumulator {
     }
   }
 
-  private ListenableFuture<Result> appendToHolder(GroupKey groupKey, List<LogItem> logItems,
-      Callback callback, int sizeInBytes, ProducerBatchHolder holder) {
+  private ListenableFuture<Result> appendToHolder(
+      GroupKey groupKey,
+      List<LogItem> logItems,
+      Callback callback,
+      int sizeInBytes,
+      ProducerBatchHolder holder) {
     if (holder.producerBatch != null) {
       ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
       if (f != null) {
         return f;
       } else {
         holder.transferProducerBatch(
-            ioThreadPool,
-            producerConfig,
-            retryQueue,
-            successQueue,
-            failureQueue,
-            batchCount);
+            ioThreadPool, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
       }
     }
-    holder.producerBatch = new ProducerBatch(
-        groupKey,
-        Utils.generatePackageId(producerHash, BATCH_ID),
-        producerConfig.getMaxBatchSizeInBytes(),
-        producerConfig.getMaxBatchCount(),
-        producerConfig.getMaxReservedAttempts(),
-        System.currentTimeMillis());
+    holder.producerBatch =
+        new ProducerBatch(
+            groupKey,
+            Utils.generatePackageId(producerHash, BATCH_ID),
+            producerConfig.getMaxBatchSizeInBytes(),
+            producerConfig.getMaxBatchCount(),
+            producerConfig.getMaxReservedAttempts(),
+            System.currentTimeMillis());
     ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
     batchCount.incrementAndGet();
     if (holder.producerBatch.isFull()) {
       holder.transferProducerBatch(
-          ioThreadPool,
-          producerConfig,
-          retryQueue,
-          successQueue,
-          failureQueue,
-          batchCount);
+          ioThreadPool, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
     }
     return f;
   }
@@ -202,12 +213,16 @@ public final class LogAccumulator {
 
   private void ensureValidLogSize(int sizeInBytes) throws LogsTooLargeException {
     if (sizeInBytes > producerConfig.getMaxBatchSizeInBytes()) {
-      throw new LogsTooLargeException("the logs is " + sizeInBytes +
-          " bytes which is larger than the maxBatchSizeInBytes you specified");
+      throw new LogsTooLargeException(
+          "the logs is "
+              + sizeInBytes
+              + " bytes which is larger than the maxBatchSizeInBytes you specified");
     }
     if (sizeInBytes > producerConfig.getTotalSizeInBytes()) {
-      throw new LogsTooLargeException("the logs is " + sizeInBytes +
-          " bytes which is larger than the totalSizeInBytes you specified");
+      throw new LogsTooLargeException(
+          "the logs is "
+              + sizeInBytes
+              + " bytes which is larger than the totalSizeInBytes you specified");
     }
   }
 
@@ -237,11 +252,12 @@ public final class LogAccumulator {
     return appendsInProgress.get() > 0;
   }
 
-  final private static class ProducerBatchHolder {
+  private static final class ProducerBatchHolder {
 
     ProducerBatch producerBatch;
 
-    void transferProducerBatch(IOThreadPool ioThreadPool,
+    void transferProducerBatch(
+        IOThreadPool ioThreadPool,
         ProducerConfig producerConfig,
         RetryQueue retryQueue,
         BlockingQueue<ProducerBatch> successQueue,
@@ -252,12 +268,7 @@ public final class LogAccumulator {
       }
       ioThreadPool.submit(
           new SendProducerBatchTask(
-              producerBatch,
-              producerConfig,
-              retryQueue,
-              successQueue,
-              failureQueue,
-              batchCount));
+              producerBatch, producerConfig, retryQueue, successQueue, failureQueue, batchCount));
       producerBatch = null;
     }
 
@@ -268,7 +279,5 @@ public final class LogAccumulator {
       expiredBatches.add(producerBatch);
       producerBatch = null;
     }
-
   }
-
 }

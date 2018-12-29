@@ -3,7 +3,6 @@ package com.aliyun.openservices.aliyun.log.producer.internals;
 import com.aliyun.openservices.log.util.NetworkUtils;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
-
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,5 +34,4 @@ public abstract class Utils {
   public static String generatePackageId(String producerHash, AtomicLong batchId) {
     return producerHash + "-" + Long.toHexString(batchId.getAndIncrement());
   }
-
 }

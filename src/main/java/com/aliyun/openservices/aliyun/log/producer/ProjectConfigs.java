@@ -1,13 +1,10 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.log.Client;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * A collections of {@link ProjectConfig}s. All public methods are thread-safe.
- */
+/** A collections of {@link ProjectConfig}s. All public methods are thread-safe. */
 public class ProjectConfigs {
 
   private final Map<String, Client> clientPool = new ConcurrentHashMap<String, Client>();
@@ -30,10 +27,11 @@ public class ProjectConfigs {
   }
 
   private Client buildClient(ProjectConfig projectConfig) {
-    Client client = new Client(
-        projectConfig.getEndpoint(),
-        projectConfig.getAccessKeyId(),
-        projectConfig.getAccessKeySecret());
+    Client client =
+        new Client(
+            projectConfig.getEndpoint(),
+            projectConfig.getAccessKeyId(),
+            projectConfig.getAccessKeySecret());
     String userAgent = projectConfig.getUserAgent();
     if (userAgent != null) {
       client.setUserAgent(userAgent);
@@ -44,5 +42,4 @@ public class ProjectConfigs {
     }
     return client;
   }
-
 }

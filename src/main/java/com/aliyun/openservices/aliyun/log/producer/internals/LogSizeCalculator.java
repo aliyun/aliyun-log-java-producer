@@ -2,7 +2,6 @@ package com.aliyun.openservices.aliyun.log.producer.internals;
 
 import com.aliyun.openservices.log.common.LogContent;
 import com.aliyun.openservices.log.common.LogItem;
-
 import java.util.List;
 
 public abstract class LogSizeCalculator {
@@ -22,5 +21,4 @@ public abstract class LogSizeCalculator {
     }
     return sizeInBytes;
   }
-
 }

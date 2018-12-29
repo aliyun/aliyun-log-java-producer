@@ -1,13 +1,12 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RetryQueue {
 
@@ -93,5 +92,4 @@ public class RetryQueue {
   private boolean putsInProgress() {
     return putsInProgress.get() > 0;
   }
-
 }

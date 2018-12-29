@@ -1,9 +1,8 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.util.concurrent.atomic.AtomicLong;
 
 public class UtilsTest {
 
@@ -25,5 +24,4 @@ public class UtilsTest {
       Assert.assertEquals(Long.toHexString(i), pieces[1]);
     }
   }
-
 }

@@ -4,21 +4,18 @@ import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A client that send logs to the Aliyun Log Service.
  *
- * <P>
- * The producer is <i>thread safe</i> and sharing a single producer instance across threads will
+ * <p>The producer is <i>thread safe</i> and sharing a single producer instance across threads will
  * generally be faster than having multiple instances.
- * </P>
  */
 public class LogProducer implements Producer {
 
@@ -61,17 +58,13 @@ public class LogProducer implements Producer {
   /**
    * Start up a LogProducer instance.
    *
-   * <p>
-   * Since this creates a series of threads and data structures, it is fairly expensive. Avoid
+   * <p>Since this creates a series of threads and data structures, it is fairly expensive. Avoid
    * creating more than one per application.
-   * </p>
    *
-   * <p>
-   * All methods in LogProducer are thread-safe.
-   * </p>
+   * <p>All methods in LogProducer are thread-safe.
    *
    * @param producerConfig Configuration for the LogProducer. See the docs for that class for
-   * details.
+   *     details.
    * @see ProducerConfig
    */
   public LogProducer(ProducerConfig producerConfig) {
@@ -84,34 +77,38 @@ public class LogProducer implements Producer {
     BlockingQueue<ProducerBatch> successQueue = new LinkedBlockingQueue<ProducerBatch>();
     BlockingQueue<ProducerBatch> failureQueue = new LinkedBlockingQueue<ProducerBatch>();
     this.ioThreadPool = new IOThreadPool(producerConfig.getIoThreadCount(), this.name);
-    this.accumulator = new LogAccumulator(
-        this.producerHash,
-        producerConfig,
-        this.memoryController,
-        this.retryQueue,
-        successQueue,
-        failureQueue,
-        this.ioThreadPool,
-        this.batchCount);
-    this.mover = new Mover(
-        this.name + MOVER_SUFFIX,
-        producerConfig,
-        this.accumulator,
-        this.retryQueue,
-        successQueue,
-        failureQueue,
-        this.ioThreadPool,
-        this.batchCount);
-    this.successBatchHandler = new BatchHandler(
-        this.name + SUCCESS_BATCH_HANDLER_SUFFIX,
-        successQueue,
-        this.batchCount,
-        this.memoryController);
-    this.failureBatchHandler = new BatchHandler(
-        this.name + FAILURE_BATCH_HANDLER_SUFFIX,
-        failureQueue,
-        this.batchCount,
-        this.memoryController);
+    this.accumulator =
+        new LogAccumulator(
+            this.producerHash,
+            producerConfig,
+            this.memoryController,
+            this.retryQueue,
+            successQueue,
+            failureQueue,
+            this.ioThreadPool,
+            this.batchCount);
+    this.mover =
+        new Mover(
+            this.name + MOVER_SUFFIX,
+            producerConfig,
+            this.accumulator,
+            this.retryQueue,
+            successQueue,
+            failureQueue,
+            this.ioThreadPool,
+            this.batchCount);
+    this.successBatchHandler =
+        new BatchHandler(
+            this.name + SUCCESS_BATCH_HANDLER_SUFFIX,
+            successQueue,
+            this.batchCount,
+            this.memoryController);
+    this.failureBatchHandler =
+        new BatchHandler(
+            this.name + FAILURE_BATCH_HANDLER_SUFFIX,
+            failureQueue,
+            this.batchCount,
+            this.memoryController);
     this.mover.start();
     this.successBatchHandler.start();
     this.failureBatchHandler.start();
@@ -145,8 +142,9 @@ public class LogProducer implements Producer {
    * Callback)} for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      LogItem logItem) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project, String logStore, String topic, String source, LogItem logItem)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, topic, source, "", logItem, null);
   }
 
@@ -156,8 +154,9 @@ public class LogProducer implements Producer {
    * Callback)} for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      List<LogItem> logItems) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project, String logStore, String topic, String source, List<LogItem> logItems)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, topic, source, "", logItems, null);
   }
 
@@ -167,8 +166,14 @@ public class LogProducer implements Producer {
    * LogItem, Callback)} for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      String shardHash, LogItem logItem) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      String shardHash,
+      LogItem logItem)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, topic, source, shardHash, logItem, null);
   }
 
@@ -178,8 +183,14 @@ public class LogProducer implements Producer {
    * List, Callback)} for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      String shardHash, List<LogItem> logItems) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      String shardHash,
+      List<LogItem> logItems)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, topic, source, shardHash, logItems, null);
   }
 
@@ -189,8 +200,9 @@ public class LogProducer implements Producer {
    * for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, LogItem logItem,
-      Callback callback) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project, String logStore, LogItem logItem, Callback callback)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, "", "", "", logItem, callback);
   }
 
@@ -200,11 +212,11 @@ public class LogProducer implements Producer {
    * Callback)} for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, List<LogItem> logItems,
-      Callback callback) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project, String logStore, List<LogItem> logItems, Callback callback)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, "", "", "", logItems, callback);
   }
-
 
   /**
    * Send a log asynchronously. Equivalent to <code>send(project, logStore, topic, source, "",
@@ -212,8 +224,14 @@ public class LogProducer implements Producer {
    * Callback)} for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      LogItem logItem, Callback callback) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      LogItem logItem,
+      Callback callback)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, topic, source, "", logItem, callback);
   }
 
@@ -223,8 +241,14 @@ public class LogProducer implements Producer {
    * Callback)} for details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      List<LogItem> logItems, Callback callback) throws InterruptedException, ProducerException {
+  public ListenableFuture<Result> send(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      List<LogItem> logItems,
+      Callback callback)
+      throws InterruptedException, ProducerException {
     return send(project, logStore, topic, source, "", logItems, callback);
   }
 
@@ -235,8 +259,14 @@ public class LogProducer implements Producer {
    * details.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      String shardHash, LogItem logItem, Callback callback)
+  public ListenableFuture<Result> send(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      String shardHash,
+      LogItem logItem,
+      Callback callback)
       throws InterruptedException, ProducerException {
     Utils.assertArgumentNotNull(logItem, "logItem");
     List<LogItem> logItems = new ArrayList<LogItem>();
@@ -247,55 +277,54 @@ public class LogProducer implements Producer {
   /**
    * Asynchronously send a list of logs and invoke the provided callback when the send has been
    * acknowledged.
-   * <p>
-   * The send is asynchronous and this method will return immediately once the logs has been stored
-   * in the buffer of logs waiting to be sent. This allows sending many logs in parallel without
-   * blocking to wait for the response after each one.
-   * </p>
    *
-   * <p>
-   * A {@link ListenableFuture} is returned that can be used to retrieve the result, either by
+   * <p>The send is asynchronous and this method will return immediately once the logs has been
+   * stored in the buffer of logs waiting to be sent. This allows sending many logs in parallel
+   * without blocking to wait for the response after each one.
+   *
+   * <p>A {@link ListenableFuture} is returned that can be used to retrieve the result, either by
    * polling or by registering a callback.
-   * </p>
    *
-   * <p>
-   * The return value can be disregarded if you do not wish to process the result. Under the covers,
-   * the producer will automatically re-attempt sends in case of transient errors (including
+   * <p>The return value can be disregarded if you do not wish to process the result. Under the
+   * covers, the producer will automatically re-attempt sends in case of transient errors (including
    * throttling). A failed result is generally returned only if an irrecoverable error is detected
    * (e.g. trying to send to a project or logstore that doesn't exist).
-   * </p>
    *
-   * <p>
-   * Note that callbacks will generally execute in the background batch handler thread of the
+   * <p>Note that callbacks will generally execute in the background batch handler thread of the
    * producer and so should be reasonably fast or they will delay the sending of logs from other
    * threads. If you want to execute blocking or computationally expensive callbacks it is
    * recommended to use your own {@link java.util.concurrent.Executor} in the callback body to
    * parallelize processing.
-   * </p>
    *
    * @param project The target project.
    * @param logStore The target logstore.
    * @param topic The topic of the logs.
    * @param source The source of the logs.
    * @param shardHash The shardHash of the logs, used to write this logs to a specific shard in the
-   * logStore.
+   *     logStore.
    * @param logItems The logs to send.
    * @param callback A user-supplied callback to execute when the logs has been acknowledged by the
-   * server (null indicates no callback).
+   *     server (null indicates no callback).
    * @throws IllegalArgumentException If input does not meet stated constraints.
    * @throws IllegalStateException If you want to send logs after the producer was closed.
    * @throws InterruptedException If the thread is interrupted while blocked.
    * @throws com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException If the time taken
-   * for allocating memory for the logs has surpassed.
+   *     for allocating memory for the logs has surpassed.
    * @throws com.aliyun.openservices.aliyun.log.producer.errors.LogsTooLargeException If the total
-   * size of the logs exceeds {@link ProducerConfig#getTotalSizeInBytes()} or {@link
-   * ProducerConfig#getMaxBatchSizeInBytes()}.
+   *     size of the logs exceeds {@link ProducerConfig#getTotalSizeInBytes()} or {@link
+   *     ProducerConfig#getMaxBatchSizeInBytes()}.
    * @throws ProducerException If a producer related exception occurs that does not belong to the
-   * above exceptions.
+   *     above exceptions.
    */
   @Override
-  public ListenableFuture<Result> send(String project, String logStore, String topic, String source,
-      String shardHash, List<LogItem> logItems, Callback callback)
+  public ListenableFuture<Result> send(
+      String project,
+      String logStore,
+      String topic,
+      String source,
+      String shardHash,
+      List<LogItem> logItems,
+      Callback callback)
       throws InterruptedException, ProducerException {
     Utils.assertArgumentNotNullOrEmpty(project, "project");
     Utils.assertArgumentNotNullOrEmpty(logStore, "logStore");
@@ -311,14 +340,12 @@ public class LogProducer implements Producer {
 
   /**
    * Close this producer. This method blocks until all previously submitted logs have been handled
-   * and all background threads are stopped. This method is equivalent to
-   * <code>close(Long.MAX_VALUE)</code>.
+   * and all background threads are stopped. This method is equivalent to <code>
+   * close(Long.MAX_VALUE)</code>.
    *
-   * <p>
-   * <strong>If close() is called from {@link Callback}, a warning message will be logged and
-   * it will skip join batch handler thread. We do this because the sender thread would otherwise
-   * try to join itself and block forever.</strong>
-   * </p>
+   * <p><strong>If close() is called from {@link Callback}, a warning message will be logged and it
+   * will skip join batch handler thread. We do this because the sender thread would otherwise try
+   * to join itself and block forever.</strong>
    *
    * @throws InterruptedException If the thread is interrupted while blocked.
    * @throws ProducerException If the background threads is still alive.
@@ -332,19 +359,17 @@ public class LogProducer implements Producer {
    * This method waits up to <code>timeoutMs</code> for the producer to handle all submitted logs
    * and close all background threads.
    *
-   * <p>
-   * <strong>If this method is called from {@link Callback}, a warning message will be logged and
+   * <p><strong>If this method is called from {@link Callback}, a warning message will be logged and
    * it will skip join batch handler thread. We do this because the sender thread would otherwise
    * try to join itself and block forever.</strong>
-   * </p>
    *
    * @param timeoutMs The maximum time to wait for producer to handle all submitted logs and close
-   * all background threads. The value should be non-negative. Specifying a timeout of zero means do
-   * not wait for pending send requests to complete.
+   *     all background threads. The value should be non-negative. Specifying a timeout of zero
+   *     means do not wait for pending send requests to complete.
    * @throws IllegalArgumentException If the <code>timeoutMs</code> is negative.
    * @throws InterruptedException If the thread is interrupted while blocked.
    * @throws ProducerException If the producer is unable to handle all submitted logs or close all
-   * background threads.
+   *     background threads.
    */
   @Override
   public void close(long timeoutMs) throws InterruptedException, ProducerException {
@@ -440,8 +465,9 @@ public class LogProducer implements Producer {
       throws InterruptedException, ProducerException {
     long startMs = System.currentTimeMillis();
     failureBatchHandler.close();
-    boolean invokedFromCallback = Thread.currentThread() == this.successBatchHandler
-        || Thread.currentThread() == this.failureBatchHandler;
+    boolean invokedFromCallback =
+        Thread.currentThread() == this.successBatchHandler
+            || Thread.currentThread() == this.failureBatchHandler;
     if (invokedFromCallback) {
       LOGGER.warn(
           "Skip join failure batch handler since you have incorrectly invoked close from the producer call-back");
@@ -456,28 +482,21 @@ public class LogProducer implements Producer {
     return Math.max(0, timeoutMs - nowMs + startMs);
   }
 
-  /**
-   * @return Producer config of the producer instance.
-   */
+  /** @return Producer config of the producer instance. */
   @Override
   public ProducerConfig getProducerConfig() {
     return producerConfig;
   }
 
-  /**
-   * @return Uncompleted batch count in the producer.
-   */
+  /** @return Uncompleted batch count in the producer. */
   @Override
   public int getBatchCount() {
     return batchCount.get();
   }
 
-  /**
-   * @return Available memory size in the producer.
-   */
+  /** @return Available memory size in the producer. */
   @Override
   public int availableMemoryInBytes() {
     return memoryController.availablePermits();
   }
-
 }

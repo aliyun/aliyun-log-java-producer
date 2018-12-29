@@ -1,16 +1,14 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.List;
-
 public class RetryQueueTest {
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testPutAfterClose() {
@@ -95,13 +93,6 @@ public class RetryQueueTest {
 
   private ProducerBatch newProducerBatch(String packageId) {
     GroupKey groupKey = new GroupKey("project", "logStore", "", "", "");
-    return new ProducerBatch(
-        groupKey,
-        packageId,
-        100,
-        100,
-        3,
-        System.currentTimeMillis());
+    return new ProducerBatch(groupKey, packageId, 100, 100, 3, System.currentTimeMillis());
   }
-
 }

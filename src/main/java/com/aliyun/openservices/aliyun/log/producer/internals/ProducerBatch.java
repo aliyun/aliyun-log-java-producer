@@ -7,14 +7,13 @@ import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProducerBatch implements Delayed {
 
@@ -44,7 +43,8 @@ public class ProducerBatch implements Delayed {
 
   private int attemptCount;
 
-  public ProducerBatch(GroupKey groupKey,
+  public ProducerBatch(
+      GroupKey groupKey,
       String packageId,
       int maxBatchSizeInBytes,
       int maxBatchCount,
@@ -74,8 +74,8 @@ public class ProducerBatch implements Delayed {
     }
   }
 
-  public ListenableFuture<Result> tryAppend(List<LogItem> items, int sizeInBytes,
-      Callback callback) {
+  public ListenableFuture<Result> tryAppend(
+      List<LogItem> items, int sizeInBytes, Callback callback) {
     if (!hasRoomFor(sizeInBytes, items.size())) {
       return null;
     } else {
@@ -87,7 +87,6 @@ public class ProducerBatch implements Delayed {
       return future;
     }
   }
-
 
   public void appendAttempt(Attempt attempt) {
     reservedAttempts.add(attempt);
@@ -105,10 +104,7 @@ public class ProducerBatch implements Delayed {
   public void fireCallbacksAndSetFutures() {
     List<Attempt> attempts = new ArrayList<Attempt>(reservedAttempts);
     Attempt attempt = Iterables.getLast(attempts);
-    Result result = new Result(
-        attempt.isSuccess(),
-        attempts,
-        attemptCount);
+    Result result = new Result(attempt.isSuccess(), attempts, attemptCount);
     fireCallbacks(result);
     setFutures(result);
   }
@@ -208,23 +204,36 @@ public class ProducerBatch implements Delayed {
 
   @Override
   public String toString() {
-    return "ProducerBatch{" +
-        "groupKey=" + groupKey +
-        ", packageId='" + packageId + '\'' +
-        ", maxBatchSizeInBytes=" + maxBatchSizeInBytes +
-        ", maxBatchCount=" + maxBatchCount +
-        ", logItems=" + logItems +
-        ", thunks=" + thunks +
-        ", createdMs=" + createdMs +
-        ", nextRetryMs=" + nextRetryMs +
-        ", curBatchSizeInBytes=" + curBatchSizeInBytes +
-        ", curBatchCount=" + curBatchCount +
-        ", reservedAttempts=" + reservedAttempts +
-        ", attemptCount=" + attemptCount +
-        '}';
+    return "ProducerBatch{"
+        + "groupKey="
+        + groupKey
+        + ", packageId='"
+        + packageId
+        + '\''
+        + ", maxBatchSizeInBytes="
+        + maxBatchSizeInBytes
+        + ", maxBatchCount="
+        + maxBatchCount
+        + ", logItems="
+        + logItems
+        + ", thunks="
+        + thunks
+        + ", createdMs="
+        + createdMs
+        + ", nextRetryMs="
+        + nextRetryMs
+        + ", curBatchSizeInBytes="
+        + curBatchSizeInBytes
+        + ", curBatchCount="
+        + curBatchCount
+        + ", reservedAttempts="
+        + reservedAttempts
+        + ", attemptCount="
+        + attemptCount
+        + '}';
   }
 
-  final private static class Thunk {
+  private static final class Thunk {
 
     final Callback callback;
 
@@ -235,5 +244,4 @@ public class ProducerBatch implements Delayed {
       this.future = future;
     }
   }
-
 }

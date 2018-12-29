@@ -17,5 +17,4 @@ public class TimeoutException extends ProducerException {
   public TimeoutException(Throwable cause) {
     super(cause);
   }
-
 }

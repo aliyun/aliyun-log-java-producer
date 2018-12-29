@@ -1,8 +1,8 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
 import com.aliyun.openservices.aliyun.log.producer.Attempt;
-import com.aliyun.openservices.aliyun.log.producer.errors.Errors;
 import com.aliyun.openservices.aliyun.log.producer.ProducerConfig;
+import com.aliyun.openservices.aliyun.log.producer.errors.Errors;
 import com.aliyun.openservices.aliyun.log.producer.errors.RetriableErrors;
 import com.aliyun.openservices.log.Client;
 import com.aliyun.openservices.log.common.Consts;
@@ -11,13 +11,12 @@ import com.aliyun.openservices.log.exception.LogException;
 import com.aliyun.openservices.log.request.PutLogsRequest;
 import com.aliyun.openservices.log.response.PutLogsResponse;
 import com.google.common.math.LongMath;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SendProducerBatchTask implements Runnable {
 
@@ -37,7 +36,8 @@ public class SendProducerBatchTask implements Runnable {
 
   private final AtomicInteger batchCount;
 
-  public SendProducerBatchTask(ProducerBatch batch,
+  public SendProducerBatchTask(
+      ProducerBatch batch,
       ProducerConfig producerConfig,
       RetryQueue retryQueue,
       BlockingQueue<ProducerBatch> successQueue,
@@ -66,12 +66,13 @@ public class SendProducerBatchTask implements Runnable {
     Client client = getClient(project);
     if (client == null) {
       LOGGER.error("Failed to get client, project={}", project);
-      Attempt attempt = new Attempt(
-          false,
-          "",
-          Errors.PROJECT_CONFIG_NOT_EXIST,
-          "Cannot get the projectConfig for project " + project,
-          nowMs);
+      Attempt attempt =
+          new Attempt(
+              false,
+              "",
+              Errors.PROJECT_CONFIG_NOT_EXIST,
+              "Cannot get the projectConfig for project " + project,
+              nowMs);
       batch.appendAttempt(attempt);
       failureQueue.put(batch);
     } else {
@@ -89,8 +90,8 @@ public class SendProducerBatchTask implements Runnable {
         } else {
           LOGGER.debug("Prepare to put batch to the retry queue");
           long retryBackoffMs = calculateRetryBackoffMs();
-          LOGGER
-              .debug("Calculate the retryBackoffMs successfully, retryBackoffMs=" + retryBackoffMs);
+          LOGGER.debug(
+              "Calculate the retryBackoffMs successfully, retryBackoffMs=" + retryBackoffMs);
           batch.setNextRetryMs(System.currentTimeMillis() + retryBackoffMs);
           try {
             retryQueue.put(batch);
@@ -105,12 +106,7 @@ public class SendProducerBatchTask implements Runnable {
         }
         return;
       }
-      Attempt attempt = new Attempt(
-          true,
-          response.GetRequestId(),
-          "",
-          "",
-          nowMs);
+      Attempt attempt = new Attempt(true, response.GetRequestId(), "", "", nowMs);
       batch.appendAttempt(attempt);
       successQueue.put(batch);
       LOGGER.trace("Send producer batch successfully, batch={}", batch);
@@ -124,20 +120,22 @@ public class SendProducerBatchTask implements Runnable {
   private PutLogsRequest buildPutLogsRequest(ProducerBatch batch) {
     PutLogsRequest request;
     if (batch.getShardHash() != null && !batch.getShardHash().isEmpty()) {
-      request = new PutLogsRequest(
-          batch.getProject(),
-          batch.getLogStore(),
-          batch.getTopic(),
-          batch.getSource(),
-          batch.getLogItems(),
-          batch.getShardHash());
+      request =
+          new PutLogsRequest(
+              batch.getProject(),
+              batch.getLogStore(),
+              batch.getTopic(),
+              batch.getSource(),
+              batch.getLogItems(),
+              batch.getShardHash());
     } else {
-      request = new PutLogsRequest(
-          batch.getProject(),
-          batch.getLogStore(),
-          batch.getTopic(),
-          batch.getSource(),
-          batch.getLogItems());
+      request =
+          new PutLogsRequest(
+              batch.getProject(),
+              batch.getLogStore(),
+              batch.getTopic(),
+              batch.getSource(),
+              batch.getLogItems());
     }
     List<TagContent> tags = new ArrayList<TagContent>();
     tags.add(new TagContent(TAG_PACK_ID, batch.getPackageId()));
@@ -160,12 +158,7 @@ public class SendProducerBatchTask implements Runnable {
           logException.GetErrorMessage(),
           nowMs);
     } else {
-      return new Attempt(
-          false,
-          "",
-          Errors.PRODUCER_EXCEPTION,
-          e.getMessage(),
-          nowMs);
+      return new Attempt(false, "", Errors.PRODUCER_EXCEPTION, e.getMessage(), nowMs);
     }
   }
 
@@ -202,5 +195,4 @@ public class SendProducerBatchTask implements Runnable {
     }
     return Math.min(retryBackoffMs, producerConfig.getMaxRetryBackoffMs());
   }
-
 }

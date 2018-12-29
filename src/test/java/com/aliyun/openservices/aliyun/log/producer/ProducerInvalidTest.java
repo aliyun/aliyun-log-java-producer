@@ -8,19 +8,17 @@ import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.math.LongMath;
 import com.google.common.util.concurrent.ListenableFuture;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
-
 public class ProducerInvalidTest {
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testSendWithNullProject() throws InterruptedException, ProducerException {
@@ -56,8 +54,8 @@ public class ProducerInvalidTest {
       Result result = resultFailedException.getResult();
       Assert.assertFalse(result.isSuccessful());
       Assert.assertEquals(Errors.PROJECT_CONFIG_NOT_EXIST, result.getErrorCode());
-      Assert.assertEquals("Cannot get the projectConfig for project projectNotExist",
-          result.getErrorMessage());
+      Assert.assertEquals(
+          "Cannot get the projectConfig for project projectNotExist", result.getErrorMessage());
     }
     producer.close();
     ProducerTest.assertProducerFinalState(producer);
@@ -152,8 +150,7 @@ public class ProducerInvalidTest {
   }
 
   @Test
-  public void testSendLogThrownTimeoutException()
-      throws InterruptedException, ProducerException {
+  public void testSendLogThrownTimeoutException() throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     producerConfig.setTotalSizeInBytes(20);
     producerConfig.setMaxBlockMs(3);
@@ -178,8 +175,8 @@ public class ProducerInvalidTest {
       Result result = resultFailedException.getResult();
       Assert.assertFalse(result.isSuccessful());
       Assert.assertEquals("RequestError", result.getErrorCode());
-      Assert
-          .assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
+      Assert.assertTrue(
+          result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
       List<Attempt> attempts = result.getReservedAttempts();
       Assert.assertEquals(retries + 1, attempts.size());
       long t1;
@@ -227,8 +224,8 @@ public class ProducerInvalidTest {
       Result result = resultFailedException.getResult();
       Assert.assertFalse(result.isSuccessful());
       Assert.assertEquals("RequestError", result.getErrorCode());
-      Assert
-          .assertTrue(result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
+      Assert.assertTrue(
+          result.getErrorMessage().startsWith("Web request failed: project.endpoint"));
       List<Attempt> attempts = result.getReservedAttempts();
       Assert.assertEquals(maxReservedAttempts, attempts.size());
       Assert.assertEquals(retries + 1, result.getAttemptCount());
@@ -253,10 +250,8 @@ public class ProducerInvalidTest {
     int futureGetCount = 0;
     List<ListenableFuture> futures = new ArrayList<ListenableFuture>();
     for (int i = 0; i < n; ++i) {
-      ListenableFuture<Result> f = producer.send(
-          "project",
-          "logStore",
-          ProducerTest.buildLogItem());
+      ListenableFuture<Result> f =
+          producer.send("project", "logStore", ProducerTest.buildLogItem());
       futures.add(f);
     }
     for (int i = 0; i < 1000; ++i) {
@@ -296,10 +291,8 @@ public class ProducerInvalidTest {
     int futureGetCount = 0;
     List<ListenableFuture> futures = new ArrayList<ListenableFuture>();
     for (int i = 0; i < n; ++i) {
-      ListenableFuture<Result> f = producer.send(
-          "project",
-          "logStore",
-          ProducerTest.buildLogItem());
+      ListenableFuture<Result> f =
+          producer.send("project", "logStore", ProducerTest.buildLogItem());
       futures.add(f);
     }
     closeInMultiThreads(producer, 100);
@@ -331,14 +324,16 @@ public class ProducerInvalidTest {
     ExecutorService executorService = Executors.newFixedThreadPool(nTasks);
     List<Future> closeFutures = new ArrayList<Future>();
     for (int i = 0; i < nTasks; ++i) {
-      Future f = executorService.submit(new Callable<Object>() {
-        @Override
-        public Object call() throws Exception {
-          producer.close();
-          ProducerTest.assertProducerFinalState(producer);
-          return null;
-        }
-      });
+      Future f =
+          executorService.submit(
+              new Callable<Object>() {
+                @Override
+                public Object call() throws Exception {
+                  producer.close();
+                  ProducerTest.assertProducerFinalState(producer);
+                  return null;
+                }
+              });
       closeFutures.add(f);
     }
     for (Future<?> f : closeFutures) {
@@ -353,14 +348,7 @@ public class ProducerInvalidTest {
 
   private ProjectConfigs buildProjectConfigs() {
     ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(
-        new ProjectConfig(
-            "project",
-            "endpoint",
-            "accessKeyId",
-            "accessKeySecret")
-    );
+    projectConfigs.put(new ProjectConfig("project", "endpoint", "accessKeyId", "accessKeySecret"));
     return projectConfigs;
   }
-
 }

@@ -26,5 +26,4 @@ public class ExpiredBatches {
   public void setRemainingMs(long remainingMs) {
     this.remainingMs = remainingMs;
   }
-
 }

@@ -17,5 +17,4 @@ public class LogsTooLargeException extends ProducerException {
   public LogsTooLargeException(Throwable cause) {
     super(cause);
   }
-
 }

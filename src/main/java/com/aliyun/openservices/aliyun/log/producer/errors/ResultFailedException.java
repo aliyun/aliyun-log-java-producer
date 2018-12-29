@@ -2,7 +2,6 @@ package com.aliyun.openservices.aliyun.log.producer.errors;
 
 import com.aliyun.openservices.aliyun.log.producer.Attempt;
 import com.aliyun.openservices.aliyun.log.producer.Result;
-
 import java.util.List;
 
 public class ResultFailedException extends ProducerException {
@@ -28,5 +27,4 @@ public class ResultFailedException extends ProducerException {
   public List<Attempt> getReservedAttempts() {
     return result.getReservedAttempts();
   }
-
 }
