@@ -58,10 +58,13 @@ public class Result {
 
   @Override
   public String toString() {
-    return "Result{" +
-        "successful=" + successful +
-        ", reservedAttempts=" + reservedAttempts +
-        ", attemptCount=" + attemptCount +
-        '}';
+    return "Result{"
+        + "successful="
+        + successful
+        + ", reservedAttempts="
+        + reservedAttempts
+        + ", attemptCount="
+        + attemptCount
+        + '}';
   }
 }
