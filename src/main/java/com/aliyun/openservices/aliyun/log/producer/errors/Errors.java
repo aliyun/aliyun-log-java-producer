@@ -1,5 +1,8 @@
 package com.aliyun.openservices.aliyun.log.producer.errors;
 
+/**
+ * Retries for the errors below are useless.
+ */
 public class Errors {
 
   public static final String PROJECT_CONFIG_NOT_EXIST = "ProjectConfigNotExist";
