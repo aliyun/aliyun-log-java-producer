@@ -1,7 +1,7 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.aliyun.log.producer.errors.Errors;
-import com.aliyun.openservices.aliyun.log.producer.errors.LogsTooLargeException;
+import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
@@ -123,7 +123,7 @@ public class ProducerInvalidTest {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     producerConfig.setTotalSizeInBytes(10);
     Producer producer = new LogProducer(producerConfig);
-    thrown.expect(LogsTooLargeException.class);
+    thrown.expect(LogSizeTooLargeException.class);
     thrown.expectMessage(
         "the logs is 12 bytes which is larger than the totalSizeInBytes you specified");
     producer.send("project", "logStore", ProducerTest.buildLogItem());
@@ -137,7 +137,7 @@ public class ProducerInvalidTest {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     producerConfig.setTotalSizeInBytes(30);
     Producer producer = new LogProducer(producerConfig);
-    thrown.expect(LogsTooLargeException.class);
+    thrown.expect(LogSizeTooLargeException.class);
     thrown.expectMessage(
         "the logs is 36 bytes which is larger than the totalSizeInBytes you specified");
     List<LogItem> logItems = new ArrayList<LogItem>();

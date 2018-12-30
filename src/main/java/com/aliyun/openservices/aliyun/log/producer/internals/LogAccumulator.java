@@ -3,7 +3,7 @@ package com.aliyun.openservices.aliyun.log.producer.internals;
 import com.aliyun.openservices.aliyun.log.producer.Callback;
 import com.aliyun.openservices.aliyun.log.producer.ProducerConfig;
 import com.aliyun.openservices.aliyun.log.producer.Result;
-import com.aliyun.openservices.aliyun.log.producer.errors.LogsTooLargeException;
+import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
 import com.aliyun.openservices.log.common.LogItem;
@@ -211,15 +211,15 @@ public final class LogAccumulator {
     return n;
   }
 
-  private void ensureValidLogSize(int sizeInBytes) throws LogsTooLargeException {
+  private void ensureValidLogSize(int sizeInBytes) throws LogSizeTooLargeException {
     if (sizeInBytes > producerConfig.getMaxBatchSizeInBytes()) {
-      throw new LogsTooLargeException(
+      throw new LogSizeTooLargeException(
           "the logs is "
               + sizeInBytes
               + " bytes which is larger than the maxBatchSizeInBytes you specified");
     }
     if (sizeInBytes > producerConfig.getTotalSizeInBytes()) {
-      throw new LogsTooLargeException(
+      throw new LogSizeTooLargeException(
           "the logs is "
               + sizeInBytes
               + " bytes which is larger than the totalSizeInBytes you specified");

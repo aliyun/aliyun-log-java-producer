@@ -1,5 +1,7 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
+import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
+import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.common.LogItem;
@@ -310,9 +312,10 @@ public class LogProducer implements Producer {
    * @throws InterruptedException If the thread is interrupted while blocked.
    * @throws com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException If the time taken
    *     for allocating memory for the logs has surpassed.
-   * @throws com.aliyun.openservices.aliyun.log.producer.errors.LogsTooLargeException If the total
-   *     size of the logs exceeds {@link ProducerConfig#getTotalSizeInBytes()} or {@link
-   *     ProducerConfig#getMaxBatchSizeInBytes()}.
+   * @throws MaxBatchCountExceedException If the log list size exceeds {@link
+   *     ProducerConfig#getMaxBatchCount()}.
+   * @throws LogSizeTooLargeException If the total size of the logs exceeds {@link
+   *     ProducerConfig#getTotalSizeInBytes()} or {@link ProducerConfig#getMaxBatchSizeInBytes()}.
    * @throws ProducerException If a producer related exception occurs that does not belong to the
    *     above exceptions.
    */
@@ -334,6 +337,11 @@ public class LogProducer implements Producer {
     Utils.assertArgumentNotNull(logItems, "logItems");
     if (logItems.isEmpty()) {
       throw new IllegalArgumentException("logItems cannot be empty");
+    }
+    int count = logItems.size();
+    if (count > producerConfig.getMaxBatchCount()) {
+      throw new MaxBatchCountExceedException(
+          "the log list size is " + count + " which exceeds the maxBatchCount you specified");
     }
     return accumulator.append(project, logStore, topic, source, shardHash, logItems, callback);
   }
