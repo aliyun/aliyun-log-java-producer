@@ -94,7 +94,7 @@ public class ProducerBatch implements Delayed {
   }
 
   public boolean isFull() {
-    return curBatchSizeInBytes >= maxBatchSizeInBytes && curBatchCount >= maxBatchCount;
+    return curBatchSizeInBytes >= maxBatchSizeInBytes || curBatchCount >= maxBatchCount;
   }
 
   public long remainingMs(long nowMs, long lingerMs) {
