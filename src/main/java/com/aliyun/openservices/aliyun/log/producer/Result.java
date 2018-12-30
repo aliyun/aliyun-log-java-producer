@@ -55,4 +55,13 @@ public class Result {
     Attempt lastAttempt = Iterables.getLast(reservedAttempts);
     return lastAttempt.getErrorMessage();
   }
+
+  @Override
+  public String toString() {
+    return "Result{" +
+        "successful=" + successful +
+        ", reservedAttempts=" + reservedAttempts +
+        ", attemptCount=" + attemptCount +
+        '}';
+  }
 }
