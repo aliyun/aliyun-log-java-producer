@@ -2,6 +2,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.aliyun.log.producer.errors.Errors;
 import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
+import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
@@ -118,7 +119,22 @@ public class ProducerInvalidTest {
   }
 
   @Test
-  public void testSendLogThrownLogsTooLargeException()
+  public void testSendLogsThrownMaxBatchCountExceedException()
+      throws InterruptedException, ProducerException {
+    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    producerConfig.setMaxBatchCount(2);
+    Producer producer = new LogProducer(producerConfig);
+    thrown.expect(MaxBatchCountExceedException.class);
+    thrown.expectMessage("the log list size is 3 which exceeds the maxBatchCount you specified");
+    List<LogItem> logItems = new ArrayList<LogItem>();
+    logItems.add(ProducerTest.buildLogItem());
+    logItems.add(ProducerTest.buildLogItem());
+    logItems.add(ProducerTest.buildLogItem());
+    producer.send("project", "logStore", logItems);
+  }
+
+  @Test
+  public void testSendLogThrownLogSizeTooLargeException()
       throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     producerConfig.setTotalSizeInBytes(10);
@@ -132,7 +148,7 @@ public class ProducerInvalidTest {
   }
 
   @Test
-  public void testSendLogsThrownLogsTooLargeException()
+  public void testSendLogsThrownLogSizeTooLargeException()
       throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
     producerConfig.setTotalSizeInBytes(30);
