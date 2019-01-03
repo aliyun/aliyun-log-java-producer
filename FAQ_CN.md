@@ -2,7 +2,7 @@
 
 **Q:** Aliyun LOG Java Producer 依赖 [Aliyun LOG Java SDK](https://github.com/aliyun/aliyun-log-java-sdk)，而 Aliyun LOG Java SDK 依赖了 2.5.0 版本的 protobuf 库，如果该版本的 protobuf 与用户应用程序中自身带的 protobuf 库冲突怎么办？
 
-**A:** 可以使用 Aliyun LOG Java SDK 提供的一个特殊版本`jar-with-dependencies`，它包含第三方依赖库并重写了这些库的命令空间。配置方式如下：
+**A:** 可以使用 Aliyun LOG Java SDK 提供的一个特殊版本`jar-with-dependencies`，它包含第三方依赖库并重写了这些库的命名空间。配置方式如下：
 ```
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
