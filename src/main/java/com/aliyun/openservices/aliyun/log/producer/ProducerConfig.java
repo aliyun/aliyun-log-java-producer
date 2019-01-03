@@ -13,7 +13,7 @@ public class ProducerConfig {
   public static final long DEFAULT_MAX_BLOCK_MS = 60 * 1000L;
 
   public static final int DEFAULT_IO_THREAD_COUNT =
-      Math.max(Runtime.getRuntime().availableProcessors() * 2, 1);
+      Math.max(Runtime.getRuntime().availableProcessors(), 1);
 
   public static final int DEFAULT_MAX_BATCH_SIZE_IN_BYTES = 3 * 1024 * 1024;
 
