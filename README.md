@@ -63,7 +63,7 @@ compile 'com.google.protobuf:protobuf-java:2.5.0'
 
 ## 原理剖析
 
-参考文章 [日志上云利器 - Aliyun LOG Java Producer](https://yq.aliyun.com/articles/682762)。
+参考文章[日志上云利器 - Aliyun LOG Java Producer](https://yq.aliyun.com/articles/682762)。
 
 ## 应用示例
 
