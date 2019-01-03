@@ -48,6 +48,7 @@ content_key_8:  8abcdefghijklmnopqrstuvwxyz!@#$%^&*()_0123456789-<suffix>
 * 发送日志总条数：200,000,000
 
 测试代码：[SamplePerformance.java](https://github.com/aliyun/aliyun-log-producer-sample/blob/master/src/main/java/com/aliyun/openservices/aliyun/log/producer/sample/SamplePerformance.java)
+
 运行步骤：[SamplePerformance 运行步骤
 ](https://github.com/aliyun/aliyun-log-producer-sample/blob/master/PERF_README_CN.md)
 
