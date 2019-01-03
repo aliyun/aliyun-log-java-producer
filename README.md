@@ -69,9 +69,13 @@ compile 'com.google.protobuf:protobuf-java:2.5.0'
 
 https://github.com/aliyun/aliyun-log-producer-sample
 
+## 异常诊断
+
+参考文档[异常诊断](/DIAGNOSIS_CN.md)。
+
 ## 常见问题
 
-参考文档 [常见问题](/FAQ_CN.md)。
+参考文档[常见问题](/FAQ_CN.md)。
 
 ## 关于性能
 
