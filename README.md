@@ -63,11 +63,19 @@ compile 'com.google.protobuf:protobuf-java:2.5.0'
 
 ## 原理剖析
 
-参考文章 [日志上云利器 - Aliyun LOG Java Producer](https://yq.aliyun.com/articles/682762)。
+参考文章[日志上云利器 - Aliyun LOG Java Producer](https://yq.aliyun.com/articles/682762)。
 
 ## 应用示例
 
 https://github.com/aliyun/aliyun-log-producer-sample
+
+## 异常诊断
+
+参考文档[异常诊断](/DIAGNOSIS_CN.md)。
+
+## 常见问题
+
+参考文档[常见问题](/FAQ_CN.md)。
 
 ## 关于性能
 
