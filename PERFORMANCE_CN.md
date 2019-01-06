@@ -64,6 +64,8 @@ content_key_8:  8abcdefghijklmnopqrstuvwxyz!@#$%^&*()_0123456789-<suffix>
 | 16 | 450.440 MB/s | 48.040 MB/s | 900% | 未达 10 个 shard 写入能力里上限。 |
 | 32 | 508.207 MB/s | 54.201 MB/s | 1350% | 达到 10 个 shard 写入能力里上限，服务端偶尔返回 Write quota exceed。 |
 
+**说明：** CPU 时间主要花费在对象的序列化和压缩上，在吞吐量较高的情况下 CPU 使用率比较高。但在日常环境中，单机数据流量均值为 100KB/S，因此造成的 CPU 消耗几乎可以忽略不计。
+
 ### 调整 totalSizeInBytes
 将 ProducerConfig.ioThreadCount 设置为8，通过调整 ProducerConfig.totalSizeInBytes 观察程序性能。
 
