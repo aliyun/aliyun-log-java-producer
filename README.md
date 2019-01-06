@@ -79,7 +79,8 @@ https://github.com/aliyun/aliyun-log-producer-sample
 
 ## 关于性能
 
-Aliyun LOG Java Producer 的性能报告参见[性能测试](/PERFORMANCE_CN.md)。
+* [性能测试报告](/PERFORMANCE_CN.md)
+* [性能诊断利器 JProfiler 快速入门和最佳实践](https://yq.aliyun.com/articles/684776)
 
 ## 关于升级
 
