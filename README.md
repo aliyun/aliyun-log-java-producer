@@ -36,7 +36,7 @@ Aliyun LOG Java Producer 是一个易于使用且高度可配置的 Java 类库�
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.0.9</version>
+    <version>0.0.10</version>
 </dependency>
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
