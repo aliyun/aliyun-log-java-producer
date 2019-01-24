@@ -366,7 +366,7 @@ public class LogProducer implements Producer {
       throw new MaxBatchCountExceedException(
           "the log list size is " + count + " which exceeds the maxBatchCount you specified");
     }
-    if (shardHash!=null && !shardHash.isEmpty()) {
+    if (shardHash != null && !shardHash.isEmpty()) {
       shardHash = shardDecider.getHashKey(project, logStore, shardHash);
     }
     return accumulator.append(project, logStore, topic, source, shardHash, logItems, callback);

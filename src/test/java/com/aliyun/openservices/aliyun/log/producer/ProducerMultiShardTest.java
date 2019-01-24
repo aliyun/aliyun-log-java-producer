@@ -23,103 +23,113 @@ public class ProducerMultiShardTest {
     Result result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        null,
-        "shard0_1",
-        "00000000000000000000000000000000",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            null,
+            "shard0_1",
+            "00000000000000000000000000000000",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        null,
-        "shard0_2",
-        "39999999999999999999999999999999",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            null,
+            "shard0_2",
+            "39999999999999999999999999999999",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        null,
-        "shard1_0",
-        "40000000000000000000000000000000",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            null,
+            "shard1_0",
+            "40000000000000000000000000000000",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        "topic",
-        "shard1_1",
-        "79999999999999999999999999999999",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            "topic",
+            "shard1_1",
+            "79999999999999999999999999999999",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        "topic",
-        "shard2_0",
-        "80000000000000000000000000000000",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            "topic",
+            "shard2_0",
+            "80000000000000000000000000000000",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        "topic",
-        "shard2_1",
-        "b9999999999999999999999999999999",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            "topic",
+            "shard2_1",
+            "b9999999999999999999999999999999",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        "topic",
-        "shard3_0",
-        "c0000000000000000000000000000000",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            "topic",
+            "shard3_0",
+            "c0000000000000000000000000000000",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        "topic",
-        "shard3_1",
-        "ffffffffffffffffffffffffffffffff",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            "topic",
+            "shard3_1",
+            "ffffffffffffffffffffffffffffffff",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        "topic",
-        "shard3_2",
-        "fffffffffffffffffffffffffffffffg",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            "topic",
+            "shard3_2",
+            "fffffffffffffffffffffffffffffffg",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
-    f = producer.send(
-        System.getenv("OTHER_PROJECT"),
-        System.getenv("OTHER_LOG_STORE"),
-        "topic",
-        "shard3_3",
-        "zzz",
-        ProducerTest.buildLogItem());
+    f =
+        producer.send(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("OTHER_LOG_STORE"),
+            "topic",
+            "shard3_3",
+            "zzz",
+            ProducerTest.buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
 
@@ -143,5 +153,4 @@ public class ProducerMultiShardTest {
             System.getenv("ACCESS_KEY_SECRET")));
     return projectConfigs;
   }
-
 }
