@@ -27,6 +27,9 @@ public class ProducerConfigTest {
         ProducerConfig.DEFAULT_BASE_RETRY_BACKOFF_MS, producerConfig.getBaseRetryBackoffMs());
     Assert.assertEquals(
         ProducerConfig.DEFAULT_MAX_RETRY_BACKOFF_MS, producerConfig.getMaxRetryBackoffMs());
+    Assert.assertEquals(
+        ProducerConfig.DEFAULT_SHARD_HASH_UPDATE_INTERVAL_MS,
+        producerConfig.getShardHashUpdateIntervalMS());
     Assert.assertEquals(ProducerConfig.DEFAULT_LOG_FORMAT, producerConfig.getLogFormat());
   }
 
@@ -113,5 +116,13 @@ public class ProducerConfigTest {
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("maxRetryBackoffMs must be greater than 0, got -1");
     producerConfig.setMaxRetryBackoffMs(-1);
+  }
+
+  @Test
+  public void testInvalidShardHashUpdateIntervalMS() {
+    ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("shardHashUpdateIntervalMS must be greater than or equal to 100, got 99");
+    producerConfig.setShardHashUpdateIntervalMS(99);
   }
 }

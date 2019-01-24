@@ -33,6 +33,8 @@ public class ProducerConfig {
 
   public static final long DEFAULT_MAX_RETRY_BACKOFF_MS = 600 * 1000L;
 
+  public static final long DEFAULT_SHARD_HASH_UPDATE_INTERVAL_MS = 600 * 1000L;
+
   public enum LogFormat {
     PROTOBUF,
     JSON
@@ -61,6 +63,8 @@ public class ProducerConfig {
   private long baseRetryBackoffMs = DEFAULT_BASE_RETRY_BACKOFF_MS;
 
   private long maxRetryBackoffMs = DEFAULT_MAX_RETRY_BACKOFF_MS;
+
+  private long shardHashUpdateIntervalMS = DEFAULT_SHARD_HASH_UPDATE_INTERVAL_MS;
 
   private LogFormat logFormat = DEFAULT_LOG_FORMAT;
 
@@ -224,6 +228,21 @@ public class ProducerConfig {
           "maxRetryBackoffMs must be greater than 0, got " + maxRetryBackoffMs);
     }
     this.maxRetryBackoffMs = maxRetryBackoffMs;
+  }
+
+  /** @return The time interval for updating all shard information. */
+  public long getShardHashUpdateIntervalMS() {
+    return shardHashUpdateIntervalMS;
+  }
+
+  /** Set the time interval for updating all shard information. */
+  public void setShardHashUpdateIntervalMS(long shardHashUpdateIntervalMS) {
+    if (shardHashUpdateIntervalMS < 100) {
+      throw new IllegalArgumentException(
+          "shardHashUpdateIntervalMS must be greater than or equal to 100, got "
+              + shardHashUpdateIntervalMS);
+    }
+    this.shardHashUpdateIntervalMS = shardHashUpdateIntervalMS;
   }
 
   /** @return The content type of the request. */

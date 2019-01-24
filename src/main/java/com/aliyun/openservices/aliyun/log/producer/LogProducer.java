@@ -6,6 +6,7 @@ import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -33,6 +34,8 @@ public class LogProducer implements Producer {
 
   private static final String FAILURE_BATCH_HANDLER_SUFFIX = "-failure-batch-handler";
 
+  private static final String SHARD_MAINTAINER_SUFFIX_FORMAT = "-shard-maintainer-%d";
+
   private final int instanceId;
 
   private final String name;
@@ -56,6 +59,8 @@ public class LogProducer implements Producer {
   private final BatchHandler failureBatchHandler;
 
   private final AtomicInteger batchCount = new AtomicInteger(0);
+
+  private final ShardDecider shardDecider;
 
   /**
    * Start up a LogProducer instance.
@@ -114,6 +119,24 @@ public class LogProducer implements Producer {
     this.mover.start();
     this.successBatchHandler.start();
     this.failureBatchHandler.start();
+    this.shardDecider = new ShardDecider(producerConfig);
+    ScheduledExecutorService shardMaintainer =
+        Executors.newScheduledThreadPool(
+            1,
+            new ThreadFactoryBuilder()
+                .setDaemon(true)
+                .setNameFormat(this.name + SHARD_MAINTAINER_SUFFIX_FORMAT)
+                .build());
+    shardMaintainer.scheduleAtFixedRate(
+        new Runnable() {
+          @Override
+          public void run() {
+            shardDecider.updateLogStoreShardInfo();
+          }
+        },
+        0,
+        producerConfig.getShardHashUpdateIntervalMS(),
+        TimeUnit.MILLISECONDS);
   }
 
   /**
