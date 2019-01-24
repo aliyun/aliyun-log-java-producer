@@ -1,6 +1,6 @@
 # Aliyun LOG Java Producer
 
-[![Build Status](https://travis-ci.org/aliyun/aliyun-log-producer.svg?branch=master)](https://travis-ci.org/aliyun/aliyun-log-producer-java)
+[![Build Status](https://travis-ci.org/aliyun/aliyun-log-producer-java.svg?branch=master)](https://travis-ci.org/aliyun/aliyun-log-producer-java)
 [![License](https://img.shields.io/badge/license-Apache2.0-blue.svg)](/LICENSE)
 
 [中文版 README](/README.md)
