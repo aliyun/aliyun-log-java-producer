@@ -11,8 +11,7 @@ import org.junit.rules.ExpectedException;
 
 public class ProducerMultiShardTest {
 
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
+  @Rule public ExpectedException thrown = ExpectedException.none();
 
   @Test
   public void testSend() throws InterruptedException, ProducerException, ExecutionException {
@@ -60,7 +59,7 @@ public class ProducerMultiShardTest {
     try {
       f.get();
     } catch (ExecutionException e) {
-      ResultFailedException resultFailedException = (ResultFailedException)e.getCause();
+      ResultFailedException resultFailedException = (ResultFailedException) e.getCause();
       Assert.assertEquals("ShardNotExist", resultFailedException.getErrorCode());
       Assert.assertEquals("shard 1600484969 is not exist", resultFailedException.getErrorMessage());
     }
