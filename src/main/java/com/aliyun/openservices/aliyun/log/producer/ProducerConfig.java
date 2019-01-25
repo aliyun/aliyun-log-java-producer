@@ -33,7 +33,11 @@ public class ProducerConfig {
 
   public static final long DEFAULT_MAX_RETRY_BACKOFF_MS = 600 * 1000L;
 
-  public static final long DEFAULT_SHARD_HASH_UPDATE_INTERVAL_MS = 600 * 1000L;
+  public static final int DEFAULT_BUCKETS = 64;
+
+  public static final int BUCKETS_LOWER_LIMIT = 1;
+
+  public static final int BUCKETS_UPPER_LIMIT = 256;
 
   public enum LogFormat {
     PROTOBUF,
@@ -64,7 +68,9 @@ public class ProducerConfig {
 
   private long maxRetryBackoffMs = DEFAULT_MAX_RETRY_BACKOFF_MS;
 
-  private long shardHashUpdateIntervalMS = DEFAULT_SHARD_HASH_UPDATE_INTERVAL_MS;
+  private boolean adjustShardHash = true;
+
+  private int buckets = DEFAULT_BUCKETS;
 
   private LogFormat logFormat = DEFAULT_LOG_FORMAT;
 
@@ -230,19 +236,33 @@ public class ProducerConfig {
     this.maxRetryBackoffMs = maxRetryBackoffMs;
   }
 
-  /** @return The time interval for updating all shard information. */
-  public long getShardHashUpdateIntervalMS() {
-    return shardHashUpdateIntervalMS;
+  /** @return The flag of whether to adjust shard hash. */
+  public boolean isAdjustShardHash() {
+    return adjustShardHash;
   }
 
-  /** Set the time interval for updating all shard information. */
-  public void setShardHashUpdateIntervalMS(long shardHashUpdateIntervalMS) {
-    if (shardHashUpdateIntervalMS < 100) {
+  /** Specify whether to adjust shard hash. */
+  public void setAdjustShardHash(boolean adjustShardHash) {
+    this.adjustShardHash = adjustShardHash;
+  }
+
+  /** @return The buckets of the shard hash. */
+  public int getBuckets() {
+    return buckets;
+  }
+
+  /** Set the buckets of the shard hash. */
+  public void setBuckets(int buckets) {
+    if (buckets < BUCKETS_LOWER_LIMIT || buckets > BUCKETS_UPPER_LIMIT) {
       throw new IllegalArgumentException(
-          "shardHashUpdateIntervalMS must be greater than or equal to 100, got "
-              + shardHashUpdateIntervalMS);
+          String.format(
+              "buckets must be between %d and %d, got %d",
+              BUCKETS_LOWER_LIMIT, BUCKETS_UPPER_LIMIT, buckets));
     }
-    this.shardHashUpdateIntervalMS = shardHashUpdateIntervalMS;
+    if (!ShardHashAdjuster.isPowerOfTwo(buckets)) {
+      throw new IllegalArgumentException("buckets must be a power of 2, got " + buckets);
+    }
+    this.buckets = buckets;
   }
 
   /** @return The content type of the request. */

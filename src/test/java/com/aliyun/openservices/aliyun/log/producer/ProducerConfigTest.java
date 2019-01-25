@@ -27,9 +27,8 @@ public class ProducerConfigTest {
         ProducerConfig.DEFAULT_BASE_RETRY_BACKOFF_MS, producerConfig.getBaseRetryBackoffMs());
     Assert.assertEquals(
         ProducerConfig.DEFAULT_MAX_RETRY_BACKOFF_MS, producerConfig.getMaxRetryBackoffMs());
-    Assert.assertEquals(
-        ProducerConfig.DEFAULT_SHARD_HASH_UPDATE_INTERVAL_MS,
-        producerConfig.getShardHashUpdateIntervalMS());
+    Assert.assertTrue(producerConfig.isAdjustShardHash());
+    Assert.assertEquals(ProducerConfig.DEFAULT_BUCKETS, producerConfig.getBuckets());
     Assert.assertEquals(ProducerConfig.DEFAULT_LOG_FORMAT, producerConfig.getLogFormat());
   }
 
@@ -119,10 +118,26 @@ public class ProducerConfigTest {
   }
 
   @Test
-  public void testInvalidShardHashUpdateIntervalMS() {
+  public void testInvalidBuckets() {
     ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
     thrown.expect(IllegalArgumentException.class);
-    thrown.expectMessage("shardHashUpdateIntervalMS must be greater than or equal to 100, got 99");
-    producerConfig.setShardHashUpdateIntervalMS(99);
+    thrown.expectMessage("buckets must be between 1 and 256, got 0");
+    producerConfig.setBuckets(0);
+  }
+
+  @Test
+  public void testInvalidBuckets2() {
+    ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("buckets must be between 1 and 256, got 257");
+    producerConfig.setBuckets(257);
+  }
+
+  @Test
+  public void testInvalidBuckets3() {
+    ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
+    thrown.expect(IllegalArgumentException.class);
+    thrown.expectMessage("buckets must be a power of 2, got 15");
+    producerConfig.setBuckets(15);
   }
 }

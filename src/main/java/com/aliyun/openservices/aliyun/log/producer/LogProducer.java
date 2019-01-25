@@ -6,7 +6,6 @@ import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -34,8 +33,6 @@ public class LogProducer implements Producer {
 
   private static final String FAILURE_BATCH_HANDLER_SUFFIX = "-failure-batch-handler";
 
-  private static final String SHARD_MAINTAINER_SUFFIX_FORMAT = "-shard-maintainer-%d";
-
   private final int instanceId;
 
   private final String name;
@@ -60,7 +57,7 @@ public class LogProducer implements Producer {
 
   private final AtomicInteger batchCount = new AtomicInteger(0);
 
-  private final ShardDecider shardDecider;
+  private final ShardHashAdjuster adjuster;
 
   /**
    * Start up a LogProducer instance.
@@ -119,24 +116,7 @@ public class LogProducer implements Producer {
     this.mover.start();
     this.successBatchHandler.start();
     this.failureBatchHandler.start();
-    this.shardDecider = new ShardDecider(producerConfig);
-    ScheduledExecutorService shardMaintainer =
-        Executors.newScheduledThreadPool(
-            1,
-            new ThreadFactoryBuilder()
-                .setDaemon(true)
-                .setNameFormat(this.name + SHARD_MAINTAINER_SUFFIX_FORMAT)
-                .build());
-    shardMaintainer.scheduleAtFixedRate(
-        new Runnable() {
-          @Override
-          public void run() {
-            shardDecider.updateLogStoreShardInfo();
-          }
-        },
-        0,
-        producerConfig.getShardHashUpdateIntervalMS(),
-        TimeUnit.MILLISECONDS);
+    this.adjuster = new ShardHashAdjuster(producerConfig.getBuckets());
   }
 
   /**
@@ -147,7 +127,7 @@ public class LogProducer implements Producer {
   @Override
   public ListenableFuture<Result> send(String project, String logStore, LogItem logItem)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, "", "", "", logItem, null);
+    return send(project, logStore, "", "", null, logItem, null);
   }
 
   /**
@@ -158,7 +138,7 @@ public class LogProducer implements Producer {
   @Override
   public ListenableFuture<Result> send(String project, String logStore, List<LogItem> logItems)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, "", "", "", logItems, null);
+    return send(project, logStore, "", "", null, logItems, null);
   }
 
   /**
@@ -170,7 +150,7 @@ public class LogProducer implements Producer {
   public ListenableFuture<Result> send(
       String project, String logStore, String topic, String source, LogItem logItem)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, topic, source, "", logItem, null);
+    return send(project, logStore, topic, source, null, logItem, null);
   }
 
   /**
@@ -182,7 +162,7 @@ public class LogProducer implements Producer {
   public ListenableFuture<Result> send(
       String project, String logStore, String topic, String source, List<LogItem> logItems)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, topic, source, "", logItems, null);
+    return send(project, logStore, topic, source, null, logItems, null);
   }
 
   /**
@@ -228,7 +208,7 @@ public class LogProducer implements Producer {
   public ListenableFuture<Result> send(
       String project, String logStore, LogItem logItem, Callback callback)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, "", "", "", logItem, callback);
+    return send(project, logStore, "", "", null, logItem, callback);
   }
 
   /**
@@ -240,7 +220,7 @@ public class LogProducer implements Producer {
   public ListenableFuture<Result> send(
       String project, String logStore, List<LogItem> logItems, Callback callback)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, "", "", "", logItems, callback);
+    return send(project, logStore, "", "", null, logItems, callback);
   }
 
   /**
@@ -257,7 +237,7 @@ public class LogProducer implements Producer {
       LogItem logItem,
       Callback callback)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, topic, source, "", logItem, callback);
+    return send(project, logStore, topic, source, null, logItem, callback);
   }
 
   /**
@@ -274,7 +254,7 @@ public class LogProducer implements Producer {
       List<LogItem> logItems,
       Callback callback)
       throws InterruptedException, ProducerException {
-    return send(project, logStore, topic, source, "", logItems, callback);
+    return send(project, logStore, topic, source, null, logItems, callback);
   }
 
   /**
@@ -366,8 +346,8 @@ public class LogProducer implements Producer {
       throw new MaxBatchCountExceedException(
           "the log list size is " + count + " which exceeds the maxBatchCount you specified");
     }
-    if (shardHash != null && !shardHash.isEmpty()) {
-      shardHash = shardDecider.getHashKey(project, logStore, shardHash);
+    if (shardHash != null && producerConfig.isAdjustShardHash()) {
+      shardHash = adjuster.adjust(shardHash);
     }
     return accumulator.append(project, logStore, topic, source, shardHash, logItems, callback);
   }
