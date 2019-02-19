@@ -56,7 +56,13 @@ A: 支持。将 ProjectConfig.endpoint 设置成`https://<endpoint>`即可。
 **Q:** 程序运行过程中抛出如下异常`Caused by: java.lang.NoSuchMethodError: com.google.common.hash.Hashing.farmHashFingerprint64()`？
 
 A: 这是因为项目引入的 guava lib 不包含 farmHash 函数。Producer 使用的 guava 版本为 [27.0-jre](https://github.com/aliyun/aliyun-log-java-producer/blob/master/pom.xml#L45)，请将项目引入的 guava lib 至少升级到 27.0-jre。 
-
+```
+<dependency>
+    <groupId>com.google.guava</groupId>
+    <artifactId>guava</artifactId>
+    <version>27.0-jre</version>
+</dependency>
+```
 
 
 
