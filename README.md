@@ -57,6 +57,23 @@ compile 'com.aliyun.openservices:aliyun-log:0.6.28'
 compile 'com.google.protobuf:protobuf-java:2.5.0'
 ```
 
+## RAM 子账号访问
+如果您使用子账号 AK，请确保该子账号拥有目标 project、logStore 的写权限，具体请参考 [RAM 子用户访问](https://help.aliyun.com/document_detail/29049.html)。
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Resource</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>log:PostLogStoreLogs</td>
+<td>acs:log:${regionName}:${projectOwnerAliUid}:project/${projectName}/logstore/${logstoreName}</td>
+</tr>
+</tbody>
+</table>
+
 ## 快速入门
 
 参考教程 [Aliyun LOG Java Producer 快速入门](https://yq.aliyun.com/articles/682761)。
