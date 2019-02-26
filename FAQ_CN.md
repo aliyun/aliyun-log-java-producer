@@ -33,6 +33,10 @@ A: 可以使用 Aliyun LOG Java SDK 提供的一个特殊版本`jar-with-depende
 </dependency>
 ```
 
+**Q:** 日志写入过程中返回如下错误`com.aliyun.openservices.log.exception.LogException: denied by sts or ram, action: log:PostLogStoreLogs, resource: acs:log:${regionName}:${projectOwnerAliUid}:project/${projectName}/logstore/${logstoreName}`？
+
+A：子账号没有目标 project、logStore 的写权限，请参考 [RAM 子账号访问](https://github.com/aliyun/aliyun-log-java-producer#ram-%E5%AD%90%E8%B4%A6%E5%8F%B7%E8%AE%BF%E9%97%AE)配置相应权限。
+
 **Q:** 应该在何时调用 producer 的 close() 方法？
 
 A: 请在程序退出之前调用 producer 的 close() 方法，以防止缓存在内存中的数据丢失。
@@ -68,7 +72,7 @@ A: 这是因为项目引入的 guava lib 不包含 farmHash 函数。Producer �
 at java.lang.ClassLoader.defineClass1(Native Method)
 ...`？
 
-A: 检查项目中引入的 protobuf 版本是否低于 2.5.0。这些版本中，类`Logs$LogGroup`的方法`getUnknownFields`被申明为 final，无法override，从而报错。请引入 2.5.0 版本的 protobuf。
+A: 检查项目中引入的 protobuf 版本是否低于 2.5.0。这些版本中，类`Logs$LogGroup`的方法`getUnknownFields`被申明为 final，无法override，从而报错。解决方法是引入 2.5.0 版本的 protobuf。
 ```
 <dependency>
     <groupId>com.google.protobuf</groupId>
