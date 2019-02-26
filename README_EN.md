@@ -57,7 +57,7 @@ compile 'com.aliyun.openservices:aliyun-log:0.6.28'
 compile 'com.google.protobuf:protobuf-java:2.5.0'
 ```
 ## RAM
-If you use the subaccount AK, make sure that the subaccount has write permissions for the target project and logStore.
+If you use the subaccount AK, make sure that the subaccount has write permissions for the target project and logStore, please refer to [RAM](https://www.alibabacloud.com/help/en/doc-detail/29049.htm).
 
 | Action | Resource |
 |---|---|
