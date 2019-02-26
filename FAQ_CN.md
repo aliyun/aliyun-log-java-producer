@@ -64,8 +64,18 @@ A: 这是因为项目引入的 guava lib 不包含 farmHash 函数。Producer �
 </dependency>
 ```
 
+**Q:** 程序运行过程中抛出如下异常`java.lang.VerifyError: class com.aliyun.openservices.log.common.Logs$LogGroup overrides final method getUnknownFields.()Lcom/google/protobuf/UnknownFieldSet;
+at java.lang.ClassLoader.defineClass1(Native Method)
+...`？
 
-
+A: 检查项目中引入的 protobuf 版本是否低于 2.5.0。这些版本中，类`Logs$LogGroup`的方法`getUnknownFields`被申明为 final，无法override，从而报错。请引入 2.5.0 版本的 protobuf。
+```
+<dependency>
+    <groupId>com.google.protobuf</groupId>
+    <artifactId>protobuf-java</artifactId>
+    <version>2.5.0</version>
+</dependency>
+```
 
 
 
