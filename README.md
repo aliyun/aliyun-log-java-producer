@@ -36,7 +36,7 @@ Aliyun LOG Java Producer 是一个易于使用且高度可配置的 Java 类库�
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 </dependency>
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
@@ -52,7 +52,7 @@ Aliyun LOG Java Producer 是一个易于使用且高度可配置的 Java 类库�
 
 ### Gradle 使用者
 ```
-compile 'com.aliyun.openservices:aliyun-log-producer:0.1.0'
+compile 'com.aliyun.openservices:aliyun-log-producer:0.1.1'
 compile 'com.aliyun.openservices:aliyun-log:0.6.28'
 compile 'com.google.protobuf:protobuf-java:2.5.0'
 ```
