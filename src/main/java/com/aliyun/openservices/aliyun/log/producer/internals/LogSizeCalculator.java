@@ -9,7 +9,12 @@ public abstract class LogSizeCalculator {
   public static int calculate(LogItem logItem) {
     int sizeInBytes = 4;
     for (LogContent content : logItem.GetLogContents()) {
-      sizeInBytes += content.mKey.length() + content.mValue.length();
+      if (content.mKey != null) {
+        sizeInBytes += content.mKey.length();
+      }
+      if (content.mValue != null) {
+        sizeInBytes += content.mValue.length();
+      }
     }
     return sizeInBytes;
   }
