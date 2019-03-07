@@ -15,11 +15,11 @@ public class ProducerConfig {
   public static final int DEFAULT_IO_THREAD_COUNT =
       Math.max(Runtime.getRuntime().availableProcessors(), 1);
 
-  public static final int DEFAULT_MAX_BATCH_SIZE_IN_BYTES = 3 * 1024 * 1024;
+  public static final int DEFAULT_MAX_BATCH_SIZE_IN_BYTES = 512 * 1024;
 
   public static final int MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT = 5 * 1024 * 1024;
 
-  public static final int DEFAULT_MAX_BATCH_COUNT = 40960;
+  public static final int DEFAULT_MAX_BATCH_COUNT = 4096;
 
   public static final int MAX_BATCH_COUNT_UPPER_LIMIT = 40960;
 
