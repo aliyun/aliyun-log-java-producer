@@ -2,6 +2,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
+import com.aliyun.openservices.aliyun.log.producer.internals.LogSizeCalculator;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
@@ -305,6 +306,20 @@ public class ProducerTest {
     Assert.assertEquals(n, successCount.get());
     Assert.assertEquals(n, futureGetCount);
     assertProducerFinalState(producer);
+  }
+
+  @Test
+  public void testMaxBatchSizeInBytes() throws InterruptedException, ProducerException {
+    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    producerConfig.setMaxBatchSizeInBytes(27);
+    Producer producer = new LogProducer(producerConfig);
+    LogItem logItem = new LogItem();
+    logItem.PushBack("key1", "val1");
+    logItem.PushBack("key2", "val2");
+    logItem.PushBack("key3", "val3");
+    int sizeInBytes = LogSizeCalculator.calculate(logItem);
+    Assert.assertEquals(28, sizeInBytes);
+    producer.send("project", "logStore", new LogItem());
   }
 
   public static void assertProducerFinalState(Producer producer) {
