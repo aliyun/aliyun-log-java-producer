@@ -212,11 +212,12 @@ public final class LogAccumulator {
   }
 
   private void ensureValidLogSize(int sizeInBytes) throws LogSizeTooLargeException {
-    if (sizeInBytes > producerConfig.getMaxBatchSizeInBytes()) {
+    if (sizeInBytes > ProducerConfig.MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT) {
       throw new LogSizeTooLargeException(
           "the logs is "
               + sizeInBytes
-              + " bytes which is larger than the maxBatchSizeInBytes you specified");
+              + " bytes which is larger than "
+              + ProducerConfig.MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT);
     }
     if (sizeInBytes > producerConfig.getTotalSizeInBytes()) {
       throw new LogSizeTooLargeException(

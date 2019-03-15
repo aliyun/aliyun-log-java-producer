@@ -158,6 +158,9 @@ public class ProducerBatch implements Delayed {
   }
 
   private boolean hasRoomFor(int sizeInBytes, int count) {
+    if (curBatchCount == 0) {
+      return true;
+    }
     return curBatchSizeInBytes + sizeInBytes <= maxBatchSizeInBytes
         && curBatchCount + count <= maxBatchCount;
   }

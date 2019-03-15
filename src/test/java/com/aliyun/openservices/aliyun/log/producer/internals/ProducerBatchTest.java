@@ -29,7 +29,7 @@ public class ProducerBatchTest {
     int sizeInBytes = LogSizeCalculator.calculate(logItem);
     Assert.assertEquals(36, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItem, sizeInBytes, null);
-    Assert.assertNull(f);
+    Assert.assertNotNull(f);
   }
 
   @Test
@@ -43,7 +43,7 @@ public class ProducerBatchTest {
     int sizeInBytes = LogSizeCalculator.calculate(logItems);
     Assert.assertEquals(36, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
-    Assert.assertNull(f);
+    Assert.assertNotNull(f);
   }
 
   @Test
@@ -57,7 +57,7 @@ public class ProducerBatchTest {
     int sizeInBytes = LogSizeCalculator.calculate(logItems);
     Assert.assertEquals(8, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
-    Assert.assertNull(f);
+    Assert.assertNotNull(f);
   }
 
   @Test
