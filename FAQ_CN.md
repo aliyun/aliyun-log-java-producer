@@ -35,7 +35,8 @@ A: 可以使用 Aliyun LOG Java SDK 提供的一个特殊版本`jar-with-depende
 
 **Q:** `ProducerConfig.maxBatchSizeInBytes`和`MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT`有什么区别？
 
-A: `ProducerConfig.maxBatchSizeInBytes`是每个 ProducerBatch 大小的上限，producer 会尽力保证生成的 ProducerBatch 不超过这个大小，`MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT`是服务端可单次请求可接收的日志大小上限。
+A: `ProducerConfig.maxBatchSizeInBytes`是每个 ProducerBatch 大小的上限，producer 会尽力保证生成的 ProducerBatch 不超过这个大小。
+`MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT`是单次请求服务端可接收的日志大小上限。
 如果单次调用 send 方法时传入的 logItem 或 logItems 的大小超过`ProducerConfig.maxBatchSizeInBytes`，只要它们不超过 MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT，还是能够被缓存在一个 ProducerBatch 中发送。
 
 **Q:** 日志写入过程中返回如下错误`com.aliyun.openservices.log.exception.LogException: denied by sts or ram, action: log:PostLogStoreLogs, resource: acs:log:${regionName}:${projectOwnerAliUid}:project/${projectName}/logstore/${logstoreName}`？
