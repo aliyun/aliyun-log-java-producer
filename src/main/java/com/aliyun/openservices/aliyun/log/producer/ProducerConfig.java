@@ -31,7 +31,7 @@ public class ProducerConfig {
 
   public static final long DEFAULT_BASE_RETRY_BACKOFF_MS = 100L;
 
-  public static final long DEFAULT_MAX_RETRY_BACKOFF_MS = 600 * 1000L;
+  public static final long DEFAULT_MAX_RETRY_BACKOFF_MS = 50 * 1000L;
 
   public static final int DEFAULT_BUCKETS = 64;
 
