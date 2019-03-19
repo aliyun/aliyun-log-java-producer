@@ -316,9 +316,10 @@ public class LogProducer implements Producer {
    * @throws com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException If the time taken
    *     for allocating memory for the logs has surpassed.
    * @throws MaxBatchCountExceedException If the log list size exceeds {@link
-   *     ProducerConfig#getMaxBatchCount()}.
+   *     ProducerConfig#getBatchCountThreshold()}.
    * @throws LogSizeTooLargeException If the total size of the logs exceeds {@link
-   *     ProducerConfig#getTotalSizeInBytes()} or {@link ProducerConfig#getMaxBatchSizeInBytes()}.
+   *     ProducerConfig#getTotalSizeInBytes()} or {@link
+   *     ProducerConfig#getBatchSizeThresholdInBytes()}.
    * @throws ProducerException If a producer related exception occurs that does not belong to the
    *     above exceptions.
    */
@@ -342,9 +343,12 @@ public class LogProducer implements Producer {
       throw new IllegalArgumentException("logItems cannot be empty");
     }
     int count = logItems.size();
-    if (count > producerConfig.getMaxBatchCount()) {
+    if (count > ProducerConfig.MAX_BATCH_COUNT) {
       throw new MaxBatchCountExceedException(
-          "the log list size is " + count + " which exceeds the maxBatchCount you specified");
+          "the log list size is "
+              + count
+              + " which exceeds the MAX_BATCH_COUNT "
+              + ProducerConfig.MAX_BATCH_COUNT);
     }
     if (shardHash != null && producerConfig.isAdjustShardHash()) {
       shardHash = adjuster.adjust(shardHash);

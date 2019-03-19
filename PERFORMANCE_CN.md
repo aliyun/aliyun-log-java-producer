@@ -35,8 +35,8 @@ content_key_8:  8abcdefghijklmnopqrstuvwxyz!@#$%^&*()_0123456789-<suffix>
 
 ### 测试程序说明
 * ProducerConfig.totalSizeInBytes: 具体用例中调整
-* ProducerConfig.maxBatchSizeInBytes: 3 \* 1024 \* 1024
-* ProducerConfig.maxBatchCount：40960
+* ProducerConfig.batchSizeThresholdInBytes: 3 \* 1024 \* 1024
+* ProducerConfig.batchCountThreshold：40960
 * ProducerConfig.lingerMs：2000
 * ProducerConfig.ioThreadCount: 具体用例中调整
 * JVM 初始堆大小：2 GB

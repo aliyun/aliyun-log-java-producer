@@ -23,9 +23,9 @@ public class ProducerBatch implements Delayed {
 
   private final String packageId;
 
-  private final int maxBatchSizeInBytes;
+  private final int batchSizeThresholdInBytes;
 
-  private final int maxBatchCount;
+  private final int batchCountThreshold;
 
   private final List<LogItem> logItems = new ArrayList<LogItem>();
 
@@ -46,15 +46,15 @@ public class ProducerBatch implements Delayed {
   public ProducerBatch(
       GroupKey groupKey,
       String packageId,
-      int maxBatchSizeInBytes,
-      int maxBatchCount,
+      int batchSizeThresholdInBytes,
+      int batchCountThreshold,
       int maxReservedAttempts,
       long nowMs) {
     this.groupKey = groupKey;
     this.packageId = packageId;
     this.createdMs = nowMs;
-    this.maxBatchSizeInBytes = maxBatchSizeInBytes;
-    this.maxBatchCount = maxBatchCount;
+    this.batchSizeThresholdInBytes = batchSizeThresholdInBytes;
+    this.batchCountThreshold = batchCountThreshold;
     this.curBatchCount = 0;
     this.curBatchSizeInBytes = 0;
     this.reservedAttempts = EvictingQueue.create(maxReservedAttempts);
@@ -93,8 +93,8 @@ public class ProducerBatch implements Delayed {
     this.attemptCount++;
   }
 
-  public boolean isFull() {
-    return curBatchSizeInBytes >= maxBatchSizeInBytes || curBatchCount >= maxBatchCount;
+  public boolean isMeetSendCondition() {
+    return curBatchSizeInBytes >= batchSizeThresholdInBytes || curBatchCount >= batchCountThreshold;
   }
 
   public long remainingMs(long nowMs, long lingerMs) {
@@ -158,11 +158,8 @@ public class ProducerBatch implements Delayed {
   }
 
   private boolean hasRoomFor(int sizeInBytes, int count) {
-    if (curBatchCount == 0) {
-      return true;
-    }
-    return curBatchSizeInBytes + sizeInBytes <= maxBatchSizeInBytes
-        && curBatchCount + count <= maxBatchCount;
+    return curBatchSizeInBytes + sizeInBytes <= ProducerConfig.MAX_BATCH_SIZE_IN_BYTES
+        && curBatchCount + count <= ProducerConfig.MAX_BATCH_COUNT;
   }
 
   private long createdTimeMs(long nowMs) {
@@ -213,10 +210,10 @@ public class ProducerBatch implements Delayed {
         + ", packageId='"
         + packageId
         + '\''
-        + ", maxBatchSizeInBytes="
-        + maxBatchSizeInBytes
-        + ", maxBatchCount="
-        + maxBatchCount
+        + ", batchSizeThresholdInBytes="
+        + batchSizeThresholdInBytes
+        + ", batchCountThreshold="
+        + batchCountThreshold
         + ", logItems="
         + logItems
         + ", thunks="

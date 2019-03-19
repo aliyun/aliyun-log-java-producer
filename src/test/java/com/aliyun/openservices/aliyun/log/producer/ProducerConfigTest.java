@@ -17,8 +17,10 @@ public class ProducerConfigTest {
     Assert.assertEquals(ProducerConfig.DEFAULT_MAX_BLOCK_MS, producerConfig.getMaxBlockMs());
     Assert.assertEquals(ProducerConfig.DEFAULT_IO_THREAD_COUNT, producerConfig.getIoThreadCount());
     Assert.assertEquals(
-        ProducerConfig.DEFAULT_MAX_BATCH_SIZE_IN_BYTES, producerConfig.getMaxBatchSizeInBytes());
-    Assert.assertEquals(ProducerConfig.DEFAULT_MAX_BATCH_COUNT, producerConfig.getMaxBatchCount());
+        ProducerConfig.DEFAULT_BATCH_SIZE_THRESHOLD_IN_BYTES,
+        producerConfig.getBatchSizeThresholdInBytes());
+    Assert.assertEquals(
+        ProducerConfig.DEFAULT_BATCH_COUNT_THRESHOLD, producerConfig.getBatchCountThreshold());
     Assert.assertEquals(ProducerConfig.DEFAULT_LINGER_MS, producerConfig.getLingerMs());
     Assert.assertEquals(ProducerConfig.DEFAULT_RETRIES, producerConfig.getRetries());
     Assert.assertEquals(
@@ -60,10 +62,10 @@ public class ProducerConfigTest {
     ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage(
-        "maxBatchSizeInBytes must be between 1 and "
-            + ProducerConfig.MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT
+        "batchSizeThresholdInBytes must be between 1 and "
+            + ProducerConfig.MAX_BATCH_SIZE_IN_BYTES
             + ", got -1");
-    producerConfig.setMaxBatchSizeInBytes(-1);
+    producerConfig.setBatchSizeThresholdInBytes(-1);
   }
 
   @Test
@@ -71,10 +73,10 @@ public class ProducerConfigTest {
     ProducerConfig producerConfig = new ProducerConfig(new ProjectConfigs());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage(
-        "maxBatchCount must be between 1 and "
-            + ProducerConfig.MAX_BATCH_COUNT_UPPER_LIMIT
+        "batchCountThreshold must be between 1 and "
+            + ProducerConfig.MAX_BATCH_COUNT
             + ", got -100");
-    producerConfig.setMaxBatchCount(-100);
+    producerConfig.setBatchCountThreshold(-100);
   }
 
   @Test

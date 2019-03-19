@@ -30,10 +30,11 @@ public class ProducerBatchTest {
     Assert.assertEquals(36, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItem, sizeInBytes, null);
     Assert.assertNotNull(f);
+    Assert.assertTrue(batch.isMeetSendCondition());
   }
 
   @Test
-  public void testTryAppendLogsExceedMaxBatchSize() {
+  public void testTryAppendLogsExceedBatchSizeThreshold() {
     GroupKey groupKey = new GroupKey("project", "logStore", "topic", "source", "shardHash");
     ProducerBatch batch = new ProducerBatch(groupKey, "id", 20, 10, 3, System.currentTimeMillis());
     List<LogItem> logItems = new ArrayList<LogItem>();
@@ -44,10 +45,11 @@ public class ProducerBatchTest {
     Assert.assertEquals(36, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
     Assert.assertNotNull(f);
+    Assert.assertTrue(batch.isMeetSendCondition());
   }
 
   @Test
-  public void testTryAppendLogsExceedMaxBatchCount() {
+  public void testTryAppendLogsExceedBatchCountThreshold() {
     GroupKey groupKey = new GroupKey("project", "logStore", "topic", "source", "shardHash");
     ProducerBatch batch =
         new ProducerBatch(groupKey, "id", 10000, 1, 3, System.currentTimeMillis());
@@ -58,10 +60,11 @@ public class ProducerBatchTest {
     Assert.assertEquals(8, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
     Assert.assertNotNull(f);
+    Assert.assertTrue(batch.isMeetSendCondition());
   }
 
   @Test
-  public void testIsFullWithBatchSize() {
+  public void testIsMeetSendCondition() {
     GroupKey groupKey = new GroupKey("project", "logStore", "topic", "source", "shardHash");
     ProducerBatch batch = new ProducerBatch(groupKey, "id", 8, 100, 3, System.currentTimeMillis());
     List<LogItem> logItems = new ArrayList<LogItem>();
@@ -71,29 +74,7 @@ public class ProducerBatchTest {
     Assert.assertEquals(8, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
     Assert.assertNotNull(f);
-    Assert.assertTrue(batch.isFull());
-    f = batch.tryAppend(new LogItem(), 4, null);
-    Assert.assertNull(f);
-  }
-
-  @Test
-  public void testIsFullWithBatchCount() {
-    GroupKey groupKey = new GroupKey("project", "logStore", "topic", "source", "shardHash");
-    ProducerBatch batch =
-        new ProducerBatch(groupKey, "id", 10000, 5, 3, System.currentTimeMillis());
-    List<LogItem> logItems = new ArrayList<LogItem>();
-    logItems.add(new LogItem());
-    logItems.add(new LogItem());
-    logItems.add(new LogItem());
-    logItems.add(new LogItem());
-    logItems.add(new LogItem());
-    int sizeInBytes = LogSizeCalculator.calculate(logItems);
-    Assert.assertEquals(20, sizeInBytes);
-    ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
-    Assert.assertNotNull(f);
-    Assert.assertTrue(batch.isFull());
-    f = batch.tryAppend(new LogItem(), 4, null);
-    Assert.assertNull(f);
+    Assert.assertTrue(batch.isMeetSendCondition());
   }
 
   @Test

@@ -136,6 +136,10 @@ public final class LogAccumulator {
     if (holder.producerBatch != null) {
       ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
       if (f != null) {
+        if (holder.producerBatch.isMeetSendCondition()) {
+          holder.transferProducerBatch(
+              ioThreadPool, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
+        }
         return f;
       } else {
         holder.transferProducerBatch(
@@ -146,13 +150,13 @@ public final class LogAccumulator {
         new ProducerBatch(
             groupKey,
             Utils.generatePackageId(producerHash, BATCH_ID),
-            producerConfig.getMaxBatchSizeInBytes(),
-            producerConfig.getMaxBatchCount(),
+            producerConfig.getBatchSizeThresholdInBytes(),
+            producerConfig.getBatchCountThreshold(),
             producerConfig.getMaxReservedAttempts(),
             System.currentTimeMillis());
     ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
     batchCount.incrementAndGet();
-    if (holder.producerBatch.isFull()) {
+    if (holder.producerBatch.isMeetSendCondition()) {
       holder.transferProducerBatch(
           ioThreadPool, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
     }
@@ -212,12 +216,12 @@ public final class LogAccumulator {
   }
 
   private void ensureValidLogSize(int sizeInBytes) throws LogSizeTooLargeException {
-    if (sizeInBytes > ProducerConfig.MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT) {
+    if (sizeInBytes > ProducerConfig.MAX_BATCH_SIZE_IN_BYTES) {
       throw new LogSizeTooLargeException(
           "the logs is "
               + sizeInBytes
-              + " bytes which is larger than "
-              + ProducerConfig.MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT);
+              + " bytes which is larger than MAX_BATCH_SIZE_IN_BYTES "
+              + ProducerConfig.MAX_BATCH_SIZE_IN_BYTES);
     }
     if (sizeInBytes > producerConfig.getTotalSizeInBytes()) {
       throw new LogSizeTooLargeException(

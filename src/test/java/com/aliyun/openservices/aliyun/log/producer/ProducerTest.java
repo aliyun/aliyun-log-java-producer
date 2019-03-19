@@ -311,7 +311,7 @@ public class ProducerTest {
   @Test
   public void testMaxBatchSizeInBytes() throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
-    producerConfig.setMaxBatchSizeInBytes(27);
+    producerConfig.setBatchSizeThresholdInBytes(27);
     Producer producer = new LogProducer(producerConfig);
     LogItem logItem = new LogItem();
     logItem.PushBack("key1", "val1");

@@ -15,13 +15,13 @@ public class ProducerConfig {
   public static final int DEFAULT_IO_THREAD_COUNT =
       Math.max(Runtime.getRuntime().availableProcessors(), 1);
 
-  public static final int DEFAULT_MAX_BATCH_SIZE_IN_BYTES = 512 * 1024;
+  public static final int DEFAULT_BATCH_SIZE_THRESHOLD_IN_BYTES = 512 * 1024;
 
-  public static final int MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT = 10 * 1024 * 1024;
+  public static final int MAX_BATCH_SIZE_IN_BYTES = 10 * 1024 * 1024;
 
-  public static final int DEFAULT_MAX_BATCH_COUNT = 4096;
+  public static final int DEFAULT_BATCH_COUNT_THRESHOLD = 4096;
 
-  public static final int MAX_BATCH_COUNT_UPPER_LIMIT = 40960;
+  public static final int MAX_BATCH_COUNT = 40960;
 
   public static final int DEFAULT_LINGER_MS = 2000;
 
@@ -54,9 +54,9 @@ public class ProducerConfig {
 
   private int ioThreadCount = DEFAULT_IO_THREAD_COUNT;
 
-  private int maxBatchSizeInBytes = DEFAULT_MAX_BATCH_SIZE_IN_BYTES;
+  private int batchSizeThresholdInBytes = DEFAULT_BATCH_SIZE_THRESHOLD_IN_BYTES;
 
-  private int maxBatchCount = DEFAULT_MAX_BATCH_COUNT;
+  private int batchCountThreshold = DEFAULT_BATCH_COUNT_THRESHOLD;
 
   private int lingerMs = DEFAULT_LINGER_MS;
 
@@ -128,36 +128,36 @@ public class ProducerConfig {
     this.ioThreadCount = ioThreadCount;
   }
 
-  /** @return The upper limit of batch size. */
-  public int getMaxBatchSizeInBytes() {
-    return maxBatchSizeInBytes;
+  /** @return The batch size threshold. */
+  public int getBatchSizeThresholdInBytes() {
+    return batchSizeThresholdInBytes;
   }
 
-  /** Set the upper limit of batch size. */
-  public void setMaxBatchSizeInBytes(int maxBatchSizeInBytes) {
-    if (maxBatchSizeInBytes < 1 || maxBatchSizeInBytes > MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT) {
+  /** Set the batch size threshold. */
+  public void setBatchSizeThresholdInBytes(int batchSizeThresholdInBytes) {
+    if (batchSizeThresholdInBytes < 1 || batchSizeThresholdInBytes > MAX_BATCH_SIZE_IN_BYTES) {
       throw new IllegalArgumentException(
           String.format(
-              "maxBatchSizeInBytes must be between 1 and %d, got %d",
-              MAX_BATCH_SIZE_IN_BYTES_UPPER_LIMIT, maxBatchSizeInBytes));
+              "batchSizeThresholdInBytes must be between 1 and %d, got %d",
+              MAX_BATCH_SIZE_IN_BYTES, batchSizeThresholdInBytes));
     }
-    this.maxBatchSizeInBytes = maxBatchSizeInBytes;
+    this.batchSizeThresholdInBytes = batchSizeThresholdInBytes;
   }
 
-  /** @return The upper limit of batch count. */
-  public int getMaxBatchCount() {
-    return maxBatchCount;
+  /** @return The batch count threshold. */
+  public int getBatchCountThreshold() {
+    return batchCountThreshold;
   }
 
-  /** Set the upper limit of batch count. */
-  public void setMaxBatchCount(int maxBatchCount) {
-    if (maxBatchCount < 1 || maxBatchCount > MAX_BATCH_COUNT_UPPER_LIMIT) {
+  /** Set the batch count threshold. */
+  public void setBatchCountThreshold(int batchCountThreshold) {
+    if (batchCountThreshold < 1 || batchCountThreshold > MAX_BATCH_COUNT) {
       throw new IllegalArgumentException(
           String.format(
-              "maxBatchCount must be between 1 and %d, got %d",
-              MAX_BATCH_COUNT_UPPER_LIMIT, maxBatchCount));
+              "batchCountThreshold must be between 1 and %d, got %d",
+              MAX_BATCH_COUNT, batchCountThreshold));
     }
-    this.maxBatchCount = maxBatchCount;
+    this.batchCountThreshold = batchCountThreshold;
   }
 
   /** @return The max linger time of a log. */

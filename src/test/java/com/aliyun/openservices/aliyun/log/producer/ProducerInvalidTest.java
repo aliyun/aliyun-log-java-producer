@@ -122,14 +122,15 @@ public class ProducerInvalidTest {
   public void testSendLogsThrownMaxBatchCountExceedException()
       throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
-    producerConfig.setMaxBatchCount(2);
     Producer producer = new LogProducer(producerConfig);
     thrown.expect(MaxBatchCountExceedException.class);
-    thrown.expectMessage("the log list size is 3 which exceeds the maxBatchCount you specified");
+    thrown.expectMessage(
+        "the log list size is 40961 which exceeds the MAX_BATCH_COUNT "
+            + ProducerConfig.MAX_BATCH_COUNT);
     List<LogItem> logItems = new ArrayList<LogItem>();
-    logItems.add(ProducerTest.buildLogItem());
-    logItems.add(ProducerTest.buildLogItem());
-    logItems.add(ProducerTest.buildLogItem());
+    for (int i = 0; i < ProducerConfig.MAX_BATCH_COUNT + 1; ++i) {
+      logItems.add(ProducerTest.buildLogItem());
+    }
     producer.send("project", "logStore", logItems);
   }
 
