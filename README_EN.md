@@ -36,12 +36,12 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.4</version>
 </dependency>
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log</artifactId>
-    <version>0.6.28</version>
+    <version>0.6.31</version>
 </dependency>
 <dependency>
     <groupId>com.google.protobuf</groupId>
@@ -52,8 +52,8 @@ Add this dependency to your project's POM:
 
 ### Gradle users
 ```
-compile 'com.aliyun.openservices:aliyun-log-producer:0.1.3'
-compile 'com.aliyun.openservices:aliyun-log:0.6.28'
+compile 'com.aliyun.openservices:aliyun-log-producer:0.1.4'
+compile 'com.aliyun.openservices:aliyun-log:0.6.31'
 compile 'com.google.protobuf:protobuf-java:2.5.0'
 ```
 ## RAM
