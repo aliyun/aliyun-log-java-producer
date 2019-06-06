@@ -56,8 +56,13 @@ public class SendProducerBatchTask implements Runnable {
     try {
       sendProducerBatch(System.currentTimeMillis());
     } catch (Throwable t) {
-      LOGGER.error("Uncaught error in send producer batch task, project=" + batch.getProject()
-          + ", logStore=" + batch.getLogStore() + ", e=", t);
+      LOGGER.error(
+          "Uncaught error in send producer batch task, project="
+              + batch.getProject()
+              + ", logStore="
+              + batch.getLogStore()
+              + ", e=",
+          t);
     }
   }
 
@@ -82,8 +87,13 @@ public class SendProducerBatchTask implements Runnable {
         PutLogsRequest request = buildPutLogsRequest(batch);
         response = client.PutLogs(request);
       } catch (Exception e) {
-        LOGGER.error("Failed to put logs, project=" + batch.getProject() + ", logStore=" + batch
-            .getLogStore() + ", e=", e);
+        LOGGER.error(
+            "Failed to put logs, project="
+                + batch.getProject()
+                + ", logStore="
+                + batch.getLogStore()
+                + ", e=",
+            e);
         Attempt attempt = buildAttempt(e, nowMs);
         batch.appendAttempt(attempt);
         if (meetFailureCondition(e)) {
@@ -98,8 +108,13 @@ public class SendProducerBatchTask implements Runnable {
           try {
             retryQueue.put(batch);
           } catch (IllegalStateException e1) {
-            LOGGER.error("Failed to put batch to the retry queue, project=" + batch.getProject()
-                + ", logStore=" + batch.getLogStore() + ", e=", e);
+            LOGGER.error(
+                "Failed to put batch to the retry queue, project="
+                    + batch.getProject()
+                    + ", logStore="
+                    + batch.getLogStore()
+                    + ", e=",
+                e);
             if (retryQueue.isClosed()) {
               LOGGER.info(
                   "Prepare to put batch to the failure queue since the retry queue was closed");
