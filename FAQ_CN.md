@@ -81,6 +81,17 @@ A: 检查项目中引入的 protobuf 版本是否低于 2.5.0。这些版本中�
 </dependency>
 ```
 
+**Q:** 程序运行过程中抛出如下异常`java.lang.NoSuchMethodError: com.aliyun.openservices.log.request.PutLogsRequest.SetTags(Ljava/util/List;)V...`？
+
+A: 这是因为项目引入的`aliyun-log`版本过低造成的，请确保其版本至少为`0.6.31`。
+```
+<dependency>
+    <groupId>com.aliyun.openservices</groupId>
+    <artifactId>aliyun-log</artifactId>
+    <version>0.6.31</version>
+</dependency>
+```
+
 
 
 
