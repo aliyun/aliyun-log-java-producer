@@ -115,4 +115,10 @@ public interface Producer {
 
   /** See {@link LogProducer#availableMemoryInBytes()} */
   int availableMemoryInBytes();
+
+  /** See {@link LogProducer#putProjectConfig(ProjectConfig)} */
+  void putProjectConfig(ProjectConfig projectConfig);
+
+  /** See {@link LogProducer#removeProjectConfig(ProjectConfig)} */
+  void removeProjectConfig(ProjectConfig projectConfig);
 }

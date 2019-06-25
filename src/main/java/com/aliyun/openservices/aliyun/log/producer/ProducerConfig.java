@@ -1,7 +1,5 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
-import com.aliyun.openservices.aliyun.log.producer.internals.Utils;
-
 /**
  * Configuration for {@link LogProducer}. See each each individual set method for details about each
  * parameter.
@@ -46,8 +44,6 @@ public class ProducerConfig {
 
   public static final LogFormat DEFAULT_LOG_FORMAT = LogFormat.PROTOBUF;
 
-  private final ProjectConfigs projectConfigs;
-
   private int totalSizeInBytes = DEFAULT_TOTAL_SIZE_IN_BYTES;
 
   private long maxBlockMs = DEFAULT_MAX_BLOCK_MS;
@@ -73,16 +69,6 @@ public class ProducerConfig {
   private int buckets = DEFAULT_BUCKETS;
 
   private LogFormat logFormat = DEFAULT_LOG_FORMAT;
-
-  public ProducerConfig(ProjectConfigs projectConfigs) {
-    Utils.assertArgumentNotNull(projectConfigs, "projectConfigs");
-    this.projectConfigs = projectConfigs;
-  }
-
-  /** @return {@link ProjectConfigs} of this configuration. */
-  public ProjectConfigs getProjectConfigs() {
-    return projectConfigs;
-  }
 
   /**
    * @return The total bytes of memory the producer can use to buffer logs waiting to be sent to the

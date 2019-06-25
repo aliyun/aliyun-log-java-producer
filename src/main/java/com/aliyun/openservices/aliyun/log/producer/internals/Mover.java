@@ -1,7 +1,9 @@
 package com.aliyun.openservices.aliyun.log.producer.internals;
 
 import com.aliyun.openservices.aliyun.log.producer.*;
+import com.aliyun.openservices.log.Client;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
@@ -12,6 +14,8 @@ public class Mover extends LogThread {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProducerBatch.class);
 
   private final ProducerConfig producerConfig;
+
+  private final Map<String, Client> clientPool;
 
   private final LogAccumulator accumulator;
 
@@ -30,6 +34,7 @@ public class Mover extends LogThread {
   public Mover(
       String name,
       ProducerConfig producerConfig,
+      Map<String, Client> clientPool,
       LogAccumulator accumulator,
       RetryQueue retryQueue,
       BlockingQueue<ProducerBatch> successQueue,
@@ -38,6 +43,7 @@ public class Mover extends LogThread {
       AtomicInteger batchCount) {
     super(name, true);
     this.producerConfig = producerConfig;
+    this.clientPool = clientPool;
     this.accumulator = accumulator;
     this.retryQueue = retryQueue;
     this.successQueue = successQueue;
@@ -105,7 +111,7 @@ public class Mover extends LogThread {
 
   private SendProducerBatchTask createSendProducerBatchTask(ProducerBatch batch) {
     return new SendProducerBatchTask(
-        batch, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
+        batch, producerConfig, clientPool, retryQueue, successQueue, failureQueue, batchCount);
   }
 
   public void close() {

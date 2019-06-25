@@ -4,10 +4,16 @@ import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeExcepti
 import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
+import com.aliyun.openservices.log.Client;
 import com.aliyun.openservices.log.common.LogItem;
+import com.aliyun.openservices.log.http.client.ClientConfiguration;
+import com.aliyun.openservices.log.http.comm.ServiceClient;
+import com.aliyun.openservices.log.http.comm.TimeoutServiceClient;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
@@ -33,6 +39,8 @@ public class LogProducer implements Producer {
 
   private static final String FAILURE_BATCH_HANDLER_SUFFIX = "-failure-batch-handler";
 
+  private static final String TIMEOUT_THREAD_SUFFIX_FORMAT = "-timeout-thread-%d";
+
   private final int instanceId;
 
   private final String name;
@@ -40,6 +48,10 @@ public class LogProducer implements Producer {
   private final String producerHash;
 
   private final ProducerConfig producerConfig;
+
+  private final Map<String, Client> clientPool = new ConcurrentHashMap<String, Client>();
+
+  private final ServiceClient serviceClient;
 
   private final Semaphore memoryController;
 
@@ -76,6 +88,20 @@ public class LogProducer implements Producer {
     this.name = LOG_PRODUCER_PREFIX + this.instanceId;
     this.producerHash = Utils.generateProducerHash(this.instanceId);
     this.producerConfig = producerConfig;
+    ClientConfiguration config = new ClientConfiguration();
+    this.serviceClient =
+        new TimeoutServiceClient(
+            config,
+            new ThreadPoolExecutor(
+                producerConfig.getIoThreadCount(),
+                producerConfig.getIoThreadCount(),
+                0L,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(),
+                new ThreadFactoryBuilder()
+                    .setDaemon(true)
+                    .setNameFormat(this.name + TIMEOUT_THREAD_SUFFIX_FORMAT)
+                    .build()));
     this.memoryController = new Semaphore(producerConfig.getTotalSizeInBytes());
     this.retryQueue = new RetryQueue();
     BlockingQueue<ProducerBatch> successQueue = new LinkedBlockingQueue<ProducerBatch>();
@@ -85,6 +111,7 @@ public class LogProducer implements Producer {
         new LogAccumulator(
             this.producerHash,
             producerConfig,
+            this.clientPool,
             this.memoryController,
             this.retryQueue,
             successQueue,
@@ -95,6 +122,7 @@ public class LogProducer implements Producer {
         new Mover(
             this.name + MOVER_SUFFIX,
             producerConfig,
+            this.clientPool,
             this.accumulator,
             this.retryQueue,
             successQueue,
@@ -516,5 +544,34 @@ public class LogProducer implements Producer {
   @Override
   public int availableMemoryInBytes() {
     return memoryController.availablePermits();
+  }
+
+  @Override
+  public void putProjectConfig(ProjectConfig projectConfig) {
+    Client client = buildClient(projectConfig);
+    clientPool.put(projectConfig.getProject(), client);
+  }
+
+  @Override
+  public void removeProjectConfig(ProjectConfig projectConfig) {
+    clientPool.remove(projectConfig.getProject());
+  }
+
+  private Client buildClient(ProjectConfig projectConfig) {
+    Client client =
+        new Client(
+            projectConfig.getEndpoint(),
+            projectConfig.getAccessKeyId(),
+            projectConfig.getAccessKeySecret(),
+            serviceClient);
+    String userAgent = projectConfig.getUserAgent();
+    if (userAgent != null) {
+      client.setUserAgent(userAgent);
+    }
+    String stsToken = projectConfig.getStsToken();
+    if (stsToken != null) {
+      client.setSecurityToken(stsToken);
+    }
+    return client;
   }
 }

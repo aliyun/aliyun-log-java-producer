@@ -16,8 +16,9 @@ public class ProducerTest {
 
   @Test
   public void testSend() throws InterruptedException, ProducerException, ExecutionException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     ListenableFuture<Result> f =
         producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
     Result result = f.get();
@@ -66,8 +67,9 @@ public class ProducerTest {
   @Test
   public void testSendWithCallback()
       throws InterruptedException, ProducerException, ExecutionException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     final AtomicInteger successCount = new AtomicInteger(0);
     ListenableFuture<Result> f =
         producer.send(
@@ -159,15 +161,14 @@ public class ProducerTest {
 
   @Test
   public void testSendWithInvalidAccessKeyId() throws InterruptedException, ProducerException {
-    ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(buildInvalidAccessKeyIdProjectConfig());
-    ProducerConfig producerConfig = new ProducerConfig(projectConfigs);
+    ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setRetries(4);
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildInvalidAccessKeyIdProjectConfig());
     ListenableFuture<Result> f =
         producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
     Thread.sleep(1000 * 3);
-    projectConfigs.put(buildProjectConfig());
+    producer.putProjectConfig(buildProjectConfig());
     try {
       Result result = f.get();
       Assert.assertTrue(result.isSuccessful());
@@ -207,10 +208,9 @@ public class ProducerTest {
 
   @Test
   public void testSendWithInvalidAccessKeySecret() throws InterruptedException, ProducerException {
-    ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(buildInvalidAccessKeySecretProjectConfig());
-    ProducerConfig producerConfig = new ProducerConfig(projectConfigs);
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildInvalidAccessKeySecretProjectConfig());
     ListenableFuture<Result> f =
         producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
     try {
@@ -234,8 +234,9 @@ public class ProducerTest {
 
   @Test
   public void testClose() throws InterruptedException, ProducerException, ExecutionException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     final AtomicInteger successCount = new AtomicInteger(0);
     int futureGetCount = 0;
     int n = 100000;
@@ -270,8 +271,9 @@ public class ProducerTest {
   @Test
   public void testCloseInCallback()
       throws InterruptedException, ProducerException, ExecutionException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     final AtomicInteger successCount = new AtomicInteger(0);
     int futureGetCount = 0;
     int n = 10000;
@@ -310,9 +312,10 @@ public class ProducerTest {
 
   @Test
   public void testMaxBatchSizeInBytes() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setBatchSizeThresholdInBytes(27);
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     LogItem logItem = new LogItem();
     logItem.PushBack("key1", "val1");
     logItem.PushBack("key2", "val2");
@@ -341,12 +344,6 @@ public class ProducerTest {
       logItems.add(buildLogItem());
     }
     return logItems;
-  }
-
-  private ProjectConfigs buildProjectConfigs() {
-    ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(buildProjectConfig());
-    return projectConfigs;
   }
 
   private ProjectConfig buildProjectConfig() {

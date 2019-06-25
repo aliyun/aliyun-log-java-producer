@@ -13,6 +13,7 @@ import com.aliyun.openservices.log.response.PutLogsResponse;
 import com.google.common.math.LongMath;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
@@ -28,6 +29,8 @@ public class SendProducerBatchTask implements Runnable {
 
   private final ProducerConfig producerConfig;
 
+  private final Map<String, Client> clientPool;
+
   private final RetryQueue retryQueue;
 
   private final BlockingQueue<ProducerBatch> successQueue;
@@ -39,12 +42,14 @@ public class SendProducerBatchTask implements Runnable {
   public SendProducerBatchTask(
       ProducerBatch batch,
       ProducerConfig producerConfig,
+      Map<String, Client> clientPool,
       RetryQueue retryQueue,
       BlockingQueue<ProducerBatch> successQueue,
       BlockingQueue<ProducerBatch> failureQueue,
       AtomicInteger batchCount) {
     this.batch = batch;
     this.producerConfig = producerConfig;
+    this.clientPool = clientPool;
     this.retryQueue = retryQueue;
     this.successQueue = successQueue;
     this.failureQueue = failureQueue;
@@ -132,7 +137,7 @@ public class SendProducerBatchTask implements Runnable {
   }
 
   private Client getClient(String project) {
-    return producerConfig.getProjectConfigs().getClient(project);
+    return clientPool.get(project);
   }
 
   private PutLogsRequest buildPutLogsRequest(ProducerBatch batch) {

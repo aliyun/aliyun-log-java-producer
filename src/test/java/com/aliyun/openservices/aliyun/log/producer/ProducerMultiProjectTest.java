@@ -25,8 +25,20 @@ public class ProducerMultiProjectTest {
 
   @Test
   public void testSend() throws InterruptedException, ProducerException, ExecutionException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(
+        new ProjectConfig(
+            System.getenv("PROJECT"),
+            System.getenv("ENDPOINT"),
+            System.getenv("ACCESS_KEY_ID"),
+            System.getenv("ACCESS_KEY_SECRET")));
+    producer.putProjectConfig(
+        new ProjectConfig(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("ENDPOINT"),
+            System.getenv("ACCESS_KEY_ID"),
+            System.getenv("ACCESS_KEY_SECRET")));
     final AtomicInteger successCount = new AtomicInteger();
     int futureGetCount = 0;
     int n = 10000;
@@ -76,23 +88,6 @@ public class ProducerMultiProjectTest {
     Assert.assertEquals(n * 2, successCount.get());
     Assert.assertEquals(n * 2, futureGetCount);
     ProducerTest.assertProducerFinalState(producer);
-  }
-
-  private ProjectConfigs buildProjectConfigs() {
-    ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(
-        new ProjectConfig(
-            System.getenv("PROJECT"),
-            System.getenv("ENDPOINT"),
-            System.getenv("ACCESS_KEY_ID"),
-            System.getenv("ACCESS_KEY_SECRET")));
-    projectConfigs.put(
-        new ProjectConfig(
-            System.getenv("OTHER_PROJECT"),
-            System.getenv("ENDPOINT"),
-            System.getenv("ACCESS_KEY_ID"),
-            System.getenv("ACCESS_KEY_SECRET")));
-    return projectConfigs;
   }
 
   private String getShardHash() {

@@ -23,8 +23,10 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithNullProject() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(
+        new ProjectConfig("project", "endpoint", "accessKeyId", "accessKeySecret"));
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("project cannot be null");
     producer.send(null, "logStore", new LogItem());
@@ -34,8 +36,9 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithEmptyProject() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("project cannot be empty");
     producer.send("", "logStore", new LogItem());
@@ -45,8 +48,9 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithNotExistProject() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     ListenableFuture<Result> f = producer.send("projectNotExist", "logStore", new LogItem(), null);
     try {
       f.get();
@@ -64,8 +68,9 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithNullLogStore() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("logStore cannot be null");
     producer.send("project", null, new LogItem());
@@ -75,8 +80,9 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithEmptyLogStore() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("logStore cannot be empty");
     producer.send("project", "", new LogItem());
@@ -86,8 +92,9 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithNullLogItem() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("logItem cannot be null");
     producer.send("project", "logStore", (LogItem) null);
@@ -97,8 +104,9 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithNullLogItems() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("logItems cannot be null");
     producer.send("project", "logStore", (List<LogItem>) null);
@@ -108,8 +116,9 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithEmptyLogItems() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(IllegalArgumentException.class);
     thrown.expectMessage("logItems cannot be empty");
     List<LogItem> logItems = new ArrayList<LogItem>();
@@ -121,8 +130,9 @@ public class ProducerInvalidTest {
   @Test
   public void testSendLogsThrownMaxBatchCountExceedException()
       throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(MaxBatchCountExceedException.class);
     thrown.expectMessage(
         "the log list size is 40961 which exceeds the MAX_BATCH_COUNT "
@@ -137,9 +147,10 @@ public class ProducerInvalidTest {
   @Test
   public void testSendLogThrownLogSizeTooLargeException()
       throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setTotalSizeInBytes(10);
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(LogSizeTooLargeException.class);
     thrown.expectMessage(
         "the logs is 12 bytes which is larger than the totalSizeInBytes you specified");
@@ -151,9 +162,10 @@ public class ProducerInvalidTest {
   @Test
   public void testSendLogsThrownLogSizeTooLargeException()
       throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setTotalSizeInBytes(30);
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(LogSizeTooLargeException.class);
     thrown.expectMessage(
         "the logs is 36 bytes which is larger than the totalSizeInBytes you specified");
@@ -168,10 +180,11 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendLogThrownTimeoutException() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setTotalSizeInBytes(20);
     producerConfig.setMaxBlockMs(3);
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     thrown.expect(TimeoutException.class);
     producer.send("project", "logStore", ProducerTest.buildLogItem());
     producer.send("project", "logStore", ProducerTest.buildLogItem());
@@ -179,11 +192,12 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithRequestError() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     int retries = 5;
     producerConfig.setRetries(retries);
     producerConfig.setMaxReservedAttempts(retries + 1);
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     ListenableFuture<Result> f = producer.send("project", "logStore", ProducerTest.buildLogItem());
     try {
       f.get();
@@ -227,12 +241,13 @@ public class ProducerInvalidTest {
 
   @Test
   public void testSendWithRequestError2() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     int retries = 5;
     int maxReservedAttempts = 2;
     producerConfig.setRetries(retries);
     producerConfig.setMaxReservedAttempts(maxReservedAttempts);
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     ListenableFuture<Result> f = producer.send("project", "logStore", ProducerTest.buildLogItem());
     try {
       f.get();
@@ -260,9 +275,10 @@ public class ProducerInvalidTest {
 
   @Test
   public void testCloseMultiTimes() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setRetries(3);
     Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     int n = 1000000;
     int futureGetCount = 0;
     List<ListenableFuture> futures = new ArrayList<ListenableFuture>();
@@ -301,9 +317,10 @@ public class ProducerInvalidTest {
 
   @Test
   public void testCloseInMultiThreads() throws InterruptedException, ProducerException {
-    final ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    final ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setRetries(3);
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     int n = 1000000;
     int futureGetCount = 0;
     List<ListenableFuture> futures = new ArrayList<ListenableFuture>();
@@ -363,9 +380,7 @@ public class ProducerInvalidTest {
     executorService.shutdown();
   }
 
-  private ProjectConfigs buildProjectConfigs() {
-    ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(new ProjectConfig("project", "endpoint", "accessKeyId", "accessKeySecret"));
-    return projectConfigs;
+  private ProjectConfig buildProjectConfig() {
+    return new ProjectConfig("project", "endpoint", "accessKeyId", "accessKeySecret");
   }
 }

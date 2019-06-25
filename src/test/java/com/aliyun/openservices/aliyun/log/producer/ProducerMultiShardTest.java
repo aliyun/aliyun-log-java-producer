@@ -15,8 +15,20 @@ public class ProducerMultiShardTest {
 
   @Test
   public void testSend() throws InterruptedException, ProducerException, ExecutionException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(
+        new ProjectConfig(
+            System.getenv("PROJECT"),
+            System.getenv("ENDPOINT"),
+            System.getenv("ACCESS_KEY_ID"),
+            System.getenv("ACCESS_KEY_SECRET")));
+    producer.putProjectConfig(
+        new ProjectConfig(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("ENDPOINT"),
+            System.getenv("ACCESS_KEY_ID"),
+            System.getenv("ACCESS_KEY_SECRET")));
     ListenableFuture<Result> f =
         producer.send(
             System.getenv("OTHER_PROJECT"),
@@ -45,9 +57,21 @@ public class ProducerMultiShardTest {
 
   @Test
   public void testInvalidSend() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     producerConfig.setAdjustShardHash(false);
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(
+        new ProjectConfig(
+            System.getenv("PROJECT"),
+            System.getenv("ENDPOINT"),
+            System.getenv("ACCESS_KEY_ID"),
+            System.getenv("ACCESS_KEY_SECRET")));
+    producer.putProjectConfig(
+        new ProjectConfig(
+            System.getenv("OTHER_PROJECT"),
+            System.getenv("ENDPOINT"),
+            System.getenv("ACCESS_KEY_ID"),
+            System.getenv("ACCESS_KEY_SECRET")));
     ListenableFuture<Result> f =
         producer.send(
             System.getenv("OTHER_PROJECT"),
@@ -60,25 +84,8 @@ public class ProducerMultiShardTest {
       f.get();
     } catch (ExecutionException e) {
       ResultFailedException resultFailedException = (ResultFailedException) e.getCause();
-      Assert.assertEquals("ShardNotExist", resultFailedException.getErrorCode());
-      Assert.assertEquals("shard 1600484969 is not exist", resultFailedException.getErrorMessage());
+      Assert.assertEquals("InternalServerError", resultFailedException.getErrorCode());
+      Assert.assertEquals("sync send error", resultFailedException.getErrorMessage());
     }
-  }
-
-  private ProjectConfigs buildProjectConfigs() {
-    ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(
-        new ProjectConfig(
-            System.getenv("PROJECT"),
-            System.getenv("ENDPOINT"),
-            System.getenv("ACCESS_KEY_ID"),
-            System.getenv("ACCESS_KEY_SECRET")));
-    projectConfigs.put(
-        new ProjectConfig(
-            System.getenv("OTHER_PROJECT"),
-            System.getenv("ENDPOINT"),
-            System.getenv("ACCESS_KEY_ID"),
-            System.getenv("ACCESS_KEY_SECRET")));
-    return projectConfigs;
   }
 }

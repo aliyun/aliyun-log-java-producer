@@ -17,8 +17,9 @@ public class ProducerLargeAmountTest {
 
   @Test
   public void testSend() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildProjectConfig());
     final AtomicInteger successCount = new AtomicInteger(0);
     final int nTasks = 100;
     final int times = 10000;
@@ -63,7 +64,7 @@ public class ProducerLargeAmountTest {
 
   @Test
   public void testSendLogs() throws InterruptedException, ProducerException {
-    ProducerConfig producerConfig = new ProducerConfig(buildProjectConfigs());
+    ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
     final AtomicInteger successCount = new AtomicInteger(0);
     final int nTasks = 100;
@@ -106,12 +107,6 @@ public class ProducerLargeAmountTest {
     producer.close();
     Assert.assertEquals(nTasks * times, successCount.get());
     ProducerTest.assertProducerFinalState(producer);
-  }
-
-  private ProjectConfigs buildProjectConfigs() {
-    ProjectConfigs projectConfigs = new ProjectConfigs();
-    projectConfigs.put(buildProjectConfig());
-    return projectConfigs;
   }
 
   private ProjectConfig buildProjectConfig() {

@@ -6,6 +6,7 @@ import com.aliyun.openservices.aliyun.log.producer.Result;
 import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
+import com.aliyun.openservices.log.Client;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.*;
@@ -24,6 +25,8 @@ public final class LogAccumulator {
   private final String producerHash;
 
   private final ProducerConfig producerConfig;
+
+  private final Map<String, Client> clientPool;
 
   private final Semaphore memoryController;
 
@@ -46,6 +49,7 @@ public final class LogAccumulator {
   public LogAccumulator(
       String producerHash,
       ProducerConfig producerConfig,
+      Map<String, Client> clientPool,
       Semaphore memoryController,
       RetryQueue retryQueue,
       BlockingQueue<ProducerBatch> successQueue,
@@ -54,6 +58,7 @@ public final class LogAccumulator {
       AtomicInteger batchCount) {
     this.producerHash = producerHash;
     this.producerConfig = producerConfig;
+    this.clientPool = clientPool;
     this.memoryController = memoryController;
     this.retryQueue = retryQueue;
     this.successQueue = successQueue;
@@ -138,12 +143,24 @@ public final class LogAccumulator {
       if (f != null) {
         if (holder.producerBatch.isMeetSendCondition()) {
           holder.transferProducerBatch(
-              ioThreadPool, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
+              ioThreadPool,
+              producerConfig,
+              clientPool,
+              retryQueue,
+              successQueue,
+              failureQueue,
+              batchCount);
         }
         return f;
       } else {
         holder.transferProducerBatch(
-            ioThreadPool, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
+            ioThreadPool,
+            producerConfig,
+            clientPool,
+            retryQueue,
+            successQueue,
+            failureQueue,
+            batchCount);
       }
     }
     holder.producerBatch =
@@ -158,7 +175,13 @@ public final class LogAccumulator {
     batchCount.incrementAndGet();
     if (holder.producerBatch.isMeetSendCondition()) {
       holder.transferProducerBatch(
-          ioThreadPool, producerConfig, retryQueue, successQueue, failureQueue, batchCount);
+          ioThreadPool,
+          producerConfig,
+          clientPool,
+          retryQueue,
+          successQueue,
+          failureQueue,
+          batchCount);
     }
     return f;
   }
@@ -264,6 +287,7 @@ public final class LogAccumulator {
     void transferProducerBatch(
         IOThreadPool ioThreadPool,
         ProducerConfig producerConfig,
+        Map<String, Client> clientPool,
         RetryQueue retryQueue,
         BlockingQueue<ProducerBatch> successQueue,
         BlockingQueue<ProducerBatch> failureQueue,
@@ -273,7 +297,13 @@ public final class LogAccumulator {
       }
       ioThreadPool.submit(
           new SendProducerBatchTask(
-              producerBatch, producerConfig, retryQueue, successQueue, failureQueue, batchCount));
+              producerBatch,
+              producerConfig,
+              clientPool,
+              retryQueue,
+              successQueue,
+              failureQueue,
+              batchCount));
       producerBatch = null;
     }
 
