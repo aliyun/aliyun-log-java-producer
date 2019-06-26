@@ -546,12 +546,14 @@ public class LogProducer implements Producer {
     return memoryController.availablePermits();
   }
 
+  /** Add or update a project config. */
   @Override
   public void putProjectConfig(ProjectConfig projectConfig) {
     Client client = buildClient(projectConfig);
     clientPool.put(projectConfig.getProject(), client);
   }
 
+  /** Remove a project config. */
   @Override
   public void removeProjectConfig(ProjectConfig projectConfig) {
     clientPool.remove(projectConfig.getProject());
