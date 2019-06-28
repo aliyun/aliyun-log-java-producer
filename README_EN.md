@@ -52,8 +52,8 @@ Add this dependency to your project's POM:
 
 ### Gradle users
 ```
-compile 'com.aliyun.openservices:aliyun-log-producer:0.2.0'
-compile 'com.aliyun.openservices:aliyun-log:0.6.31'
+compile 'com.aliyun.openservices:aliyun-log-producer:0.3.0'
+compile 'com.aliyun.openservices:aliyun-log:0.6.33'
 compile 'com.google.protobuf:protobuf-java:2.5.0'
 ```
 ## RAM
