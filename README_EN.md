@@ -36,12 +36,12 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
 </dependency>
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log</artifactId>
-    <version>0.6.31</version>
+    <version>0.6.33</version>
 </dependency>
 <dependency>
     <groupId>com.google.protobuf</groupId>
