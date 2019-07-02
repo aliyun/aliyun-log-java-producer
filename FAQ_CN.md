@@ -100,7 +100,7 @@ Producer producer = new LogProducer(new ProducerConfig());
 ProjectConfig projectConfig = new ProjectConfig("xxx", endpoint, accessKeyId, accessKeySecret);
 producer.putProjectConfig(projectConfig);
 ```
-Producer 构造方式请参考样例程序[Utils.java](https://github.com/aliyun/aliyun-log-producer-sample/blob/master/src/main/java/com/aliyun/openservices/aliyun/log/producer/sample/Utils.java#L19)。
+Producer 构造方式请参考样例程序 [Utils.java](https://github.com/aliyun/aliyun-log-producer-sample/blob/master/src/main/java/com/aliyun/openservices/aliyun/log/producer/sample/Utils.java#L19)。
 
 
 
