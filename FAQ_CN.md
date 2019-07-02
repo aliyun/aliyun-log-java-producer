@@ -92,6 +92,15 @@ A: 这是因为项目引入的`aliyun-log`版本过低造成的，请确保其�
 </dependency>
 ```
 
+**Q:** 程序运行过程出现异常`Failed to get client, project=xxx`或`errorCode=ProjectConfigNotExist, errorMessage=Cannot get the projectConfig for project xxx`？
+
+A: 没有为 project xxx 设置 projectConfig。请按如下方式进行设置。
+```
+Producer producer = new LogProducer(new ProducerConfig());
+ProjectConfig projectConfig = new ProjectConfig("xxx", endpoint, accessKeyId, accessKeySecret);
+producer.putProjectConfig(projectConfig);
+```
+Producer 构造方式请参考样例程序[Utils.java](https://github.com/aliyun/aliyun-log-producer-sample/blob/master/src/main/java/com/aliyun/openservices/aliyun/log/producer/sample/Utils.java#L19)。
 
 
 
