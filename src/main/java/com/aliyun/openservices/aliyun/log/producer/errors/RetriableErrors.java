@@ -16,4 +16,6 @@ public class RetriableErrors {
   public static final String INTERNAL_SERVER_ERROR = "InternalServerError";
 
   public static final String SERVER_BUSY = "ServerBusy";
+
+  public static final String BAD_RESPONSE = "BadResponse";
 }
