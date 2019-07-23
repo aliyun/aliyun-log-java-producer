@@ -84,8 +84,7 @@ public class ProducerMultiShardTest {
       f.get();
     } catch (ExecutionException e) {
       ResultFailedException resultFailedException = (ResultFailedException) e.getCause();
-      Assert.assertEquals("InternalServerError", resultFailedException.getErrorCode());
-      Assert.assertEquals("sync send error", resultFailedException.getErrorMessage());
+      Assert.assertEquals("ShardNotExist", resultFailedException.getErrorCode());
     }
   }
 }
