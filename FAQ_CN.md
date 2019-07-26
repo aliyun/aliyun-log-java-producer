@@ -33,6 +33,10 @@ A: 可以使用 Aliyun LOG Java SDK 提供的一个特殊版本`jar-with-depende
 </dependency>
 ```
 
+**Q:** 一个进程应当创建多少个 producer 实例？
+
+A: 创建 producer 的同时会创建一系列线程，是一个相对昂贵的操作，因此强烈建议一个进程共用一个 producer 实例。 使用方式请参考 - [Aliyun LOG Java Producer 快速入门](https://yq.aliyun.com/articles/682761)。
+
 **Q:** 日志写入过程中返回如下错误`com.aliyun.openservices.log.exception.LogException: denied by sts or ram, action: log:PostLogStoreLogs, resource: acs:log:${regionName}:${projectOwnerAliUid}:project/${projectName}/logstore/${logstoreName}`？
 
 A：子账号没有目标 project、logStore 的写权限，请参考 [RAM 子账号访问](https://github.com/aliyun/aliyun-log-java-producer#ram-%E5%AD%90%E8%B4%A6%E5%8F%B7%E8%AE%BF%E9%97%AE)配置相应权限。
