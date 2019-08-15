@@ -18,4 +18,8 @@ public class RetriableErrors {
   public static final String SERVER_BUSY = "ServerBusy";
 
   public static final String BAD_RESPONSE = "BadResponse";
+
+  public static final String PROJECT_NOT_EXISTS = "ProjectNotExists";
+
+  public static final String LOGSTORE_NOT_EXISTS = "LogstoreNotExists";
 }
