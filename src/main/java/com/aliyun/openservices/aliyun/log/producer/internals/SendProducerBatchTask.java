@@ -206,7 +206,9 @@ public class SendProducerBatchTask implements Runnable {
           || logException.GetErrorCode().equals(RetriableErrors.EXCEED_QUOTA)
           || logException.GetErrorCode().equals(RetriableErrors.INTERNAL_SERVER_ERROR)
           || logException.GetErrorCode().equals(RetriableErrors.SERVER_BUSY)
-          || logException.GetErrorCode().equals(RetriableErrors.BAD_RESPONSE));
+          || logException.GetErrorCode().equals(RetriableErrors.BAD_RESPONSE)
+          || logException.GetErrorCode().equals(RetriableErrors.PROJECT_NOT_EXISTS)
+          || logException.GetErrorCode().equals(RetriableErrors.LOGSTORE_NOT_EXISTS));
     }
     return false;
   }
