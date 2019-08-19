@@ -59,6 +59,8 @@ public class LogProducer implements Producer {
 
   private final IOThreadPool ioThreadPool;
 
+  private final ThreadPoolExecutor timeoutThreadPool;
+
   private final LogAccumulator accumulator;
 
   private final Mover mover;
@@ -88,25 +90,24 @@ public class LogProducer implements Producer {
     this.name = LOG_PRODUCER_PREFIX + this.instanceId;
     this.producerHash = Utils.generateProducerHash(this.instanceId);
     this.producerConfig = producerConfig;
-    ClientConfiguration config = new ClientConfiguration();
-    this.serviceClient =
-        new TimeoutServiceClient(
-            config,
-            new ThreadPoolExecutor(
-                producerConfig.getIoThreadCount(),
-                producerConfig.getIoThreadCount(),
-                0L,
-                TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(),
-                new ThreadFactoryBuilder()
-                    .setDaemon(true)
-                    .setNameFormat(this.name + TIMEOUT_THREAD_SUFFIX_FORMAT)
-                    .build()));
     this.memoryController = new Semaphore(producerConfig.getTotalSizeInBytes());
     this.retryQueue = new RetryQueue();
     BlockingQueue<ProducerBatch> successQueue = new LinkedBlockingQueue<ProducerBatch>();
     BlockingQueue<ProducerBatch> failureQueue = new LinkedBlockingQueue<ProducerBatch>();
     this.ioThreadPool = new IOThreadPool(producerConfig.getIoThreadCount(), this.name);
+    this.timeoutThreadPool =
+        new ThreadPoolExecutor(
+            producerConfig.getIoThreadCount(),
+            producerConfig.getIoThreadCount(),
+            0L,
+            TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<Runnable>(),
+            new ThreadFactoryBuilder()
+                .setDaemon(true)
+                .setNameFormat(this.name + TIMEOUT_THREAD_SUFFIX_FORMAT)
+                .build());
+    this.serviceClient =
+        new TimeoutServiceClient(new ClientConfiguration(), this.timeoutThreadPool);
     this.accumulator =
         new LogAccumulator(
             this.producerHash,
@@ -440,6 +441,14 @@ public class LogProducer implements Producer {
     }
     LOGGER.debug("After close ioThreadPool, timeoutMs={}", timeoutMs);
     try {
+      timeoutMs = closeTimeoutThreadPool(timeoutMs);
+    } catch (ProducerException e) {
+      if (firstException == null) {
+        firstException = e;
+      }
+    }
+    LOGGER.debug("After close timeoutThreadPool, timeoutMs={}", timeoutMs);
+    try {
       timeoutMs = closeSuccessBatchHandler(timeoutMs);
     } catch (ProducerException e) {
       if (firstException == null) {
@@ -483,6 +492,20 @@ public class LogProducer implements Producer {
     } else {
       LOGGER.warn("The ioThreadPool is not fully terminated");
       throw new ProducerException("the ioThreadPool is not fully terminated");
+    }
+    long nowMs = System.currentTimeMillis();
+    return Math.max(0, timeoutMs - nowMs + startMs);
+  }
+
+  private long closeTimeoutThreadPool(long timeoutMs)
+      throws InterruptedException, ProducerException {
+    long startMs = System.currentTimeMillis();
+    timeoutThreadPool.shutdown();
+    if (timeoutThreadPool.awaitTermination(timeoutMs, TimeUnit.MILLISECONDS)) {
+      LOGGER.debug("The timeoutThreadPool is terminated");
+    } else {
+      LOGGER.warn("The timeoutThreadPool is not fully terminated");
+      throw new ProducerException("the timeoutThreadPool is not fully terminated");
     }
     long nowMs = System.currentTimeMillis();
     return Math.max(0, timeoutMs - nowMs + startMs);
