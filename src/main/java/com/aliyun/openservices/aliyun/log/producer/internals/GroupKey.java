@@ -22,7 +22,9 @@ public final class GroupKey {
     this.topic = topic;
     this.source = source;
     this.shardHash = shardHash;
-    this.key = project + DELIMITER + logStore + DELIMITER + topic + DELIMITER + source;
+    this.key =
+        project + DELIMITER + logStore + DELIMITER + topic + DELIMITER + source + DELIMITER
+            + shardHash;
   }
 
   @Override
