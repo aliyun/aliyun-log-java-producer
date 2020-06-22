@@ -50,6 +50,16 @@ Aliyun LOG Java Producer 是一个易于使用且高度可配置的 Java 类库�
 </dependency>
 ```
 
+jar-with-dependency 版本，可以解决producer依赖的版本冲突
+```
+<dependency>
+    <groupId>com.aliyun.openservices</groupId>
+    <artifactId>aliyun-log</artifactId>
+    <version>0.6.35</version>
+  <classifier>jar-with-dependencies</classifier>
+</dependency>
+```
+
 ### Gradle 使用者
 ```
 compile 'com.aliyun.openservices:aliyun-log-producer:0.3.4'
