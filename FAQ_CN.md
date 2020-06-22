@@ -106,6 +106,25 @@ producer.putProjectConfig(projectConfig);
 ```
 Producer 构造方式请参考样例程序 [Utils.java](https://github.com/aliyun/aliyun-log-producer-sample/blob/master/src/main/java/com/aliyun/openservices/aliyun/log/producer/sample/Utils.java#L19)。
 
+**Q:** aliyun-log-producer 相比 log-loghub-producer，shardHash 的对齐逻辑有什么变化？
 
+A：2 者差别如下。
+
+log-loghub-producer
+1. 定期轮询服务端目标 logstore 的 shard 梳理
+2. 根据二分法，计算指定的 shardHash 应该落在哪个区间里
+
+源码
+https://github.com/aliyun/aliyun-log-producer-java/blob/master/src/main/java/com/aliyun/openservices/log/producer/inner/ShardHashManager.java#L59
+
+aliyun-log-producer
+
+如果 buckets 是 32，则根据 shardHash 的前 5 位决定该日志应该和哪个区间对齐。
+
+源码
+https://github.com/aliyun/aliyun-log-java-producer/blob/1ca3b473b1f3a71f73c1b5d513c85b3109e03022/src/main/java/com/aliyun/openservices/aliyun/log/producer/ShardHashAdjuster.java#L23
+
+测试代码
+https://github.com/aliyun/aliyun-log-java-producer/blob/master/src/test/java/com/aliyun/openservices/aliyun/log/producer/ShardHashAdjusterTest.java#L13
 
 
