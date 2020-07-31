@@ -38,7 +38,8 @@ A: 可以使用 Aliyun LOG Java SDK 提供的一个特殊版本`jar-with-depende
 A: 创建 producer 的同时会创建一系列线程，是一个相对昂贵的操作，因此强烈建议一个进程共用一个 producer 实例。 使用方式请参考 - [Aliyun LOG Java Producer 快速入门](https://yq.aliyun.com/articles/682761)。
 
 Q：调用 send 方法发送数据时抛出如下异常`failed to acquire memory within the configured max blocking time xxx ms...`？
-A：Producer 中的数据最终是由 IO 线程异步发送的，抛出以上异常表明 send 方法的调用速度大于 IO 线程的发送速度。一般而言，可通过以下方式解决。
+A：Producer 中的数据最终是由 IO 线程异步发送的，抛出以上异常表明 send 方法的调用速度大于 IO 线程的发送速度。一般而言，可通过以下方式解决：
+
 1. 检查配置的 endpoint 是不是公网 endpoint。如果是，请将 endpoint 替换为[内网 endpoint](https://help.aliyun.com/document_detail/29008.html)，因为公网带宽有限。
 2. 检查目标 project、logstore 是否超过了数据写入的[流量和次数限制](https://help.aliyun.com/document_detail/92571.html)，因为这可能导致 producer 不断重试，从而导致内存数据堆积。如果是，请调整 project 的写入 quota 或分裂 shard。
 3. 通过参数 ioThreadCount 增加 IO 线程数量，从而加快数据发送速率。
