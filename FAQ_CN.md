@@ -41,7 +41,7 @@ Q：调用 send 方法发送数据时抛出如下异常`failed to acquire memory
 A：Producer 中的数据最终是由 IO 线程异步发送的，抛出以上异常表明 send 方法的调用速度大于 IO 线程的发送速度。一般而言，可通过以下方式解决：
 
 1. 检查配置的 endpoint 是不是公网 endpoint。如果是，请将 endpoint 替换为[内网 endpoint](https://help.aliyun.com/document_detail/29008.html)，因为公网带宽有限。
-2. 检查目标 project、logstore 是否超过了数据写入的[流量和次数限制](https://help.aliyun.com/document_detail/92571.html)，因为这可能导致 producer 不断重试，从而导致内存数据堆积。如果是，请调整 project 的写入 quota 或分裂 shard。
+2. 检查目标 project、logstore 是否超过了数据写入的[流量和次数限制](https://help.aliyun.com/document_detail/92571.html)，因为这可能导致 producer 不断重试，内存数据堆积。如果是，请调整 project 的写入 quota 或分裂 logstore 的 shard。
 3. 通过参数 ioThreadCount 增加 IO 线程数量，从而加快数据发送速率。
 
 **Q:** 日志写入过程中返回如下错误`com.aliyun.openservices.log.exception.LogException: denied by sts or ram, action: log:PostLogStoreLogs, resource: acs:log:${regionName}:${projectOwnerAliUid}:project/${projectName}/logstore/${logstoreName}`？
