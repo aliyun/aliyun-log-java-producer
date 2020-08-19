@@ -52,6 +52,10 @@ A：子账号没有目标 project、logStore 的写权限，请参考 [RAM 子�
 
 A: 请在程序退出之前调用 producer 的 close() 方法，以防止缓存在内存中的数据丢失。
 
+**Q:** 调用 send() 方法为什么会抛出异常`cannot append after the log accumulator was closed`？
+
+A: 说明在调用了 producer 实例的 close() 方法后，仍然尝试调用 producer 实例的 send() 方法。此时，producer 会提示调用者它已经处于关闭状态。
+
 **Q:** Producer 会缓存待发送的数据，并将数据合并成 batch 后批量发往服务端。什么样的数据有机会合并在相同的 batch 里？
 
 A: 具有相同 project，logStore，topic，source，shardHash 的数据会被合并在一起。为了让数据合并功能充分发挥作用，同时也为了节省内存，建议您控制这 5 个字段的取值范围。如果某个字段如 topic 的取值确实非常多，建议您将其加入 logItem 而不是直接使用 topic。
