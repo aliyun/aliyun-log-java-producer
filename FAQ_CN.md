@@ -52,9 +52,9 @@ A：子账号没有目标 project、logStore 的写权限，请参考 [RAM 子�
 
 A: 请在程序退出之前调用 producer 的 close() 方法，以防止缓存在内存中的数据丢失。
 
-**Q:** 调用 send() 方法为什么会抛出异常`cannot append after the log accumulator was closed`？
+**Q:** 调用 send() 方法为什么会抛出异常`cannot append after the log accumulator was closed`？应用程序该如何处理？
 
-A: 说明在调用了 producer 实例的 close() 方法后，仍然尝试调用 producer 实例的 send() 方法。此时，producer 会提示调用者它已经处于关闭状态。
+A: 说明在调用了 producer 实例的 close() 方法后，仍然尝试调用 producer 实例的 send() 方法。此时，producer 会通过抛出 IllegalStateException 提示调用者它已经处于关闭状态。推荐应用程序在调用 close() 方法后就不要继续调用 send() 方法发送数据，如果做不到这一点，可以 catch IllegalStateException 并打印相关日志。
 
 **Q:** Producer 会缓存待发送的数据，并将数据合并成 batch 后批量发往服务端。什么样的数据有机会合并在相同的 batch 里？
 
