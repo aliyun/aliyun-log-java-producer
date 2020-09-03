@@ -10,7 +10,7 @@
 
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.3.6</version>
+    <version>0.3.7-SNAPSHOT</version>
 
     <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
