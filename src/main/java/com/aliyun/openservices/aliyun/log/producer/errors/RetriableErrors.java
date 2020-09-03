@@ -22,4 +22,7 @@ public class RetriableErrors {
   public static final String PROJECT_NOT_EXISTS = "ProjectNotExists";
 
   public static final String LOGSTORE_NOT_EXISTS = "LogstoreNotExists";
+
+  public static final String SOCKET_TIMEOUT = "SocketTimeout";
+
 }
