@@ -112,6 +112,12 @@ public final class LogAccumulator {
       boolean acquired =
           memoryController.tryAcquire(sizeInBytes, maxBlockMs, TimeUnit.MILLISECONDS);
       if (!acquired) {
+        LOGGER.warn(
+            "Failed to acquire memory within the configured max blocking time {} ms, "
+                + "requiredSizeInBytes={}, availableSizeInBytes={}",
+            producerConfig.getMaxBlockMs(),
+            sizeInBytes,
+            memoryController.availablePermits());
         throw new TimeoutException(
             "failed to acquire memory within the configured max blocking time "
                 + producerConfig.getMaxBlockMs()
