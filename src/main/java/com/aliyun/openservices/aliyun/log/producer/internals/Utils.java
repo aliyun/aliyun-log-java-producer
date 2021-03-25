@@ -5,8 +5,12 @@ import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.atomic.AtomicLong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Utils {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(Utils.class);
 
   public static void assertArgumentNotNull(Object argument, String argumentName) {
     if (argument == null) {
@@ -24,7 +28,8 @@ public abstract class Utils {
   public static String generateProducerHash(int instanceId) {
     String ip = NetworkUtils.getLocalMachineIP();
     if (ip == null) {
-      throw new IllegalStateException("failed to get local machine ip");
+      LOGGER.warn("Failed to get local machine ip, set ip to 127.0.0.1");
+      ip = "127.0.0.1";
     }
     String name = ManagementFactory.getRuntimeMXBean().getName();
     String input = ip + "-" + name + "-" + instanceId;
