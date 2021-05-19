@@ -209,7 +209,8 @@ public class SendProducerBatchTask implements Runnable {
           || logException.GetErrorCode().equals(RetriableErrors.BAD_RESPONSE)
           || logException.GetErrorCode().equals(RetriableErrors.PROJECT_NOT_EXISTS)
           || logException.GetErrorCode().equals(RetriableErrors.LOGSTORE_NOT_EXISTS)
-          || logException.GetErrorCode().equals(RetriableErrors.SOCKET_TIMEOUT));
+          || logException.GetErrorCode().equals(RetriableErrors.SOCKET_TIMEOUT)
+          || logException.GetErrorCode().equals(RetriableErrors.SIGNATURE_NOT_MATCH));
     }
     return false;
   }

@@ -24,4 +24,6 @@ public class RetriableErrors {
   public static final String LOGSTORE_NOT_EXISTS = "LogstoreNotExists";
 
   public static final String SOCKET_TIMEOUT = "SocketTimeout";
+
+  public static final String SIGNATURE_NOT_MATCH = "SignatureNotMatch";
 }
