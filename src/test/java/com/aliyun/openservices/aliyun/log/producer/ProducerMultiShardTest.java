@@ -84,7 +84,7 @@ public class ProducerMultiShardTest {
       f.get();
     } catch (ExecutionException e) {
       ResultFailedException resultFailedException = (ResultFailedException) e.getCause();
-      Assert.assertEquals("ShardNotExist", resultFailedException.getErrorCode());
+      Assert.assertEquals("ParameterInvalid", resultFailedException.getErrorCode());
     }
   }
 }
