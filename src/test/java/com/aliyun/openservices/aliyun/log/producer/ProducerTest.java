@@ -2,6 +2,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
+import com.aliyun.openservices.aliyun.log.producer.errors.RetriableErrors;
 import com.aliyun.openservices.aliyun.log.producer.internals.LogSizeCalculator;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -219,13 +220,13 @@ public class ProducerTest {
       ResultFailedException resultFailedException = (ResultFailedException) e.getCause();
       Result result = resultFailedException.getResult();
       Assert.assertFalse(result.isSuccessful());
-      Assert.assertEquals("SignatureNotMatch", result.getErrorCode());
+      Assert.assertEquals(RetriableErrors.SIGNATURE_NOT_MATCH, result.getErrorCode());
       Assert.assertTrue(!result.getErrorMessage().isEmpty());
       List<Attempt> attempts = result.getReservedAttempts();
-      Assert.assertEquals(1, attempts.size());
+      Assert.assertEquals(11, attempts.size());
       for (Attempt attempt : attempts) {
         Assert.assertFalse(attempt.isSuccess());
-        Assert.assertEquals("SignatureNotMatch", attempt.getErrorCode());
+        Assert.assertEquals(RetriableErrors.SIGNATURE_NOT_MATCH, attempt.getErrorCode());
         Assert.assertTrue(!attempt.getErrorMessage().isEmpty());
         Assert.assertTrue(!attempt.getRequestId().isEmpty());
       }
