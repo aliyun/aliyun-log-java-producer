@@ -36,7 +36,7 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.3.9</version>
+    <version>0.3.10</version>
 </dependency>
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
@@ -62,7 +62,7 @@ jar-with-dependency version, can resolve dependent version conflicts
 
 ### Gradle users
 ```
-compile 'com.aliyun.openservices:aliyun-log-producer:0.3.9'
+compile 'com.aliyun.openservices:aliyun-log-producer:0.3.10'
 compile 'com.aliyun.openservices:aliyun-log:0.6.33'
 compile 'com.google.protobuf:protobuf-java:2.5.0'
 ```
