@@ -15,7 +15,7 @@ public class ProducerConfig {
 
   public static final int DEFAULT_BATCH_SIZE_THRESHOLD_IN_BYTES = 512 * 1024;
 
-  public static final int MAX_BATCH_SIZE_IN_BYTES = 10 * 1024 * 1024;
+  public static final int MAX_BATCH_SIZE_IN_BYTES = 8 * 1024 * 1024;
 
   public static final int DEFAULT_BATCH_COUNT_THRESHOLD = 4096;
 
