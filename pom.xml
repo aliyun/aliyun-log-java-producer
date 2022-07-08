@@ -25,8 +25,8 @@
     </licenses>
     <scm>
         <url>https://github.com/aliyun/aliyun-log-producer</url>
-        <connection>scm:git:https://github.com/aliyun/aliyun-log-producer.git</connection>
-        <developerConnection>scm:git:https://github.com/aliyun/aliyun-log-producer.git</developerConnection>
+        <connection>scm:git:git@github.com:aliyun/aliyun-log-java-producer.git</connection>
+        <developerConnection>scm:git:git@github.com:aliyun/aliyun-log-java-producer.git</developerConnection>
     </scm>
     <developers>
         <developer>
