@@ -139,4 +139,8 @@ https://github.com/aliyun/aliyun-log-java-producer/blob/1ca3b473b1f3a71f73c1b5d5
 测试代码
 https://github.com/aliyun/aliyun-log-java-producer/blob/master/src/test/java/com/aliyun/openservices/aliyun/log/producer/ShardHashAdjusterTest.java#L13
 
+**Q：** 调用 send() 方法为什么会抛出异常`java.lang.InterruptedException`？
+
+A：当调用 send() 方法的线程被中断时会抛出此类异常，一般当主进程准备退出时会主动中断各个线程。
+
 
