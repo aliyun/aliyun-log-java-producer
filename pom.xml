@@ -17,10 +17,8 @@
     <description>Aliyun LOG Java Producer</description>
     <licenses>
         <license>
-            <name />
-            <url />
-            <distribution>repo</distribution>
-            <comments>Copyright (C) Alibaba Cloud Computing. All rights reserved.</comments>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
     <scm>
