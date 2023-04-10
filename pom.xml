@@ -1,41 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>9</version>
     </parent>
-
     <groupId>com.aliyun.openservices</groupId>
-    <artifactId>aliyun-log-producer</artifactId>
-    <version>0.3.12</version>
-
+    <artifactId>aliyun-log-producer-internal</artifactId>
+    <version>0.3.11_ZF-SNAPSHOT</version>
     <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
     <description>Aliyun LOG Java Producer</description>
     <licenses>
         <license>
-            <name>The Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <name/>
+            <url/>
+            <distribution>repo</distribution>
+            <comments>Copyright (C) Alibaba Cloud Computing. All rights reserved.</comments>
         </license>
     </licenses>
     <scm>
         <url>https://github.com/aliyun/aliyun-log-producer</url>
-        <connection>scm:git:git@github.com:aliyun/aliyun-log-java-producer.git</connection>
-        <developerConnection>scm:git:git@github.com:aliyun/aliyun-log-java-producer.git</developerConnection>
+        <connection>scm:git:https://github.com/aliyun/aliyun-log-producer.git</connection>
+        <developerConnection>scm:git:https://github.com/aliyun/aliyun-log-producer.git</developerConnection>
     </scm>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
     <developers>
         <developer>
             <id>aliyunproducts</id>
@@ -51,9 +41,8 @@
         <slf4j.version>1.7.15</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <guava.version>27.0-jre</guava.version>
-        <aliyun-log.version>0.6.73</aliyun-log.version>
+        <aliyun-log.version>0.6.57</aliyun-log.version>
     </properties>
-
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -87,36 +76,50 @@
             <groupId>com.aliyun.openservices</groupId>
             <artifactId>aliyun-log</artifactId>
             <version>${aliyun-log.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.7.25</version>
         </dependency>
     </dependencies>
-
+    <profiles>
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.3</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>sonatype-nexus-staging</serverId>
-                    <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -198,16 +201,24 @@
                         <configuration>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.google.guava</pattern>
-                                    <shadedPattern>com.shade.google.guava</shadedPattern>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>com.shaded.google</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.google.common</pattern>
-                                    <shadedPattern>com.shade.google.common</shadedPattern>
+                                    <pattern>com.aliyun.openservices.log</pattern>
+                                    <shadedPattern>com.shaded.aliyun.openservices.log</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.google.thirdparty</pattern>
-                                    <shadedPattern>com.shade.google.thirdparty</shadedPattern>
+                                    <pattern>com.alibaba.fastjson</pattern>
+                                    <shadedPattern>com.shaded.alibaba.fastjson</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache.http</pattern>
+                                    <shadedPattern>org.shaded.apache</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>net.jpountz</pattern>
+                                    <shadedPattern>net.shaded.jpountz</shadedPattern>
                                 </relocation>
                             </relocations>
                             <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
@@ -218,5 +229,11 @@
             </plugin>
         </plugins>
     </build>
-
+    <contributors>
+        <contributor>
+            <properties>
+                <provider>ke.like@alibaba-inc.com</provider>
+            </properties>
+        </contributor>
+    </contributors>
 </project>
