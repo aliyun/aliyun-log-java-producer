@@ -9,7 +9,7 @@
     </parent>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer-internal</artifactId>
-    <version>0.3.11_ZF-SNAPSHOT</version>
+    <version>0.3.11_nonjcl</version>
     <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
     <description>Aliyun LOG Java Producer</description>
