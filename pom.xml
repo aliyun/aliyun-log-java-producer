@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -9,7 +8,7 @@
     </parent>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer-internal</artifactId>
-    <version>0.3.11_nonjcl</version>
+    <version>0.3.12</version>
     <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
     <description>Aliyun LOG Java Producer</description>
