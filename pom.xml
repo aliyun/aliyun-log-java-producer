@@ -10,7 +10,7 @@
 
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.3.13</version>
+    <version>0.3.14</version>
 
     <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
@@ -202,8 +202,8 @@
                                     <shadedPattern>com.shade.google</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.aliyun.openservices</pattern>
-                                    <shadedPattern>com.shade.aliyun.openservices</shadedPattern>
+                                    <pattern>com.aliyun.openservices.log</pattern>
+                                    <shadedPattern>com.shade.aliyun.openservices.log</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>net.jpountz</pattern>
