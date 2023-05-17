@@ -10,7 +10,7 @@
 
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.3.12</version>
+    <version>0.3.14</version>
 
     <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
@@ -198,16 +198,32 @@
                         <configuration>
                             <relocations>
                                 <relocation>
-                                    <pattern>com.google.guava</pattern>
-                                    <shadedPattern>com.shade.google.guava</shadedPattern>
+                                    <pattern>com.google</pattern>
+                                    <shadedPattern>com.shade.google</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.google.common</pattern>
-                                    <shadedPattern>com.shade.google.common</shadedPattern>
+                                    <pattern>com.aliyun.openservices.log</pattern>
+                                    <shadedPattern>com.shade.aliyun.openservices.log</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>com.google.thirdparty</pattern>
-                                    <shadedPattern>com.shade.google.thirdparty</shadedPattern>
+                                    <pattern>net.jpountz</pattern>
+                                    <shadedPattern>net.shade.jpountz</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.alibaba</pattern>
+                                    <shadedPattern>com.shade.alibaba</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.apache</pattern>
+                                    <shadedPattern>org.shade.apache</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.codehaus</pattern>
+                                    <shadedPattern>org.shade.codehaus</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.checkerframework</pattern>
+                                    <shadedPattern>org.shade.checkerframework</shadedPattern>
                                 </relocation>
                             </relocations>
                             <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
