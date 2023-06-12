@@ -161,9 +161,7 @@ public class SendProducerBatchTask implements Runnable {
               batch.getLogItems());
     }
     List<TagContent> tags = new ArrayList<TagContent>();
-    if (batch.getPackageId() != null) {
-      tags.add(new TagContent(TAG_PACK_ID, batch.getPackageId().toUpperCase()));
-    }
+    tags.add(new TagContent(TAG_PACK_ID, batch.getPackageId()));
     request.SetTags(tags);
     if (producerConfig.getLogFormat() == ProducerConfig.LogFormat.PROTOBUF) {
       request.setContentType(Consts.CONST_PROTO_BUF);
