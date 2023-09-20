@@ -29,20 +29,26 @@ public class ProjectConfig {
 
     private final String userAgent;
 
+    /**
+     * @param project             name of log project
+     * @param endpoint            aliyun sls service endpoint
+     * @param credentialsProvider interface which provides credentials
+     * @param userAgent           nullable, user agent, default to aliyun-log-java-producer
+     */
     public ProjectConfig(
-            String project, String endpoint, CredentialsProvider provider, @Nullable String userAgent) {
+            String project, String endpoint, CredentialsProvider credentialsProvider, @Nullable String userAgent) {
         if (project == null) {
             throw new NullPointerException("project cannot be null");
         }
         if (endpoint == null) {
             throw new NullPointerException("endpoint cannot be null");
         }
-        if (provider == null) {
+        if (credentialsProvider == null) {
             throw new NullPointerException("credentialsProvider cannot be null");
         }
         this.project = project;
         this.endpoint = endpoint;
-        this.credentialsProvider = provider;
+        this.credentialsProvider = credentialsProvider;
         this.accessKeyId = null;
         this.accessKeySecret = null;
         this.stsToken = null;
@@ -59,7 +65,7 @@ public class ProjectConfig {
             String endpoint,
             String accessKeyId,
             String accessKeySecret,
-            String stsToken) {
+            @Nullable String stsToken) {
         this(project, endpoint, accessKeyId, accessKeySecret, stsToken, DEFAULT_USER_AGENT);
     }
 
@@ -68,8 +74,8 @@ public class ProjectConfig {
             String endpoint,
             String accessKeyId,
             String accessKeySecret,
-            String stsToken,
-            String userAgent) {
+            @Nullable String stsToken,
+            @Nullable String userAgent) {
         if (project == null) {
             throw new NullPointerException("project cannot be null");
         }
@@ -128,7 +134,7 @@ public class ProjectConfig {
     }
 
     public CredentialsProvider getCredentialsProvider() {
-      return credentialsProvider;
+        return credentialsProvider;
     }
 
     public String getUserAgent() {
