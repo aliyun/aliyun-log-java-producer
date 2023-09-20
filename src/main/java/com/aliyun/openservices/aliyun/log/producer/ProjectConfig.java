@@ -19,11 +19,11 @@ public class ProjectConfig {
 
     private final String endpoint;
 
-    private final String accessKeyId;
+    private String accessKeyId;
 
-    private final String accessKeySecret;
+    private String accessKeySecret;
 
-    private final String stsToken;
+    private String stsToken;
 
     private final CredentialsProvider credentialsProvider;
 
@@ -49,9 +49,6 @@ public class ProjectConfig {
         this.project = project;
         this.endpoint = endpoint;
         this.credentialsProvider = credentialsProvider;
-        this.accessKeyId = null;
-        this.accessKeySecret = null;
-        this.stsToken = null;
         this.userAgent = userAgent;
     }
 
