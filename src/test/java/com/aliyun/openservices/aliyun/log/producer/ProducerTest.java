@@ -5,6 +5,8 @@ import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.RetriableErrors;
 import com.aliyun.openservices.aliyun.log.producer.internals.LogSizeCalculator;
 import com.aliyun.openservices.log.common.LogItem;
+import com.aliyun.openservices.log.common.auth.DefaultCredentials;
+import com.aliyun.openservices.log.common.auth.StaticCredentialsProvider;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,56 @@ public class ProducerTest {
             "topic",
             "source",
             buildLogItem());
+    result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    producer.close();
+    assertProducerFinalState(producer);
+  }
+
+  @Test
+  public void testSendWithCredentialsProvider() throws InterruptedException, ProducerException, ExecutionException {
+    ProducerConfig producerConfig = new ProducerConfig();
+    final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildCredentialsProjectConfig());
+    ListenableFuture<Result> f =
+            producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
+    Result result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    f =
+            producer.send(
+                    System.getenv("PROJECT"), System.getenv("LOG_STORE"), null, null, buildLogItem());
+    result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    f = producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), "", "", buildLogItem());
+    result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    f =
+            producer.send(
+                    System.getenv("PROJECT"),
+                    System.getenv("LOG_STORE"),
+                    "topic",
+                    "source",
+                    buildLogItem());
     result = f.get();
     Assert.assertTrue(result.isSuccessful());
     Assert.assertEquals("", result.getErrorCode());
@@ -353,6 +405,16 @@ public class ProducerTest {
     String accessKeyId = System.getenv("ACCESS_KEY_ID");
     String accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
     return new ProjectConfig(project, endpoint, accessKeyId, accessKeySecret);
+  }
+
+  private ProjectConfig buildCredentialsProjectConfig() {
+    String project = System.getenv("PROJECT");
+    String endpoint = System.getenv("ENDPOINT");
+    String accessKeyId = System.getenv("ACCESS_KEY_ID");
+    String accessKeySecret = System.getenv("ACCESS_KEY_SECRET");
+    return new ProjectConfig(project, endpoint,
+            new StaticCredentialsProvider(new DefaultCredentials(accessKeyId, accessKeySecret)),
+            null);
   }
 
   private ProjectConfig buildInvalidAccessKeyIdProjectConfig() {

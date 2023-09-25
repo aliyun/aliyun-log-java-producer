@@ -584,18 +584,14 @@ public class LogProducer implements Producer {
 
   private Client buildClient(ProjectConfig projectConfig) {
     Client client =
-        new Client(
-            projectConfig.getEndpoint(),
-            projectConfig.getAccessKeyId(),
-            projectConfig.getAccessKeySecret(),
-            serviceClient);
+            new Client(
+                    projectConfig.getEndpoint(),
+                    projectConfig.getCredentialsProvider(),
+                    serviceClient,
+                    null);
     String userAgent = projectConfig.getUserAgent();
     if (userAgent != null) {
       client.setUserAgent(userAgent);
-    }
-    String stsToken = projectConfig.getStsToken();
-    if (stsToken != null) {
-      client.setSecurityToken(stsToken);
     }
     return client;
   }
