@@ -5,6 +5,7 @@ import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedExc
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.Client;
+import com.aliyun.openservices.log.ClientBuilder;
 import com.aliyun.openservices.log.common.LogItem;
 import com.aliyun.openservices.log.http.client.ClientConfiguration;
 import com.aliyun.openservices.log.http.comm.ServiceClient;
@@ -583,12 +584,13 @@ public class LogProducer implements Producer {
   }
 
   private Client buildClient(ProjectConfig projectConfig) {
+    ClientBuilder builder =
+        new ClientBuilder(projectConfig.getEndpoint(), projectConfig.getCredentialsProvider());
+    ClientConfiguration clientConfiguration = new ClientConfiguration();
+    clientConfiguration.setSignatureVersion(projectConfig.getSignVersion());
+    clientConfiguration.setRegion(projectConfig.getRegion());
     Client client =
-            new Client(
-                    projectConfig.getEndpoint(),
-                    projectConfig.getCredentialsProvider(),
-                    serviceClient,
-                    null);
+        builder.serviceClient(serviceClient).clientConfiguration(clientConfiguration).build();
     String userAgent = projectConfig.getUserAgent();
     if (userAgent != null) {
       client.setUserAgent(userAgent);
