@@ -4,7 +4,6 @@ import com.aliyun.openservices.log.common.auth.Credentials;
 import com.aliyun.openservices.log.common.auth.CredentialsProvider;
 import com.aliyun.openservices.log.common.auth.DefaultCredentials;
 import com.aliyun.openservices.log.common.auth.StaticCredentialsProvider;
-import com.aliyun.openservices.log.http.signer.SignVersion;
 import javax.annotation.Nullable;
 
 /**
@@ -28,10 +27,6 @@ public class ProjectConfig {
   private final CredentialsProvider credentialsProvider;
 
   private final String userAgent;
-
-  private SignVersion signVersion = SignVersion.V1;
-
-  private String region;
 
   /**
    * @param project name of log project
@@ -139,21 +134,5 @@ public class ProjectConfig {
 
   public String getUserAgent() {
     return userAgent;
-  }
-
-  public SignVersion getSignVersion() {
-    return signVersion;
-  }
-
-  public void setSignVersion(SignVersion signVersion) {
-    this.signVersion = signVersion;
-  }
-
-  public String getRegion() {
-    return region;
-  }
-
-  public void setRegion(String region) {
-    this.region = region;
   }
 }

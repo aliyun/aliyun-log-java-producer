@@ -74,6 +74,8 @@ public class LogProducer implements Producer {
 
   private final ShardHashAdjuster adjuster;
 
+  private final ClientConfiguration clientConfiguration;
+
   /**
    * Start up a LogProducer instance.
    *
@@ -107,8 +109,10 @@ public class LogProducer implements Producer {
                 .setDaemon(true)
                 .setNameFormat(this.name + TIMEOUT_THREAD_SUFFIX_FORMAT)
                 .build());
-    this.serviceClient =
-        new TimeoutServiceClient(new ClientConfiguration(), this.timeoutThreadPool);
+    this.clientConfiguration = new ClientConfiguration();
+    clientConfiguration.setRegion(producerConfig.getRegion());
+    clientConfiguration.setSignatureVersion(producerConfig.getSignVersion());
+    this.serviceClient = new TimeoutServiceClient(clientConfiguration, this.timeoutThreadPool);
     this.accumulator =
         new LogAccumulator(
             this.producerHash,
@@ -586,11 +590,7 @@ public class LogProducer implements Producer {
   private Client buildClient(ProjectConfig projectConfig) {
     ClientBuilder builder =
         new ClientBuilder(projectConfig.getEndpoint(), projectConfig.getCredentialsProvider());
-    ClientConfiguration clientConfiguration = new ClientConfiguration();
-    clientConfiguration.setSignatureVersion(projectConfig.getSignVersion());
-    clientConfiguration.setRegion(projectConfig.getRegion());
-    Client client =
-        builder.serviceClient(serviceClient).clientConfiguration(clientConfiguration).build();
+    Client client = builder.clientConfiguration(clientConfiguration).build();
     String userAgent = projectConfig.getUserAgent();
     if (userAgent != null) {
       client.setUserAgent(userAgent);
