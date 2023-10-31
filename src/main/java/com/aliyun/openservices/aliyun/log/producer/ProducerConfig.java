@@ -1,5 +1,7 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
+import com.aliyun.openservices.log.http.signer.SignVersion;
+
 /**
  * Configuration for {@link LogProducer}. See each each individual set method for details about each
  * parameter.
@@ -69,6 +71,10 @@ public class ProducerConfig {
   private int buckets = DEFAULT_BUCKETS;
 
   private LogFormat logFormat = DEFAULT_LOG_FORMAT;
+
+  private SignVersion signVersion = SignVersion.V1;
+
+  private String region;
 
   /**
    * @return The total bytes of memory the producer can use to buffer logs waiting to be sent to the
@@ -259,5 +265,21 @@ public class ProducerConfig {
   /** Set the content type of the request. */
   public void setLogFormat(LogFormat logFormat) {
     this.logFormat = logFormat;
+  }
+
+  public SignVersion getSignVersion() {
+    return signVersion;
+  }
+
+  public void setSignVersion(SignVersion signVersion) {
+    this.signVersion = signVersion;
+  }
+
+  public String getRegion() {
+    return region;
+  }
+
+  public void setRegion(String region) {
+    this.region = region;
   }
 }

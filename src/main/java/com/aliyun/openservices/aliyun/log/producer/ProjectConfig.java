@@ -4,7 +4,6 @@ import com.aliyun.openservices.log.common.auth.Credentials;
 import com.aliyun.openservices.log.common.auth.CredentialsProvider;
 import com.aliyun.openservices.log.common.auth.DefaultCredentials;
 import com.aliyun.openservices.log.common.auth.StaticCredentialsProvider;
-
 import javax.annotation.Nullable;
 
 /**
@@ -13,128 +12,127 @@ import javax.annotation.Nullable;
  */
 public class ProjectConfig {
 
-    public static final String DEFAULT_USER_AGENT = "aliyun-log-java-producer";
+  public static final String DEFAULT_USER_AGENT = "aliyun-log-java-producer";
 
-    private final String project;
+  private final String project;
 
-    private final String endpoint;
+  private final String endpoint;
 
-    private String accessKeyId;
+  private String accessKeyId;
 
-    private String accessKeySecret;
+  private String accessKeySecret;
 
-    private String stsToken;
+  private String stsToken;
 
-    private final CredentialsProvider credentialsProvider;
+  private final CredentialsProvider credentialsProvider;
 
-    private final String userAgent;
+  private final String userAgent;
 
-    /**
-     * @param project             name of log project
-     * @param endpoint            aliyun sls service endpoint
-     * @param credentialsProvider interface which provides credentials
-     * @param userAgent           nullable, user agent, default to aliyun-log-java-producer
-     */
-    public ProjectConfig(
-            String project, String endpoint, CredentialsProvider credentialsProvider, @Nullable String userAgent) {
-        if (project == null) {
-            throw new NullPointerException("project cannot be null");
-        }
-        if (endpoint == null) {
-            throw new NullPointerException("endpoint cannot be null");
-        }
-        if (credentialsProvider == null) {
-            throw new NullPointerException("credentialsProvider cannot be null");
-        }
-        this.project = project;
-        this.endpoint = endpoint;
-        this.credentialsProvider = credentialsProvider;
-        this.userAgent = userAgent;
+  /**
+   * @param project name of log project
+   * @param endpoint aliyun sls service endpoint
+   * @param credentialsProvider interface which provides credentials
+   * @param userAgent nullable, user agent, default to aliyun-log-java-producer
+   */
+  public ProjectConfig(
+      String project,
+      String endpoint,
+      CredentialsProvider credentialsProvider,
+      @Nullable String userAgent) {
+    if (project == null) {
+      throw new NullPointerException("project cannot be null");
     }
-
-    public ProjectConfig(
-            String project, String endpoint, String accessKeyId, String accessKeySecret) {
-        this(project, endpoint, accessKeyId, accessKeySecret, null, DEFAULT_USER_AGENT);
+    if (endpoint == null) {
+      throw new NullPointerException("endpoint cannot be null");
     }
-
-    public ProjectConfig(
-            String project,
-            String endpoint,
-            String accessKeyId,
-            String accessKeySecret,
-            @Nullable String stsToken) {
-        this(project, endpoint, accessKeyId, accessKeySecret, stsToken, DEFAULT_USER_AGENT);
+    if (credentialsProvider == null) {
+      throw new NullPointerException("credentialsProvider cannot be null");
     }
+    this.project = project;
+    this.endpoint = endpoint;
+    this.credentialsProvider = credentialsProvider;
+    this.userAgent = userAgent;
+  }
 
-    public ProjectConfig(
-            String project,
-            String endpoint,
-            String accessKeyId,
-            String accessKeySecret,
-            @Nullable String stsToken,
-            @Nullable String userAgent) {
-        if (project == null) {
-            throw new NullPointerException("project cannot be null");
-        }
-        if (endpoint == null) {
-            throw new NullPointerException("endpoint cannot be null");
-        }
-        if (accessKeyId == null) {
-            throw new NullPointerException("accessKeyId cannot be null");
-        }
-        if (accessKeySecret == null) {
-            throw new NullPointerException("accessKeySecret cannot be null");
-        }
-        this.project = project;
-        this.endpoint = endpoint;
-        this.accessKeyId = accessKeyId;
-        this.accessKeySecret = accessKeySecret;
-        this.stsToken = stsToken;
-        this.userAgent = userAgent;
-        this.credentialsProvider = new StaticCredentialsProvider(new DefaultCredentials(accessKeyId, accessKeySecret, stsToken));
-    }
+  public ProjectConfig(
+      String project, String endpoint, String accessKeyId, String accessKeySecret) {
+    this(project, endpoint, accessKeyId, accessKeySecret, null, DEFAULT_USER_AGENT);
+  }
 
-    public String getProject() {
-        return project;
-    }
+  public ProjectConfig(
+      String project,
+      String endpoint,
+      String accessKeyId,
+      String accessKeySecret,
+      @Nullable String stsToken) {
+    this(project, endpoint, accessKeyId, accessKeySecret, stsToken, DEFAULT_USER_AGENT);
+  }
 
-    public String getEndpoint() {
-        return endpoint;
+  public ProjectConfig(
+      String project,
+      String endpoint,
+      String accessKeyId,
+      String accessKeySecret,
+      @Nullable String stsToken,
+      @Nullable String userAgent) {
+    if (project == null) {
+      throw new NullPointerException("project cannot be null");
     }
+    if (endpoint == null) {
+      throw new NullPointerException("endpoint cannot be null");
+    }
+    if (accessKeyId == null) {
+      throw new NullPointerException("accessKeyId cannot be null");
+    }
+    if (accessKeySecret == null) {
+      throw new NullPointerException("accessKeySecret cannot be null");
+    }
+    this.project = project;
+    this.endpoint = endpoint;
+    this.accessKeyId = accessKeyId;
+    this.accessKeySecret = accessKeySecret;
+    this.stsToken = stsToken;
+    this.userAgent = userAgent;
+    this.credentialsProvider =
+        new StaticCredentialsProvider(
+            new DefaultCredentials(accessKeyId, accessKeySecret, stsToken));
+  }
 
-    /**
-     * use getCredentials instead
-     */
-    @Deprecated
-    public String getAccessKeyId() {
-        return accessKeyId;
-    }
+  public String getProject() {
+    return project;
+  }
 
-    /**
-     * use getCredentials instead
-     */
-    @Deprecated
-    public String getAccessKeySecret() {
-        return accessKeySecret;
-    }
+  public String getEndpoint() {
+    return endpoint;
+  }
 
-    /**
-     * use getCredentials instead
-     */
-    @Deprecated
-    public String getStsToken() {
-        return stsToken;
-    }
+  /** use getCredentials instead */
+  @Deprecated
+  public String getAccessKeyId() {
+    return accessKeyId;
+  }
 
-    public Credentials getCredentials() {
-        return credentialsProvider.getCredentials();
-    }
+  /** use getCredentials instead */
+  @Deprecated
+  public String getAccessKeySecret() {
+    return accessKeySecret;
+  }
 
-    public CredentialsProvider getCredentialsProvider() {
-        return credentialsProvider;
-    }
+  /** use getCredentials instead */
+  @Deprecated
+  public String getStsToken() {
+    return stsToken;
+  }
 
-    public String getUserAgent() {
-        return userAgent;
-    }
+  public Credentials getCredentials() {
+    return credentialsProvider.getCredentials();
+  }
+
+  public CredentialsProvider getCredentialsProvider() {
+    return credentialsProvider;
+  }
+
+  public String getUserAgent() {
+    return userAgent;
+  }
 }
