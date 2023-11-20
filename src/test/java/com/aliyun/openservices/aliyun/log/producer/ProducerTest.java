@@ -3,6 +3,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.RetriableErrors;
+import com.aliyun.openservices.aliyun.log.producer.errors.SendAfterCloseException;
 import com.aliyun.openservices.aliyun.log.producer.internals.LogSizeCalculator;
 import com.aliyun.openservices.log.common.LogItem;
 import com.aliyun.openservices.log.common.auth.DefaultCredentials;
@@ -117,6 +118,52 @@ public class ProducerTest {
     assertProducerFinalState(producer);
   }
 
+  @Test
+  public void testSendAfterClose() throws InterruptedException, ProducerException, ExecutionException {
+    ProducerConfig producerConfig = new ProducerConfig();
+    final Producer producer = new LogProducer(producerConfig);
+    producer.putProjectConfig(buildCredentialsProjectConfig());
+    ListenableFuture<Result> f = producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), buildLogItem());
+    Result result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    f = producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), null, null, buildLogItem());
+    result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    f = producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), "", "", buildLogItem());
+    result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    f = producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), "topic", "source", buildLogItem());
+    result = f.get();
+    Assert.assertTrue(result.isSuccessful());
+    Assert.assertEquals("", result.getErrorCode());
+    Assert.assertEquals("", result.getErrorMessage());
+    Assert.assertEquals(1, result.getReservedAttempts().size());
+    Assert.assertTrue(!result.getReservedAttempts().get(0).getRequestId().isEmpty());
+
+    producer.close();
+    assertProducerFinalState(producer);
+    try {
+      producer.send(System.getenv("PROJECT"), System.getenv("LOG_STORE"), "topic", "source", buildLogItem());
+      Assert.fail();
+    } catch (SendAfterCloseException e) {
+
+    }
+  }
   @Test
   public void testSendWithCallback()
       throws InterruptedException, ProducerException, ExecutionException {
