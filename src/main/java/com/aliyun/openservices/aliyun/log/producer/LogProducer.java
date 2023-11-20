@@ -3,6 +3,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
 import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
+import com.aliyun.openservices.aliyun.log.producer.errors.SendAfterCloseException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.Client;
 import com.aliyun.openservices.log.common.LogItem;
@@ -74,6 +75,8 @@ public class LogProducer implements Producer {
   private final ShardHashAdjuster adjuster;
 
   private final ClientConfiguration clientConfiguration;
+
+  private volatile boolean closed = false;
 
   /**
    * Start up a LogProducer instance.
@@ -366,6 +369,9 @@ public class LogProducer implements Producer {
       List<LogItem> logItems,
       Callback callback)
       throws InterruptedException, ProducerException {
+    if (closed) {
+      throw new SendAfterCloseException("Can't send logs after the producer is closed");
+    }
     Utils.assertArgumentNotNullOrEmpty(project, "project");
     Utils.assertArgumentNotNullOrEmpty(logStore, "logStore");
     if (topic == null) {
@@ -428,6 +434,7 @@ public class LogProducer implements Producer {
       throw new IllegalArgumentException(
           "timeoutMs must be greater than or equal to 0, got " + timeoutMs);
     }
+    this.closed = true;
     ProducerException firstException = null;
     LOGGER.info("Closing the log producer, timeoutMs={}", timeoutMs);
     try {
