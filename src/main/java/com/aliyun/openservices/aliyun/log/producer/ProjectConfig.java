@@ -75,17 +75,17 @@ public class ProjectConfig {
       String accessKeySecret,
       @Nullable String stsToken,
       @Nullable String userAgent) {
-    if (project == null) {
-      throw new NullPointerException("project cannot be null");
+    if (project == null || project.isEmpty()) {
+      throw new NullPointerException("project cannot be null or empty");
     }
-    if (endpoint == null) {
-      throw new NullPointerException("endpoint cannot be null");
+    if (endpoint == null || endpoint.isEmpty()) {
+      throw new NullPointerException("endpoint cannot be null or empty");
     }
-    if (accessKeyId == null) {
-      throw new NullPointerException("accessKeyId cannot be null");
+    if (accessKeyId == null || accessKeyId.isEmpty()) {
+      throw new NullPointerException("accessKeyId cannot be null or empty");
     }
-    if (accessKeySecret == null) {
-      throw new NullPointerException("accessKeySecret cannot be null");
+    if (accessKeySecret == null || accessKeySecret.isEmpty()) {
+      throw new NullPointerException("accessKeySecret cannot be null or empty");
     }
     this.project = project;
     this.endpoint = endpoint;
