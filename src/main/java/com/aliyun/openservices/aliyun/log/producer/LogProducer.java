@@ -78,6 +78,8 @@ public class LogProducer implements Producer {
 
   private final InCompleteBatchSet inCompleteBatchSet;
 
+  private volatile boolean closed;
+
   /**
    * Start up a LogProducer instance.
    *
@@ -157,6 +159,7 @@ public class LogProducer implements Producer {
     this.successBatchHandler.start();
     this.failureBatchHandler.start();
     this.adjuster = new ShardHashAdjuster(producerConfig.getBuckets());
+    this.closed = false;
   }
 
   /**
@@ -437,6 +440,7 @@ public class LogProducer implements Producer {
     }
     ProducerException firstException = null;
     LOGGER.info("Closing the log producer, timeoutMs={}", timeoutMs);
+    this.closed = true;
     try {
       timeoutMs = closeMover(timeoutMs);
     } catch (ProducerException e) {
@@ -608,17 +612,25 @@ public class LogProducer implements Producer {
   }
 
   /**
-   * Start flush and wait util flush over or timeout/interrupted
+   * Start flush and wait util flush over or timeout/interrupted,
+   * Flush returns immediately if producer is closed.
    *
-   * @param timeoutInMs timeout in milliseconds
+   * @param timeoutMs timeout in milliseconds, must be greater or equal than 0
    * @throws TimeoutException     if the wait timed out
    * @throws InterruptedException if the current thread was interrupted while waiting
    */
-  public void flush(long timeoutInMs) throws TimeoutException, InterruptedException {
+  public void flush(long timeoutMs) throws TimeoutException, InterruptedException {
+    if (timeoutMs < 0) {
+      throw new IllegalArgumentException("timeoutMs must be greater than or equal to 0, got " + timeoutMs);
+    }
+    if (this.closed) {
+      LOGGER.warn("Flush after producer is closed, returns immediately");
+      return;
+    }
     this.accumulator.beginFlush();
     this.mover.beginFlush();
     try {
-      this.accumulator.waitAndEndFlush(timeoutInMs);
+      this.accumulator.waitAndEndFlush(timeoutMs);
     } finally {
       this.mover.endFlush();
     }

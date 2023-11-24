@@ -339,11 +339,11 @@ public final class LogAccumulator {
     this.flushesInProgress.incrementAndGet();
   }
 
-  public void waitAndEndFlush(long timeoutInMs) throws TimeoutException,InterruptedException {
+  public void waitAndEndFlush(long timeoutMs) throws TimeoutException,InterruptedException {
     try {
       for (ProducerBatch batch : inCompleteBatchSet.all()) {
         // todo: refine with timeout
-        batch.getBatchFuture().get(timeoutInMs, TimeUnit.MILLISECONDS);
+        batch.getBatchFuture().get(timeoutMs, TimeUnit.MILLISECONDS);
       }
     } catch (ExecutionException e) {
         throw new RuntimeException(e);

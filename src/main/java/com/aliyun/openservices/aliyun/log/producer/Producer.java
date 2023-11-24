@@ -124,5 +124,5 @@ public interface Producer {
   void removeProjectConfig(ProjectConfig projectConfig);
 
   /** See {@link LogProducer#flush(long)} */
-  void flush(long timeoutInMs) throws TimeoutException, InterruptedException;
+  void flush(long timeoutMs) throws TimeoutException, InterruptedException;
 }
