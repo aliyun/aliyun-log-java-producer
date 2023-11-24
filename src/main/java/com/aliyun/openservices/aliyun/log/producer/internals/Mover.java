@@ -78,8 +78,7 @@ public class Mover extends LogThread {
 
   private void moveBatches() {
     if (flushInProgress()) {
-      LOGGER.debug(
-              "Prepare to flush batches from accumulator and retry queue to ioThreadPool");
+      LOGGER.debug("Prepare to flush batches from accumulator and retry queue to ioThreadPool");
       doFlushBatches();
       LOGGER.debug("Mover flush batches successfully");
       return;
@@ -93,9 +92,7 @@ public class Mover extends LogThread {
 
   private void doFlushBatches() {
     List<ProducerBatch> batches = accumulator.drainBatches();
-    LOGGER.debug(
-            "Drain batches from accumulator, size={}",
-            batches.size());
+    LOGGER.debug("Drain batches from accumulator, size={}", batches.size());
     for (ProducerBatch b : batches) {
       ioThreadPool.submit(createSendProducerBatchTask(b));
     }

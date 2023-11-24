@@ -76,7 +76,7 @@ public class LogProducer implements Producer {
 
   private final ClientConfiguration clientConfiguration;
 
-  private final InCompleteBatchSet inCompleteBatchSet;
+  private final IncompleteBatchSet incompleteBatchSet;
 
   private volatile boolean closed;
 
@@ -117,7 +117,7 @@ public class LogProducer implements Producer {
     clientConfiguration.setRegion(producerConfig.getRegion());
     clientConfiguration.setSignatureVersion(producerConfig.getSignVersion());
     this.serviceClient = new TimeoutServiceClient(clientConfiguration, this.timeoutThreadPool);
-    this.inCompleteBatchSet = new InCompleteBatchSet();
+    this.incompleteBatchSet = new IncompleteBatchSet();
     this.accumulator =
         new LogAccumulator(
             this.producerHash,
@@ -127,7 +127,7 @@ public class LogProducer implements Producer {
             this.retryQueue,
             successQueue,
             failureQueue,
-            this.inCompleteBatchSet,
+            this.incompleteBatchSet,
             this.ioThreadPool,
             this.batchCount);
     this.mover =
@@ -145,14 +145,14 @@ public class LogProducer implements Producer {
         new BatchHandler(
             this.name + SUCCESS_BATCH_HANDLER_SUFFIX,
             successQueue,
-            this.inCompleteBatchSet,
+            this.incompleteBatchSet,
             this.batchCount,
             this.memoryController);
     this.failureBatchHandler =
         new BatchHandler(
             this.name + FAILURE_BATCH_HANDLER_SUFFIX,
             failureQueue,
-            this.inCompleteBatchSet,
+            this.incompleteBatchSet,
             this.batchCount,
             this.memoryController);
     this.mover.start();
@@ -612,7 +612,7 @@ public class LogProducer implements Producer {
   }
 
   /**
-   * Start flush and wait util flush over or timeout/interrupted,
+   * Start flush and wait util flush is finished or timeout/interrupted,
    * Flush returns immediately if producer is closed.
    *
    * @param timeoutMs timeout in milliseconds, must be greater or equal than 0

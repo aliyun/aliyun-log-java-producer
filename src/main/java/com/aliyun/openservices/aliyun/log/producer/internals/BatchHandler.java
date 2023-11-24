@@ -20,17 +20,17 @@ public class BatchHandler extends LogThread {
 
   private volatile boolean closed;
 
-  private final InCompleteBatchSet inCompleteBatchSet;
+  private final IncompleteBatchSet incompleteBatchSet;
 
   public BatchHandler(
       String name,
       BlockingQueue<ProducerBatch> batches,
-      InCompleteBatchSet inCompleteBatchSet,
+      IncompleteBatchSet incompleteBatchSet,
       AtomicInteger batchCount,
       Semaphore memoryController) {
     super(name, true);
     this.batches = batches;
-    this.inCompleteBatchSet = inCompleteBatchSet;
+    this.incompleteBatchSet = incompleteBatchSet;
     this.batchCount = batchCount;
     this.memoryController = memoryController;
     this.closed = false;
@@ -67,7 +67,7 @@ public class BatchHandler extends LogThread {
     } catch (Throwable t) {
       LOGGER.error("Failed to handle batch, batch={}, e=", batch, t);
     } finally {
-      inCompleteBatchSet.remove(batch);
+      incompleteBatchSet.remove(batch);
       batchCount.decrementAndGet();
       memoryController.release(batch.getCurBatchSizeInBytes());
     }
