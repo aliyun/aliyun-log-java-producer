@@ -81,12 +81,6 @@ public class RetryQueue {
     return remainingBatches;
   }
 
-  public List<ProducerBatch> drainBatches() {
-    List<ProducerBatch> remainingBatches = new ArrayList<ProducerBatch>();
-    retryBatches.drainTo(remainingBatches);
-    return remainingBatches;
-  }
-
   public boolean isClosed() {
     return closed;
   }

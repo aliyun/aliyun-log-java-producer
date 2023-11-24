@@ -77,7 +77,6 @@ public class Mover extends LogThread {
   }
 
   private void moveBatches() {
-    // todo: add backoff interval to prevent running too frequently with no batches
     if (flushInProgress()) {
       LOGGER.debug(
               "Prepare to flush batches from accumulator and retry queue to ioThreadPool");
@@ -101,7 +100,9 @@ public class Mover extends LogThread {
       ioThreadPool.submit(createSendProducerBatchTask(b));
     }
 
-    List<ProducerBatch> retryBatches = retryQueue.drainBatches();
+    // get all ready retry batches, or wait util lingerMs/2 timeout
+    long lingerMs = producerConfig.getLingerMs() / 2;
+    List<ProducerBatch> retryBatches = retryQueue.expiredBatches(lingerMs);
     LOGGER.debug("Drain batches from retry queue, size={}", retryBatches.size());
     for (ProducerBatch b : retryBatches) {
       ioThreadPool.submit(createSendProducerBatchTask(b));
