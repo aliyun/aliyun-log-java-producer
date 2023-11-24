@@ -31,6 +31,8 @@ public class Mover extends LogThread {
 
   private volatile boolean closed;
 
+  private final AtomicInteger flushesInProgress;
+
   public Mover(
       String name,
       ProducerConfig producerConfig,
@@ -50,6 +52,7 @@ public class Mover extends LogThread {
     this.failureQueue = failureQueue;
     this.ioThreadPool = ioThreadPool;
     this.batchCount = batchCount;
+    this.flushesInProgress = new AtomicInteger(0);
     this.closed = false;
   }
 
@@ -74,10 +77,35 @@ public class Mover extends LogThread {
   }
 
   private void moveBatches() {
+    // todo: add backoff interval to prevent running too frequently with no batches
+    if (flushInProgress()) {
+      LOGGER.debug(
+              "Prepare to flush batches from accumulator and retry queue to ioThreadPool");
+      doFlushBatches();
+      LOGGER.debug("Mover flush batches successfully");
+      return;
+    }
+
     LOGGER.debug(
         "Prepare to move expired batches from accumulator and retry queue to ioThreadPool");
     doMoveBatches();
     LOGGER.debug("Move expired batches successfully");
+  }
+
+  private void doFlushBatches() {
+    List<ProducerBatch> batches = accumulator.drainBatches();
+    LOGGER.debug(
+            "Drain batches from accumulator, size={}",
+            batches.size());
+    for (ProducerBatch b : batches) {
+      ioThreadPool.submit(createSendProducerBatchTask(b));
+    }
+
+    List<ProducerBatch> retryBatches = retryQueue.drainBatches();
+    LOGGER.debug("Drain batches from retry queue, size={}", retryBatches.size());
+    for (ProducerBatch b : retryBatches) {
+      ioThreadPool.submit(createSendProducerBatchTask(b));
+    }
   }
 
   private void doMoveBatches() {
@@ -117,5 +145,20 @@ public class Mover extends LogThread {
   public void close() {
     this.closed = true;
     interrupt();
+  }
+
+  private boolean flushInProgress() {
+    return this.flushesInProgress.get() > 0;
+  }
+
+  public void beginFlush() {
+    int prevVal = this.flushesInProgress.getAndIncrement();
+    if (prevVal == 0) {
+      this.interrupt();
+    }
+  }
+
+  public void endFlush() {
+    this.flushesInProgress.decrementAndGet();
   }
 }

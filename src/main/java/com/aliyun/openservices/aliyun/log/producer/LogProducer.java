@@ -3,6 +3,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
 import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
+import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.Client;
 import com.aliyun.openservices.log.common.LogItem;
@@ -604,5 +605,15 @@ public class LogProducer implements Producer {
       client.setUserAgent(userAgent);
     }
     return client;
+  }
+
+  public void flush(long timeoutInMs) throws TimeoutException, InterruptedException {
+    this.accumulator.beginFlush();
+    this.mover.beginFlush();
+    try {
+      this.accumulator.flushAndAwait(timeoutInMs);
+    } finally {
+      this.mover.endFlush();
+    }
   }
 }

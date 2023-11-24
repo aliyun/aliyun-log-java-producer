@@ -221,6 +221,12 @@ public final class LogAccumulator {
     return expiredBatches;
   }
 
+  public List<ProducerBatch> drainBatches() {
+    List<ProducerBatch> remainingBatches = new ArrayList<ProducerBatch>();
+    drainTo(remainingBatches);
+    return remainingBatches;
+  }
+
   public List<ProducerBatch> remainingBatches() {
     if (!closed) {
       throw new IllegalStateException(
