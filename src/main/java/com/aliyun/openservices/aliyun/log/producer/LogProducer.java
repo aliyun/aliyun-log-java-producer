@@ -607,11 +607,18 @@ public class LogProducer implements Producer {
     return client;
   }
 
+  /**
+   * Start flush and wait util flush over or timeout/interrupted
+   *
+   * @param timeoutInMs timeout in milliseconds
+   * @throws TimeoutException     if the wait timed out
+   * @throws InterruptedException if the current thread was interrupted while waiting
+   */
   public void flush(long timeoutInMs) throws TimeoutException, InterruptedException {
     this.accumulator.beginFlush();
     this.mover.beginFlush();
     try {
-      this.accumulator.flushAndAwait(timeoutInMs);
+      this.accumulator.waitAndEndFlush(timeoutInMs);
     } finally {
       this.mover.endFlush();
     }

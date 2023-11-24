@@ -1,6 +1,7 @@
 package com.aliyun.openservices.aliyun.log.producer;
 
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
+import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.util.List;
@@ -121,4 +122,7 @@ public interface Producer {
 
   /** See {@link LogProducer#removeProjectConfig(ProjectConfig)} */
   void removeProjectConfig(ProjectConfig projectConfig);
+
+  /** See {@link LogProducer#flush(long)} */
+  void flush(long timeoutInMs) throws TimeoutException, InterruptedException;
 }
