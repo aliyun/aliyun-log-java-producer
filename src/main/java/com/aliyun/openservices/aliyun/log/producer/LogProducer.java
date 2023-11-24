@@ -75,6 +75,8 @@ public class LogProducer implements Producer {
 
   private final ClientConfiguration clientConfiguration;
 
+  private final InCompleteBatchSet inCompleteBatchSet;
+
   /**
    * Start up a LogProducer instance.
    *
@@ -112,6 +114,7 @@ public class LogProducer implements Producer {
     clientConfiguration.setRegion(producerConfig.getRegion());
     clientConfiguration.setSignatureVersion(producerConfig.getSignVersion());
     this.serviceClient = new TimeoutServiceClient(clientConfiguration, this.timeoutThreadPool);
+    this.inCompleteBatchSet = new InCompleteBatchSet();
     this.accumulator =
         new LogAccumulator(
             this.producerHash,
@@ -121,6 +124,7 @@ public class LogProducer implements Producer {
             this.retryQueue,
             successQueue,
             failureQueue,
+            this.inCompleteBatchSet,
             this.ioThreadPool,
             this.batchCount);
     this.mover =
@@ -138,12 +142,14 @@ public class LogProducer implements Producer {
         new BatchHandler(
             this.name + SUCCESS_BATCH_HANDLER_SUFFIX,
             successQueue,
+            this.inCompleteBatchSet,
             this.batchCount,
             this.memoryController);
     this.failureBatchHandler =
         new BatchHandler(
             this.name + FAILURE_BATCH_HANDLER_SUFFIX,
             failureQueue,
+            this.inCompleteBatchSet,
             this.batchCount,
             this.memoryController);
     this.mover.start();

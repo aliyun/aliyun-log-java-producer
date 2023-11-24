@@ -46,6 +46,7 @@ public final class LogAccumulator {
 
   private volatile boolean closed;
 
+  private final InCompleteBatchSet inCompleteBatchSet;
   public LogAccumulator(
       String producerHash,
       ProducerConfig producerConfig,
@@ -54,6 +55,7 @@ public final class LogAccumulator {
       RetryQueue retryQueue,
       BlockingQueue<ProducerBatch> successQueue,
       BlockingQueue<ProducerBatch> failureQueue,
+      InCompleteBatchSet inCompleteBatchSet,
       IOThreadPool ioThreadPool,
       AtomicInteger batchCount) {
     this.producerHash = producerHash;
@@ -63,6 +65,7 @@ public final class LogAccumulator {
     this.retryQueue = retryQueue;
     this.successQueue = successQueue;
     this.failureQueue = failureQueue;
+    this.inCompleteBatchSet = inCompleteBatchSet;
     this.ioThreadPool = ioThreadPool;
     this.batchCount = batchCount;
     this.batches = new ConcurrentHashMap<GroupKey, ProducerBatchHolder>();
@@ -177,6 +180,7 @@ public final class LogAccumulator {
             producerConfig.getBatchCountThreshold(),
             producerConfig.getMaxReservedAttempts(),
             System.currentTimeMillis());
+    this.inCompleteBatchSet.add(holder.producerBatch);
     ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
     batchCount.incrementAndGet();
     if (holder.producerBatch.isMeetSendCondition()) {

@@ -43,6 +43,8 @@ public class ProducerBatch implements Delayed {
 
   private int attemptCount;
 
+  private final SettableFuture<Result> batchFuture = SettableFuture.create();
+
   public ProducerBatch(
       GroupKey groupKey,
       String packageId,
@@ -178,17 +180,22 @@ public class ProducerBatch implements Delayed {
     }
   }
 
-  private void setFutures(Result result) {
-    for (Thunk thunk : thunks) {
-      try {
-        if (result.isSuccessful()) {
-          thunk.future.set(result);
-        } else {
-          thunk.future.setException(new ResultFailedException(result));
-        }
-      } catch (Exception e) {
-        LOGGER.error("Failed to set future, groupKey={}, e=", groupKey, e);
+  private void setFuture(Result result, SettableFuture<Result> future) {
+    try {
+      if (result.isSuccessful()) {
+        future.set(result);
+      } else {
+        future.setException(new ResultFailedException(result));
       }
+    } catch (Exception e) {
+      LOGGER.error("Failed to set future, groupKey={}, e=", groupKey, e);
+    }
+  }
+
+  private void setFutures(Result result) {
+    setFuture(result, batchFuture);
+    for (Thunk thunk : thunks) {
+      setFuture(result, thunk.future);
     }
   }
 
