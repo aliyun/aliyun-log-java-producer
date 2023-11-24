@@ -44,6 +44,8 @@ public final class LogAccumulator {
 
   private final AtomicInteger appendsInProgress;
 
+  private final AtomicInteger flushesInProgress;
+
   private volatile boolean closed;
 
   private final InCompleteBatchSet inCompleteBatchSet;
@@ -70,6 +72,7 @@ public final class LogAccumulator {
     this.batchCount = batchCount;
     this.batches = new ConcurrentHashMap<GroupKey, ProducerBatchHolder>();
     this.appendsInProgress = new AtomicInteger(0);
+    this.flushesInProgress = new AtomicInteger(0);
     this.closed = false;
   }
 
@@ -150,7 +153,7 @@ public final class LogAccumulator {
     if (holder.producerBatch != null) {
       ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
       if (f != null) {
-        if (holder.producerBatch.isMeetSendCondition()) {
+        if (holder.producerBatch.isMeetSendCondition() || flushInProgress()) {
           holder.transferProducerBatch(
               ioThreadPool,
               producerConfig,
@@ -183,7 +186,7 @@ public final class LogAccumulator {
     this.inCompleteBatchSet.add(holder.producerBatch);
     ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
     batchCount.incrementAndGet();
-    if (holder.producerBatch.isMeetSendCondition()) {
+    if (holder.producerBatch.isMeetSendCondition() || flushInProgress()) {
       holder.transferProducerBatch(
           ioThreadPool,
           producerConfig,
@@ -324,5 +327,28 @@ public final class LogAccumulator {
       expiredBatches.add(producerBatch);
       producerBatch = null;
     }
+  }
+
+  public void beginFlush() {
+    this.flushesInProgress.incrementAndGet();
+  }
+
+  public void flushAndAwait(long timeoutInMs) throws TimeoutException,InterruptedException {
+    try {
+      for (ProducerBatch batch : inCompleteBatchSet.all()) {
+        // todo: refine with timeout
+        batch.getBatchFuture().get(timeoutInMs, TimeUnit.MILLISECONDS);
+      }
+    } catch (ExecutionException e) {
+        throw new RuntimeException(e);
+    } catch (java.util.concurrent.TimeoutException e) {
+        throw new TimeoutException("Flush timeout");
+    } finally {
+      this.flushesInProgress.decrementAndGet();
+    }
+  }
+
+  private boolean flushInProgress() {
+    return this.flushesInProgress.get() > 0;
   }
 }

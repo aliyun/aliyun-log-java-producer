@@ -199,6 +199,10 @@ public class ProducerBatch implements Delayed {
     }
   }
 
+  public ListenableFuture<Result> getBatchFuture() {
+    return this.batchFuture;
+  }
+
   @Override
   public long getDelay(@Nonnull TimeUnit unit) {
     return unit.convert(nextRetryMs - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
