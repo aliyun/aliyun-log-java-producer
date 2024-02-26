@@ -592,7 +592,7 @@ public class LogProducer implements Producer {
             projectConfig.getEndpoint(),
             projectConfig.getCredentialsProvider(),
             serviceClient,
-            null);
+            producerConfig.getSourceIp());
     String userAgent = projectConfig.getUserAgent();
     if (userAgent != null) {
       client.setUserAgent(userAgent);

@@ -20,6 +20,7 @@ public class ProducerTest {
   @Test
   public void testSend() throws InterruptedException, ProducerException, ExecutionException {
     ProducerConfig producerConfig = new ProducerConfig();
+    producerConfig.setSourceIp("127.0.0.1");
     final Producer producer = new LogProducer(producerConfig);
     producer.putProjectConfig(buildProjectConfig());
     ListenableFuture<Result> f =
