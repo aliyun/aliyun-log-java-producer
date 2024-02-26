@@ -76,6 +76,7 @@ public class ProducerConfig {
 
   private String region;
 
+  private String sourceIp;
   /**
    * @return The total bytes of memory the producer can use to buffer logs waiting to be sent to the
    *     server.
@@ -281,5 +282,12 @@ public class ProducerConfig {
 
   public void setRegion(String region) {
     this.region = region;
+  }
+  public String getSourceIp() {
+    return sourceIp;
+  }
+  /** Set the source ip of producer. */
+  public void setSourceIp(String sourceIp) {
+    this.sourceIp = sourceIp;
   }
 }
