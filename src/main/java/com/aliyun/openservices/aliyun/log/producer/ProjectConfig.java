@@ -28,6 +28,8 @@ public class ProjectConfig {
 
   private final String userAgent;
 
+  private String proxyIp;
+
   /**
    * @param project name of log project
    * @param endpoint aliyun sls service endpoint
@@ -134,5 +136,13 @@ public class ProjectConfig {
 
   public String getUserAgent() {
     return userAgent;
+  }
+
+  public String getProxyIp() {
+    return proxyIp;
+  }
+
+  public void setProxyIp(String proxyIp) {
+    this.proxyIp = proxyIp;
   }
 }

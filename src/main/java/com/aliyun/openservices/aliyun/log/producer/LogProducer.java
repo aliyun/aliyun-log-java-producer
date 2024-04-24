@@ -597,6 +597,9 @@ public class LogProducer implements Producer {
     if (userAgent != null) {
       client.setUserAgent(userAgent);
     }
+    if (projectConfig.getProxyIp() != null && !projectConfig.getProxyIp().isEmpty()) {
+      client.setRealServerIP(projectConfig.getProxyIp());
+    }
     return client;
   }
 }
