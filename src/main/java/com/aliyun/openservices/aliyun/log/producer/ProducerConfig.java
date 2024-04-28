@@ -37,7 +37,7 @@ public class ProducerConfig {
 
   public static final int BUCKETS_LOWER_LIMIT = 1;
 
-  public static final int BUCKETS_UPPER_LIMIT = 256;
+  public static final int BUCKETS_UPPER_LIMIT = 512;
 
   public enum LogFormat {
     PROTOBUF,
