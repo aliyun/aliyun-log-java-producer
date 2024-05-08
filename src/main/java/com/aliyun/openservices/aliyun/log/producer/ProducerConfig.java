@@ -3,7 +3,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 import com.aliyun.openservices.log.http.signer.SignVersion;
 
 /**
- * Configuration for {@link LogProducer}. See each each individual set method for details about each
+ * Configuration for {@link LogProducer}. See each individual set method for details about each
  * parameter.
  */
 public class ProducerConfig {
@@ -77,6 +77,7 @@ public class ProducerConfig {
   private String region;
 
   private String sourceIp;
+  private String compressType;
   /**
    * @return The total bytes of memory the producer can use to buffer logs waiting to be sent to the
    *     server.
@@ -289,5 +290,13 @@ public class ProducerConfig {
   /** Set the source ip of producer. */
   public void setSourceIp(String sourceIp) {
     this.sourceIp = sourceIp;
+  }
+
+  public String getCompressType() {
+    return compressType;
+  }
+
+  public void setCompressType(String compressType) {
+    this.compressType = compressType;
   }
 }

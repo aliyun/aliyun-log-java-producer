@@ -90,6 +90,12 @@ public class SendProducerBatchTask implements Runnable {
       PutLogsResponse response;
       try {
         PutLogsRequest request = buildPutLogsRequest(batch);
+        if (producerConfig.getCompressType() != null) {
+          Consts.CompressType compressType = Consts.CompressType.fromString(producerConfig.getCompressType());
+          if (compressType != null && compressType != Consts.CompressType.NONE) {
+            request.setCompressType(compressType);
+          }
+        }
         response = client.PutLogs(request);
       } catch (Exception e) {
         LOGGER.error(
