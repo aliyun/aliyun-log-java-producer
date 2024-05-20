@@ -7,8 +7,9 @@ import java.util.List;
 public abstract class LogSizeCalculator {
 
   public static int calculate(LogItem logItem) {
-    int sizeInBytes = 4;
+    int sizeInBytes = 8;
     for (LogContent content : logItem.GetLogContents()) {
+      sizeInBytes += 8;
       if (content.mKey != null) {
         sizeInBytes += content.mKey.length();
       }
