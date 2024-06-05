@@ -127,10 +127,10 @@ public final class LogAccumulator {
       memoryController.acquire(sizeInBytes);
     }
     try {
-      GroupKey groupKey = new GroupKey(project, logStore, topic, source, shardHash);
+      GroupKey groupKey = new GroupKey(project, logStore, shardHash);
       ProducerBatchHolder holder = getOrCreateProducerBatchHolder(groupKey);
       synchronized (holder) {
-        return appendToHolder(groupKey, logItems, callback, sizeInBytes, holder);
+        return appendToHolder(groupKey, logItems, topic, source, callback, sizeInBytes, holder);
       }
     } catch (Exception e) {
       memoryController.release(sizeInBytes);
@@ -141,11 +141,13 @@ public final class LogAccumulator {
   private ListenableFuture<Result> appendToHolder(
       GroupKey groupKey,
       List<LogItem> logItems,
+      String topic,
+      String source,
       Callback callback,
       int sizeInBytes,
       ProducerBatchHolder holder) {
     if (holder.producerBatch != null) {
-      ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
+      ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, topic, source, sizeInBytes, callback);
       if (f != null) {
         if (holder.producerBatch.isMeetSendCondition()) {
           holder.transferProducerBatch(
@@ -177,7 +179,7 @@ public final class LogAccumulator {
             producerConfig.getBatchCountThreshold(),
             producerConfig.getMaxReservedAttempts(),
             System.currentTimeMillis());
-    ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
+    ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, topic, source, sizeInBytes, callback);
     batchCount.incrementAndGet();
     if (holder.producerBatch.isMeetSendCondition()) {
       holder.transferProducerBatch(

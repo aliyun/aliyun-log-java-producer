@@ -6,13 +6,10 @@ import com.aliyun.openservices.aliyun.log.producer.errors.Errors;
 import com.aliyun.openservices.aliyun.log.producer.errors.RetriableErrors;
 import com.aliyun.openservices.log.Client;
 import com.aliyun.openservices.log.common.Consts;
-import com.aliyun.openservices.log.common.TagContent;
 import com.aliyun.openservices.log.exception.LogException;
-import com.aliyun.openservices.log.request.PutLogsRequest;
-import com.aliyun.openservices.log.response.PutLogsResponse;
+import com.aliyun.openservices.log.request.BatchPutLogsRequest;
+import com.aliyun.openservices.log.response.BatchPutLogsResponse;
 import com.google.common.math.LongMath;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,8 +19,6 @@ import org.slf4j.LoggerFactory;
 public class SendProducerBatchTask implements Runnable {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProducerBatch.class);
-
-  private static final String TAG_PACK_ID = "__pack_id__";
 
   private final ProducerBatch batch;
 
@@ -87,16 +82,20 @@ public class SendProducerBatchTask implements Runnable {
       batch.appendAttempt(attempt);
       failureQueue.put(batch);
     } else {
-      PutLogsResponse response;
+      BatchPutLogsResponse response;
       try {
-        PutLogsRequest request = buildPutLogsRequest(batch);
+        BatchPutLogsRequest request = new BatchPutLogsRequest(
+            batch.getProject(),
+            batch.getLogStore(),
+            batch.getRequestLogGroups(),
+            batch.getShardHash());
         if (producerConfig.getCompressType() != null) {
           Consts.CompressType compressType = Consts.CompressType.fromString(producerConfig.getCompressType());
           if (compressType != null && compressType != Consts.CompressType.NONE) {
             request.setCompressType(compressType);
           }
         }
-        response = client.PutLogs(request);
+        response = client.batchPutLogs(request);
       } catch (Exception e) {
         LOGGER.error(
             "Failed to put logs, project="
@@ -144,37 +143,6 @@ public class SendProducerBatchTask implements Runnable {
 
   private Client getClient(String project) {
     return clientPool.get(project);
-  }
-
-  private PutLogsRequest buildPutLogsRequest(ProducerBatch batch) {
-    PutLogsRequest request;
-    if (batch.getShardHash() != null && !batch.getShardHash().isEmpty()) {
-      request =
-          new PutLogsRequest(
-              batch.getProject(),
-              batch.getLogStore(),
-              batch.getTopic(),
-              batch.getSource(),
-              batch.getLogItems(),
-              batch.getShardHash());
-    } else {
-      request =
-          new PutLogsRequest(
-              batch.getProject(),
-              batch.getLogStore(),
-              batch.getTopic(),
-              batch.getSource(),
-              batch.getLogItems());
-    }
-    List<TagContent> tags = new ArrayList<TagContent>();
-    tags.add(new TagContent(TAG_PACK_ID, batch.getPackageId()));
-    request.SetTags(tags);
-    if (producerConfig.getLogFormat() == ProducerConfig.LogFormat.PROTOBUF) {
-      request.setContentType(Consts.CONST_PROTO_BUF);
-    } else {
-      request.setContentType(Consts.CONST_SLS_JSON);
-    }
-    return request;
   }
 
   private Attempt buildAttempt(Exception e, long nowMs) {

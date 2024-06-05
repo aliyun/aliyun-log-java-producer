@@ -2,13 +2,17 @@ package com.aliyun.openservices.aliyun.log.producer.internals;
 
 import com.aliyun.openservices.aliyun.log.producer.*;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
+import com.aliyun.openservices.log.common.TagContent;
+import com.aliyun.openservices.log.common.LogGroup;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.collect.EvictingQueue;
 import com.google.common.collect.Iterables;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.SettableFuture;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
@@ -19,6 +23,8 @@ public class ProducerBatch implements Delayed {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ProducerBatch.class);
 
+  private static final String TAG_PACK_ID = "__pack_id__";
+
   private final GroupKey groupKey;
 
   private final String packageId;
@@ -27,7 +33,7 @@ public class ProducerBatch implements Delayed {
 
   private final int batchCountThreshold;
 
-  private final List<LogItem> logItems = new ArrayList<LogItem>();
+  private final Map<TopicSource, List<LogItem>> logItems = new HashMap<TopicSource, List<LogItem>>();
 
   private final List<Thunk> thunks = new ArrayList<Thunk>();
 
@@ -61,32 +67,40 @@ public class ProducerBatch implements Delayed {
     this.attemptCount = 0;
   }
 
-  public ListenableFuture<Result> tryAppend(LogItem item, int sizeInBytes, Callback callback) {
-    if (!hasRoomFor(sizeInBytes, 1)) {
-      return null;
-    } else {
-      SettableFuture<Result> future = SettableFuture.create();
-      logItems.add(item);
-      thunks.add(new Thunk(callback, future));
-      curBatchCount++;
-      curBatchSizeInBytes += sizeInBytes;
-      return future;
-    }
-  }
+  public ListenableFuture<Result> tryAppend(LogItem item, String topic, String source, int sizeInBytes, Callback callback) {
+        if (!hasRoomFor(sizeInBytes, 1)) {
+            return null;
+        }
 
-  public ListenableFuture<Result> tryAppend(
-      List<LogItem> items, int sizeInBytes, Callback callback) {
-    if (!hasRoomFor(sizeInBytes, items.size())) {
-      return null;
-    } else {
-      SettableFuture<Result> future = SettableFuture.create();
-      logItems.addAll(items);
-      thunks.add(new Thunk(callback, future));
-      curBatchCount += items.size();
-      curBatchSizeInBytes += sizeInBytes;
-      return future;
+        SettableFuture<Result> future = SettableFuture.create();
+        TopicSource key = new TopicSource(topic, source);
+        if (!logItems.containsKey(key)) {
+            logItems.put(key, new ArrayList<LogItem>());
+        }
+        logItems.get(key).add(item);
+        thunks.add(new Thunk(callback, future));
+        curBatchCount++;
+        curBatchSizeInBytes += sizeInBytes;
+        return future;
     }
-  }
+
+    public ListenableFuture<Result> tryAppend(
+          List<LogItem> items, String topic, String source, int sizeInBytes, Callback callback) {
+        if (!hasRoomFor(sizeInBytes, items.size())) {
+            return null;
+        }
+        SettableFuture<Result> future = SettableFuture.create();
+
+        TopicSource key = new TopicSource(topic, source);
+        if (!logItems.containsKey(key)) {
+            logItems.put(key, new ArrayList<LogItem>());
+        }
+        logItems.get(key).addAll(items);
+        thunks.add(new Thunk(callback, future));
+        curBatchCount += items.size();
+        curBatchSizeInBytes += sizeInBytes;
+        return future;
+    }
 
   public void appendAttempt(Attempt attempt) {
     reservedAttempts.add(attempt);
@@ -117,10 +131,6 @@ public class ProducerBatch implements Delayed {
     return packageId;
   }
 
-  public List<LogItem> getLogItems() {
-    return logItems;
-  }
-
   public long getNextRetryMs() {
     return nextRetryMs;
   }
@@ -135,14 +145,6 @@ public class ProducerBatch implements Delayed {
 
   public String getLogStore() {
     return groupKey.getLogStore();
-  }
-
-  public String getTopic() {
-    return groupKey.getTopic();
-  }
-
-  public String getSource() {
-    return groupKey.getSource();
   }
 
   public String getShardHash() {
@@ -214,8 +216,8 @@ public class ProducerBatch implements Delayed {
         + batchSizeThresholdInBytes
         + ", batchCountThreshold="
         + batchCountThreshold
-        + ", logItems="
-        + logItems
+        + ", logGroups="
+        + getRequestLogGroups()
         + ", thunks="
         + thunks
         + ", createdMs="
@@ -244,4 +246,22 @@ public class ProducerBatch implements Delayed {
       this.future = future;
     }
   }
+
+  // only contains reserved tags
+  protected List<TagContent> getExtraTags() {
+    List<TagContent> tags = new ArrayList<TagContent>();
+    tags.add(new TagContent(TAG_PACK_ID, getPackageId()));
+    return tags;
+  }
+
+  public List<LogGroup> getRequestLogGroups() {
+    List<LogGroup> logGroups = new ArrayList<LogGroup>();
+    for (Map.Entry<TopicSource, List<LogItem>> entry : logItems.entrySet()) {
+      LogGroup logGroup = new LogGroup(entry.getValue(), getExtraTags(), entry.getKey().getTopic(),
+          entry.getKey().getSource());
+      logGroups.add(logGroup);
+    }
+    return logGroups;
+  }
+
 }
