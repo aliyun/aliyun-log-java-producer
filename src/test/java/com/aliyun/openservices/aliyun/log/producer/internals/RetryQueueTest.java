@@ -92,7 +92,7 @@ public class RetryQueueTest {
   }
 
   private ProducerBatch newProducerBatch(String packageId) {
-    GroupKey groupKey = new GroupKey("project", "logStore", "", "", "");
+    GroupKey groupKey = new GroupKey("project", "logStore", "");
     return new ProducerBatch(groupKey, packageId, 100, 100, 3, System.currentTimeMillis());
   }
 }
