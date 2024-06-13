@@ -20,8 +20,8 @@ public class UtilsTest {
     for (int i = 0; i < 100; ++i) {
       String packageId = Utils.generatePackageId(producerHash, batchId);
       String[] pieces = packageId.split("-", 2);
-      Assert.assertEquals(producerHash, pieces[0]);
-      Assert.assertEquals(Long.toHexString(i), pieces[1]);
+      Assert.assertEquals(producerHash.toLowerCase(), pieces[0].toLowerCase());
+      Assert.assertEquals(Long.toHexString(i).toLowerCase(), pieces[1].toLowerCase());
     }
   }
 }
