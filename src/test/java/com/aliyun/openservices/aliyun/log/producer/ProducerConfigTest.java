@@ -116,7 +116,7 @@ public class ProducerConfigTest {
   public void testInvalidBuckets() {
     ProducerConfig producerConfig = new ProducerConfig();
     thrown.expect(IllegalArgumentException.class);
-    thrown.expectMessage("buckets must be between 1 and 512, got 0");
+    thrown.expectMessage("buckets must be between " + ProducerConfig.BUCKETS_LOWER_LIMIT + " and " + ProducerConfig.BUCKETS_UPPER_LIMIT + ", got 0");
     producerConfig.setBuckets(0);
   }
 
@@ -124,7 +124,7 @@ public class ProducerConfigTest {
   public void testInvalidBuckets2() {
     ProducerConfig producerConfig = new ProducerConfig();
     thrown.expect(IllegalArgumentException.class);
-    thrown.expectMessage("buckets must be between 1 and 512, got 513");
+    thrown.expectMessage("buckets must be between " + ProducerConfig.BUCKETS_LOWER_LIMIT + " and " + ProducerConfig.BUCKETS_UPPER_LIMIT + ", got 513");
     producerConfig.setBuckets(513);
   }
 
