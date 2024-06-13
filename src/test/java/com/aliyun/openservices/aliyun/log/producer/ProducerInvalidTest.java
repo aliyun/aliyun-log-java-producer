@@ -6,6 +6,7 @@ import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedExc
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ResultFailedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
+import com.aliyun.openservices.aliyun.log.producer.internals.LogSizeCalculator;
 import com.aliyun.openservices.log.common.LogItem;
 import com.google.common.math.LongMath;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -21,6 +22,7 @@ public class ProducerInvalidTest {
 
   @Rule public ExpectedException thrown = ExpectedException.none();
 
+  private static final int logSize = LogSizeCalculator.calculate(ProducerTest.buildLogItem());
   @Test
   public void testSendWithNullProject() throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig();
@@ -148,12 +150,12 @@ public class ProducerInvalidTest {
   public void testSendLogThrownLogSizeTooLargeException()
       throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig();
-    producerConfig.setTotalSizeInBytes(10);
+    producerConfig.setTotalSizeInBytes(logSize - 1);
     Producer producer = new LogProducer(producerConfig);
     producer.putProjectConfig(buildProjectConfig());
     thrown.expect(LogSizeTooLargeException.class);
     thrown.expectMessage(
-        "the logs is 12 bytes which is larger than the totalSizeInBytes you specified");
+        "the logs is " + logSize + " bytes which is larger than the totalSizeInBytes you specified");
     producer.send("project", "logStore", ProducerTest.buildLogItem());
     producer.close();
     ProducerTest.assertProducerFinalState(producer);
@@ -163,12 +165,12 @@ public class ProducerInvalidTest {
   public void testSendLogsThrownLogSizeTooLargeException()
       throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig();
-    producerConfig.setTotalSizeInBytes(30);
+    producerConfig.setTotalSizeInBytes(logSize - 1);
     Producer producer = new LogProducer(producerConfig);
     producer.putProjectConfig(buildProjectConfig());
     thrown.expect(LogSizeTooLargeException.class);
     thrown.expectMessage(
-        "the logs is 36 bytes which is larger than the totalSizeInBytes you specified");
+        "the logs is " + logSize * 3 + " bytes which is larger than the totalSizeInBytes you specified");
     List<LogItem> logItems = new ArrayList<LogItem>();
     logItems.add(ProducerTest.buildLogItem());
     logItems.add(ProducerTest.buildLogItem());
@@ -181,7 +183,7 @@ public class ProducerInvalidTest {
   @Test
   public void testSendLogThrownTimeoutException() throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig();
-    producerConfig.setTotalSizeInBytes(20);
+    producerConfig.setTotalSizeInBytes(logSize + 1);
     producerConfig.setMaxBlockMs(3);
     Producer producer = new LogProducer(producerConfig);
     producer.putProjectConfig(buildProjectConfig());

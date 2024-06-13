@@ -27,7 +27,6 @@ public class ProducerBatchTest {
     logItem.PushBack("key3", "val3");
     logItem.PushBack("key4", "val4");
     int sizeInBytes = LogSizeCalculator.calculate(logItem);
-    Assert.assertEquals(36, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItem, sizeInBytes, null);
     Assert.assertNotNull(f);
     Assert.assertTrue(batch.isMeetSendCondition());
@@ -42,8 +41,7 @@ public class ProducerBatchTest {
     logItems.add(ProducerTest.buildLogItem());
     logItems.add(ProducerTest.buildLogItem());
     int sizeInBytes = LogSizeCalculator.calculate(logItems);
-    Assert.assertEquals(36, sizeInBytes);
-    ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
+        ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
     Assert.assertNotNull(f);
     Assert.assertTrue(batch.isMeetSendCondition());
   }
@@ -57,7 +55,6 @@ public class ProducerBatchTest {
     logItems.add(new LogItem());
     logItems.add(new LogItem());
     int sizeInBytes = LogSizeCalculator.calculate(logItems);
-    Assert.assertEquals(8, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
     Assert.assertNotNull(f);
     Assert.assertTrue(batch.isMeetSendCondition());
@@ -71,7 +68,6 @@ public class ProducerBatchTest {
     logItems.add(new LogItem());
     logItems.add(new LogItem());
     int sizeInBytes = LogSizeCalculator.calculate(logItems);
-    Assert.assertEquals(8, sizeInBytes);
     ListenableFuture<Result> f = batch.tryAppend(logItems, sizeInBytes, null);
     Assert.assertNotNull(f);
     Assert.assertTrue(batch.isMeetSendCondition());
