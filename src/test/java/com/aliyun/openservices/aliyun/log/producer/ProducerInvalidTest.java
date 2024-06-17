@@ -233,7 +233,8 @@ public class ProducerInvalidTest {
         if (i == 1) {
           Assert.assertTrue(low <= diff);
         } else {
-          Assert.assertTrue(low <= diff && diff <= high);
+          Assert.assertTrue(low <= diff);
+          Assert.assertTrue(diff <= high);
         }
       }
     }

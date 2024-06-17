@@ -10,20 +10,15 @@ public final class GroupKey {
 
   private final String logStore;
 
-  private final String topic;
-
-  private final String source;
 
   private final String shardHash;
 
-  public GroupKey(String project, String logStore, String topic, String source, String shardHash) {
+  public GroupKey(String project, String logStore, String shardHash) {
     this.project = project;
     this.logStore = logStore;
-    this.topic = topic;
-    this.source = source;
     this.shardHash = shardHash;
     this.key =
-        project + DELIMITER + logStore + DELIMITER + topic + DELIMITER + source + DELIMITER
+        project + DELIMITER + logStore + DELIMITER 
             + shardHash;
   }
 
@@ -61,14 +56,6 @@ public final class GroupKey {
 
   public String getLogStore() {
     return logStore;
-  }
-
-  public String getTopic() {
-    return topic;
-  }
-
-  public String getSource() {
-    return source;
   }
 
   public String getShardHash() {

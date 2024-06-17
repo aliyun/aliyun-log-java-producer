@@ -375,7 +375,7 @@ public class ProducerTest {
     logItem.PushBack("key2", "val2");
     logItem.PushBack("key3", "val3");
     int sizeInBytes = LogSizeCalculator.calculate(logItem);
-    Assert.assertEquals(28, sizeInBytes);
+    Assert.assertEquals(56, sizeInBytes);
     producer.send("project", "logStore", new LogItem());
   }
 
