@@ -68,39 +68,37 @@ public class ProducerBatch implements Delayed {
   }
 
   public ListenableFuture<Result> tryAppend(LogItem item, String topic, String source, int sizeInBytes, Callback callback) {
-        if (!hasRoomFor(sizeInBytes, 1)) {
-            return null;
-        }
-
-        SettableFuture<Result> future = SettableFuture.create();
-        TopicSource key = new TopicSource(topic, source);
-        if (!logItems.containsKey(key)) {
-            logItems.put(key, new ArrayList<LogItem>());
-        }
-        logItems.get(key).add(item);
-        thunks.add(new Thunk(callback, future));
-        curBatchCount++;
-        curBatchSizeInBytes += sizeInBytes;
-        return future;
+    if (!hasRoomFor(sizeInBytes, 1)) {
+      return null;
     }
 
-    public ListenableFuture<Result> tryAppend(
-          List<LogItem> items, String topic, String source, int sizeInBytes, Callback callback) {
-        if (!hasRoomFor(sizeInBytes, items.size())) {
-            return null;
-        }
-        SettableFuture<Result> future = SettableFuture.create();
-
-        TopicSource key = new TopicSource(topic, source);
-        if (!logItems.containsKey(key)) {
-            logItems.put(key, new ArrayList<LogItem>());
-        }
-        logItems.get(key).addAll(items);
-        thunks.add(new Thunk(callback, future));
-        curBatchCount += items.size();
-        curBatchSizeInBytes += sizeInBytes;
-        return future;
+    SettableFuture<Result> future = SettableFuture.create();
+    final TopicSource key = new TopicSource(topic, source);
+    if (!logItems.containsKey(key)) {
+      logItems.put(key, new ArrayList<LogItem>());
     }
+    logItems.get(key).add(item);
+    thunks.add(new Thunk(callback, future));
+    curBatchCount++;
+    curBatchSizeInBytes += sizeInBytes;
+    return future;
+  }
+
+  public ListenableFuture<Result> tryAppend(List<LogItem> items, String topic, String source, int sizeInBytes, Callback callback) {
+    if (!hasRoomFor(sizeInBytes, items.size())) {
+      return null;
+    }
+    SettableFuture<Result> future = SettableFuture.create();
+    final TopicSource key = new TopicSource(topic, source);
+    if (!logItems.containsKey(key)) {
+      logItems.put(key, new ArrayList<LogItem>());
+    }
+    logItems.get(key).addAll(items);
+    thunks.add(new Thunk(callback, future));
+    curBatchCount += items.size();
+    curBatchSizeInBytes += sizeInBytes;
+    return future;
+  }
 
   public void appendAttempt(Attempt attempt) {
     reservedAttempts.add(attempt);
@@ -247,21 +245,20 @@ public class ProducerBatch implements Delayed {
     }
   }
 
-  // only contains reserved tags
-  protected List<TagContent> getExtraTags() {
-    List<TagContent> tags = new ArrayList<TagContent>();
-    tags.add(new TagContent(TAG_PACK_ID, getPackageId()));
-    return tags;
-  }
-
   public List<LogGroup> getRequestLogGroups() {
     List<LogGroup> logGroups = new ArrayList<LogGroup>();
     for (Map.Entry<TopicSource, List<LogItem>> entry : logItems.entrySet()) {
-      LogGroup logGroup = new LogGroup(entry.getValue(), getExtraTags(), entry.getKey().getTopic(),
-          entry.getKey().getSource());
+      final TopicSource key = entry.getKey();
+      LogGroup logGroup = new LogGroup(entry.getValue(), getExtraTags(), key.getTopic(), key.getSource());
       logGroups.add(logGroup);
     }
     return logGroups;
   }
 
+  // only contains reserved tags
+  private List<TagContent> getExtraTags() {
+    List<TagContent> tags = new ArrayList<TagContent>();
+    tags.add(new TagContent(TAG_PACK_ID, getPackageId()));
+    return tags;
+  }
 }

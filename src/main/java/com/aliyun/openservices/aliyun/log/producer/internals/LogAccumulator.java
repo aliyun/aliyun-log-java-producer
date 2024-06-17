@@ -127,7 +127,7 @@ public final class LogAccumulator {
       memoryController.acquire(sizeInBytes);
     }
     try {
-      GroupKey groupKey = new GroupKey(project, logStore, shardHash);
+      final GroupKey groupKey = new GroupKey(project, logStore, shardHash);
       ProducerBatchHolder holder = getOrCreateProducerBatchHolder(groupKey);
       synchronized (holder) {
         return appendToHolder(groupKey, logItems, topic, source, callback, sizeInBytes, holder);
