@@ -62,11 +62,13 @@ public class ProducerLargeAmountTest {
     ProducerTest.assertProducerFinalState(producer);
   }
 
+  // project config not set
   @Test
-  public void testSendLogs() throws InterruptedException, ProducerException {
+  public void testSendLogsException() throws InterruptedException, ProducerException {
     ProducerConfig producerConfig = new ProducerConfig();
     final Producer producer = new LogProducer(producerConfig);
     final AtomicInteger successCount = new AtomicInteger(0);
+    final AtomicInteger failCount = new AtomicInteger(0);
     final int nTasks = 100;
     final int times = 1000;
     final List<LogItem> logItems = ProducerTest.buildLogItems(50);
@@ -90,6 +92,8 @@ public class ProducerLargeAmountTest {
                         public void onCompletion(Result result) {
                           if (result.isSuccessful()) {
                             successCount.incrementAndGet();
+                          } else {
+                            failCount.incrementAndGet();
                           }
                         }
                       });
@@ -105,7 +109,8 @@ public class ProducerLargeAmountTest {
     executorService.shutdown();
     Thread.sleep(producerConfig.getLingerMs() * 4);
     producer.close();
-    Assert.assertEquals(nTasks * times, successCount.get());
+    Assert.assertEquals(0, successCount.get());
+    Assert.assertEquals(nTasks * times, failCount.get());
     ProducerTest.assertProducerFinalState(producer);
   }
 
