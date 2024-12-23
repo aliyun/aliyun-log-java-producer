@@ -10,7 +10,7 @@
 
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log-producer</artifactId>
-    <version>0.3.22</version>
+    <version>0.3.23</version>
 
     <name>Aliyun LOG Java Producer</name>
     <url>https://aliyun.com/product/sls</url>
@@ -51,7 +51,7 @@
         <slf4j.version>1.7.15</slf4j.version>
         <logback.version>1.2.3</logback.version>
         <guava.version>27.0-jre</guava.version>
-        <aliyun-log.version>0.6.109</aliyun-log.version>
+        <aliyun-log.version>0.6.116</aliyun-log.version>
     </properties>
 
     <dependencies>
