@@ -41,7 +41,7 @@ Add this dependency to your project's POM:
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log</artifactId>
-    <version>0.6.109</version>
+    <version>0.6.116</version>
 </dependency>
 <dependency>
     <groupId>com.google.protobuf</groupId>
@@ -55,7 +55,7 @@ jar-with-dependency version, can resolve dependent version conflicts
 <dependency>
     <groupId>com.aliyun.openservices</groupId>
     <artifactId>aliyun-log</artifactId>
-    <version>0.6.109</version>
+    <version>0.6.116</version>
   <classifier>jar-with-dependencies</classifier>
 </dependency>
 ```
@@ -63,7 +63,7 @@ jar-with-dependency version, can resolve dependent version conflicts
 ### Gradle users
 ```
 compile 'com.aliyun.openservices:aliyun-log-producer:0.3.22'
-compile 'com.aliyun.openservices:aliyun-log:0.6.109'
+compile 'com.aliyun.openservices:aliyun-log:0.6.116'
 compile 'com.google.protobuf:protobuf-java:2.5.0'
 ```
 ## RAM

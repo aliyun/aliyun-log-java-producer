@@ -78,6 +78,8 @@ public class ProducerConfig {
 
   private String sourceIp;
   private String compressType;
+  private String processor;
+
   /**
    * @return The total bytes of memory the producer can use to buffer logs waiting to be sent to the
    *     server.
@@ -298,5 +300,13 @@ public class ProducerConfig {
 
   public void setCompressType(String compressType) {
     this.compressType = compressType;
+  }
+
+  public String getProcessor() {
+    return processor;
+  }
+
+  public void setProcessor(String processor) {
+    this.processor = processor;
   }
 }
