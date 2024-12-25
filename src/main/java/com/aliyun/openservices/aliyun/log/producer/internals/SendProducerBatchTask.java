@@ -199,8 +199,7 @@ public class SendProducerBatchTask implements Runnable {
     if (retryQueue.isClosed()) {
       return true;
     }
-    return (batch.getRetries() >= producerConfig.getRetries()
-        && failureQueue.size() <= batchCount.get() / 2);
+    return batch.getRetries() >= producerConfig.getRetries();
   }
 
   private boolean isRetriableException(Exception e) {
