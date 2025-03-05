@@ -30,6 +30,8 @@ public class ProjectConfig {
 
   private String proxyIp;
 
+  private boolean useMetricStoreUrl;
+
   /**
    * @param project name of log project
    * @param endpoint aliyun sls service endpoint
@@ -144,5 +146,13 @@ public class ProjectConfig {
 
   public void setProxyIp(String proxyIp) {
     this.proxyIp = proxyIp;
+  }
+
+  public boolean isUseMetricStoreUrl() {
+    return useMetricStoreUrl;
+  }
+
+  public void setUseMetricStoreUrl(final boolean useMetricStoreUrl) {
+    this.useMetricStoreUrl = useMetricStoreUrl;
   }
 }
