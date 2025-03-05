@@ -593,6 +593,7 @@ public class LogProducer implements Producer {
             projectConfig.getCredentialsProvider(),
             serviceClient,
             producerConfig.getSourceIp());
+    client.setUseMetricStoreUrl(projectConfig.isUseMetricStoreUrl());
     String userAgent = projectConfig.getUserAgent();
     if (userAgent != null) {
       client.setUserAgent(userAgent);
