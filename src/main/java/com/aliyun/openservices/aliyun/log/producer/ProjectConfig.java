@@ -31,6 +31,7 @@ public class ProjectConfig {
   private String proxyIp;
 
   private boolean useMetricStoreUrl;
+  private boolean isCname = false;
 
   /**
    * @param project name of log project
@@ -154,5 +155,13 @@ public class ProjectConfig {
 
   public void setUseMetricStoreUrl(final boolean useMetricStoreUrl) {
     this.useMetricStoreUrl = useMetricStoreUrl;
+  }
+
+  public boolean isCname() {
+    return isCname;
+  }
+
+  public void setCname(boolean cname) {
+    isCname = cname;
   }
 }

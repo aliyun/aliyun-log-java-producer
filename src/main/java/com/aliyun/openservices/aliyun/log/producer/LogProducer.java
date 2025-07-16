@@ -601,6 +601,9 @@ public class LogProducer implements Producer {
     if (projectConfig.getProxyIp() != null && !projectConfig.getProxyIp().isEmpty()) {
       client.setRealServerIP(projectConfig.getProxyIp());
     }
+    if (projectConfig.isCname()) {
+      client.setCname(true);
+    }
     return client;
   }
 }
