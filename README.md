@@ -103,5 +103,15 @@ https://github.com/aliyun/aliyun-log-producer-sample
 
 Aliyun LOG Java Producer 是对老版 log-loghub-producer 的全面升级，解决了上一版存在的多个问题，包括网络异常情况下 CPU 占用率过高、关闭 producer 可能出现少量数据丢失等问题。另外，在容错方面也进行了加强，即使您存在误用，在资源、吞吐、隔离等方面都有较好的保证。基于上述原因，强烈建议使用老版 producer 的用户进行升级。
 
+## 其他
+### MetricStore 使用注意
+对于大时间线基数 MetricStore，设置下列参数可显著提升时序数据检索性能:
+```java
+projectConfig.setUseMetricStoreUrl(true);
+```
+使用注意:
+1. 参数作用域为 Client 全局设置, 自动追加 Hash Key(METRICS_STORE_AUTO_HASH), 仅供发送 Store 为 MetricStore 时全局设置
+2. 当同时存在 LogStore/MetricStore 写入时, 用户需要使用含有`shardHash` 的 send 接口, 且手动指定 HashKey 为 METRICS_STORE_AUTO_HASH 手动触发写入 MetricStore 自动 Hash 写功能
+
 ## 问题反馈
 如果您在使用过程中遇到了问题，可以创建 [GitHub Issue](https://github.com/aliyun/aliyun-log-producer/issues) 或者前往阿里云支持中心[提交工单](https://workorder.console.aliyun.com/#/ticket/createIndex)。
