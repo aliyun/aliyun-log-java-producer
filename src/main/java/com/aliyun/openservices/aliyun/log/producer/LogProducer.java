@@ -5,6 +5,7 @@ import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedExc
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.Client;
+import com.aliyun.openservices.log.common.Consts;
 import com.aliyun.openservices.log.common.LogItem;
 import com.aliyun.openservices.log.http.client.ClientConfiguration;
 import com.aliyun.openservices.log.http.comm.ServiceClient;
@@ -383,7 +384,7 @@ public class LogProducer implements Producer {
               + " which exceeds the MAX_BATCH_COUNT "
               + ProducerConfig.MAX_BATCH_COUNT);
     }
-    if (shardHash != null && producerConfig.isAdjustShardHash()) {
+    if (shardHash != null && !shardHash.equals(Consts.METRICS_STORE_AUTO_HASH) && producerConfig.isAdjustShardHash()) {
       shardHash = adjuster.adjust(shardHash);
     }
     return accumulator.append(project, logStore, topic, source, shardHash, logItems, callback);
