@@ -44,8 +44,11 @@ public final class LogAccumulator {
 
   private final AtomicInteger appendsInProgress;
 
+  private final AtomicInteger flushesInProgress;
+
   private volatile boolean closed;
 
+  private final IncompleteBatchSet incompleteBatchSet;
   public LogAccumulator(
       String producerHash,
       ProducerConfig producerConfig,
@@ -54,6 +57,7 @@ public final class LogAccumulator {
       RetryQueue retryQueue,
       BlockingQueue<ProducerBatch> successQueue,
       BlockingQueue<ProducerBatch> failureQueue,
+      IncompleteBatchSet incompleteBatchSet,
       IOThreadPool ioThreadPool,
       AtomicInteger batchCount) {
     this.producerHash = producerHash;
@@ -63,10 +67,12 @@ public final class LogAccumulator {
     this.retryQueue = retryQueue;
     this.successQueue = successQueue;
     this.failureQueue = failureQueue;
+    this.incompleteBatchSet = incompleteBatchSet;
     this.ioThreadPool = ioThreadPool;
     this.batchCount = batchCount;
     this.batches = new ConcurrentHashMap<GroupKey, ProducerBatchHolder>();
     this.appendsInProgress = new AtomicInteger(0);
+    this.flushesInProgress = new AtomicInteger(0);
     this.closed = false;
   }
 
@@ -147,7 +153,7 @@ public final class LogAccumulator {
     if (holder.producerBatch != null) {
       ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
       if (f != null) {
-        if (holder.producerBatch.isMeetSendCondition()) {
+        if (holder.producerBatch.isMeetSendCondition() || flushInProgress()) {
           holder.transferProducerBatch(
               ioThreadPool,
               producerConfig,
@@ -177,9 +183,10 @@ public final class LogAccumulator {
             producerConfig.getBatchCountThreshold(),
             producerConfig.getMaxReservedAttempts(),
             System.currentTimeMillis());
+    this.incompleteBatchSet.add(holder.producerBatch);
     ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
     batchCount.incrementAndGet();
-    if (holder.producerBatch.isMeetSendCondition()) {
+    if (holder.producerBatch.isMeetSendCondition() || flushInProgress()) {
       holder.transferProducerBatch(
           ioThreadPool,
           producerConfig,
@@ -212,6 +219,12 @@ public final class LogAccumulator {
     }
     expiredBatches.setRemainingMs(remainingMs);
     return expiredBatches;
+  }
+
+  public List<ProducerBatch> drainBatches() {
+    List<ProducerBatch> remainingBatches = new ArrayList<ProducerBatch>();
+    drainTo(remainingBatches);
+    return remainingBatches;
   }
 
   public List<ProducerBatch> remainingBatches() {
@@ -320,5 +333,28 @@ public final class LogAccumulator {
       expiredBatches.add(producerBatch);
       producerBatch = null;
     }
+  }
+
+  public void beginFlush() {
+    this.flushesInProgress.incrementAndGet();
+  }
+
+  public void waitAndEndFlush(long timeoutMs) throws TimeoutException, InterruptedException {
+    try {
+      for (ProducerBatch batch : incompleteBatchSet.all()) {
+        // todo: refine with timeout
+        batch.getBatchFuture().get(timeoutMs, TimeUnit.MILLISECONDS);
+      }
+    } catch (ExecutionException e) {
+      throw new RuntimeException(e);
+    } catch (java.util.concurrent.TimeoutException e) {
+      throw new TimeoutException("Flush timeout");
+    } finally {
+      this.flushesInProgress.decrementAndGet();
+    }
+  }
+
+  private boolean flushInProgress() {
+    return this.flushesInProgress.get() > 0;
   }
 }
