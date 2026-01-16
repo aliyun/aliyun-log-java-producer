@@ -10,6 +10,7 @@ import com.aliyun.openservices.log.common.LogItem;
 import com.aliyun.openservices.log.http.client.ClientConfiguration;
 import com.aliyun.openservices.log.http.comm.ServiceClient;
 import com.aliyun.openservices.log.http.comm.TimeoutServiceClient;
+import com.aliyun.openservices.log.http.signer.SignVersion;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
@@ -384,7 +385,9 @@ public class LogProducer implements Producer {
               + " which exceeds the MAX_BATCH_COUNT "
               + ProducerConfig.MAX_BATCH_COUNT);
     }
-    if (shardHash != null && !shardHash.equals(Consts.METRICS_STORE_AUTO_HASH) && producerConfig.isAdjustShardHash()) {
+    if (shardHash != null
+        && !shardHash.equals(Consts.METRICS_STORE_AUTO_HASH)
+        && producerConfig.isAdjustShardHash()) {
       shardHash = adjuster.adjust(shardHash);
     }
     return accumulator.append(project, logStore, topic, source, shardHash, logItems, callback);
@@ -596,8 +599,8 @@ public class LogProducer implements Producer {
             producerConfig.getSourceIp());
     client.setUseMetricStoreUrl(projectConfig.isUseMetricStoreUrl());
     if (producerConfig.getSignVersion() != SignVersion.V1) {
-        client.setSignatureVersion(producerConfig.getSignVersion());
-        client.setRegion(producerConfig.getRegion());
+      client.setSignatureVersion(producerConfig.getSignVersion());
+      client.setRegion(producerConfig.getRegion());
     }
     String userAgent = projectConfig.getUserAgent();
     if (userAgent != null) {
