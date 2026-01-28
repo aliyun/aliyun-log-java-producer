@@ -175,6 +175,7 @@ public class SendProducerBatchTask implements Runnable {
       request.setContentType(Consts.CONST_SLS_JSON);
     }
     request.setProcessor(producerConfig.getProcessor());
+    request.SetParam("spl", this.producerConfig.getSpl());
     return request;
   }
 

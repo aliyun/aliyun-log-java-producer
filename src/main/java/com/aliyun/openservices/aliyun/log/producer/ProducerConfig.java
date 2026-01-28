@@ -79,6 +79,7 @@ public class ProducerConfig {
   private String sourceIp;
   private String compressType;
   private String processor;
+  private String spl;
 
   /**
    * @return The total bytes of memory the producer can use to buffer logs waiting to be sent to the
@@ -308,5 +309,13 @@ public class ProducerConfig {
 
   public void setProcessor(String processor) {
     this.processor = processor;
+  }
+
+  public String getSpl() {
+    return spl;
+  }
+
+  public void setSpl(String spl) {
+    this.spl = spl;
   }
 }
