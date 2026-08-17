@@ -3,6 +3,7 @@ package com.aliyun.openservices.aliyun.log.producer;
 import com.aliyun.openservices.aliyun.log.producer.errors.LogSizeTooLargeException;
 import com.aliyun.openservices.aliyun.log.producer.errors.MaxBatchCountExceedException;
 import com.aliyun.openservices.aliyun.log.producer.errors.ProducerException;
+import com.aliyun.openservices.aliyun.log.producer.errors.TimeoutException;
 import com.aliyun.openservices.aliyun.log.producer.internals.*;
 import com.aliyun.openservices.log.Client;
 import com.aliyun.openservices.log.common.Consts;
@@ -77,6 +78,10 @@ public class LogProducer implements Producer {
 
   private final ClientConfiguration clientConfiguration;
 
+  private final IncompleteBatchSet incompleteBatchSet;
+
+  private volatile boolean closed;
+
   /**
    * Start up a LogProducer instance.
    *
@@ -114,6 +119,7 @@ public class LogProducer implements Producer {
     clientConfiguration.setRegion(producerConfig.getRegion());
     clientConfiguration.setSignatureVersion(producerConfig.getSignVersion());
     this.serviceClient = new TimeoutServiceClient(clientConfiguration, this.timeoutThreadPool);
+    this.incompleteBatchSet = new IncompleteBatchSet();
     this.accumulator =
         new LogAccumulator(
             this.producerHash,
@@ -123,6 +129,7 @@ public class LogProducer implements Producer {
             this.retryQueue,
             successQueue,
             failureQueue,
+            this.incompleteBatchSet,
             this.ioThreadPool,
             this.batchCount);
     this.mover =
@@ -140,18 +147,21 @@ public class LogProducer implements Producer {
         new BatchHandler(
             this.name + SUCCESS_BATCH_HANDLER_SUFFIX,
             successQueue,
+            this.incompleteBatchSet,
             this.batchCount,
             this.memoryController);
     this.failureBatchHandler =
         new BatchHandler(
             this.name + FAILURE_BATCH_HANDLER_SUFFIX,
             failureQueue,
+            this.incompleteBatchSet,
             this.batchCount,
             this.memoryController);
     this.mover.start();
     this.successBatchHandler.start();
     this.failureBatchHandler.start();
     this.adjuster = new ShardHashAdjuster(producerConfig.getBuckets());
+    this.closed = false;
   }
 
   /**
@@ -434,6 +444,7 @@ public class LogProducer implements Producer {
     }
     ProducerException firstException = null;
     LOGGER.info("Closing the log producer, timeoutMs={}", timeoutMs);
+    this.closed = true;
     try {
       timeoutMs = closeMover(timeoutMs);
     } catch (ProducerException e) {
@@ -613,5 +624,30 @@ public class LogProducer implements Producer {
       client.setCname(true);
     }
     return client;
+  }
+
+  /**
+   * Start flush and wait util flush is finished or timeout/interrupted,
+   * Flush returns immediately if producer is closed.
+   *
+   * @param timeoutMs timeout in milliseconds, must be greater or equal than 0
+   * @throws TimeoutException     if the wait timed out
+   * @throws InterruptedException if the current thread was interrupted while waiting
+   */
+  public void flush(long timeoutMs) throws TimeoutException, InterruptedException {
+    if (timeoutMs < 0) {
+      throw new IllegalArgumentException("timeoutMs must be greater than or equal to 0, got " + timeoutMs);
+    }
+    if (this.closed) {
+      LOGGER.warn("Flush after producer is closed, returns immediately");
+      return;
+    }
+    this.accumulator.beginFlush();
+    this.mover.beginFlush();
+    try {
+      this.accumulator.waitAndEndFlush(timeoutMs);
+    } finally {
+      this.mover.endFlush();
+    }
   }
 }
