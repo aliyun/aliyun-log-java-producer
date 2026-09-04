@@ -129,67 +129,69 @@ public final class LogAccumulator {
     try {
       GroupKey groupKey = new GroupKey(project, logStore, topic, source, shardHash);
       ProducerBatchHolder holder = getOrCreateProducerBatchHolder(groupKey);
-      synchronized (holder) {
-        return appendToHolder(groupKey, logItems, callback, sizeInBytes, holder);
-      }
+      AppendResult appendResult = appendToHolder(groupKey, logItems, callback, sizeInBytes, holder);
+
+      submitProducerBatch(appendResult.existingBatchToSend);
+      submitProducerBatch(appendResult.newBatchToSend);
+      return appendResult.future;
     } catch (Exception e) {
       memoryController.release(sizeInBytes);
       throw new ProducerException(e);
     }
   }
 
-  private ListenableFuture<Result> appendToHolder(
+  private AppendResult appendToHolder(
       GroupKey groupKey,
       List<LogItem> logItems,
       Callback callback,
       int sizeInBytes,
       ProducerBatchHolder holder) {
-    if (holder.producerBatch != null) {
-      ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
-      if (f != null) {
-        if (holder.producerBatch.isMeetSendCondition()) {
-          holder.transferProducerBatch(
-              ioThreadPool,
-              producerConfig,
-              clientPool,
-              retryQueue,
-              successQueue,
-              failureQueue,
-              batchCount);
+    ProducerBatch existingBatchToSend = null;
+    ProducerBatch newBatchToSend = null;
+    ListenableFuture<Result> future = null;
+
+    synchronized (holder) {
+      ProducerBatch existingBatch = holder.producerBatch;
+      if (existingBatch != null) {
+        future = existingBatch.tryAppend(logItems, sizeInBytes, callback);
+        boolean doesNotFit = future == null;
+        boolean isReadyToSend = !doesNotFit && existingBatch.isMeetSendCondition();
+        if (doesNotFit || isReadyToSend) {
+          existingBatchToSend = holder.detachProducerBatch();
         }
-        return f;
-      } else {
-        holder.transferProducerBatch(
-            ioThreadPool,
-            producerConfig,
-            clientPool,
-            retryQueue,
-            successQueue,
-            failureQueue,
-            batchCount);
+      }
+
+      if (future == null) {
+        ProducerBatch newBatch = newProducerBatch(groupKey);
+        holder.producerBatch = newBatch;
+        future = newBatch.tryAppend(logItems, sizeInBytes, callback);
+        batchCount.incrementAndGet();
+        if (newBatch.isMeetSendCondition()) {
+          newBatchToSend = holder.detachProducerBatch();
+        }
       }
     }
-    holder.producerBatch =
-        new ProducerBatch(
-            groupKey,
-            Utils.generatePackageId(producerHash, BATCH_ID),
-            producerConfig.getBatchSizeThresholdInBytes(),
-            producerConfig.getBatchCountThreshold(),
-            producerConfig.getMaxReservedAttempts(),
-            System.currentTimeMillis());
-    ListenableFuture<Result> f = holder.producerBatch.tryAppend(logItems, sizeInBytes, callback);
-    batchCount.incrementAndGet();
-    if (holder.producerBatch.isMeetSendCondition()) {
-      holder.transferProducerBatch(
-          ioThreadPool,
-          producerConfig,
-          clientPool,
-          retryQueue,
-          successQueue,
-          failureQueue,
-          batchCount);
+
+    return new AppendResult(existingBatchToSend, newBatchToSend, future);
+  }
+
+  private ProducerBatch newProducerBatch(GroupKey groupKey) {
+    return new ProducerBatch(
+        groupKey,
+        Utils.generatePackageId(producerHash, BATCH_ID),
+        producerConfig.getBatchSizeThresholdInBytes(),
+        producerConfig.getBatchCountThreshold(),
+        producerConfig.getMaxReservedAttempts(),
+        System.currentTimeMillis());
+  }
+
+  private void submitProducerBatch(ProducerBatch batch) {
+    if (batch == null) {
+      return;
     }
-    return f;
+    ioThreadPool.submit(
+        new SendProducerBatchTask(
+            batch, producerConfig, clientPool, retryQueue, successQueue, failureQueue, batchCount));
   }
 
   public ExpiredBatches expiredBatches() {
@@ -286,31 +288,32 @@ public final class LogAccumulator {
     return appendsInProgress.get() > 0;
   }
 
+  private static final class AppendResult {
+
+    final ProducerBatch existingBatchToSend;
+
+    final ProducerBatch newBatchToSend;
+
+    final ListenableFuture<Result> future;
+
+    AppendResult(
+        ProducerBatch existingBatchToSend,
+        ProducerBatch newBatchToSend,
+        ListenableFuture<Result> future) {
+      this.existingBatchToSend = existingBatchToSend;
+      this.newBatchToSend = newBatchToSend;
+      this.future = future;
+    }
+  }
+
   private static final class ProducerBatchHolder {
 
     ProducerBatch producerBatch;
 
-    void transferProducerBatch(
-        IOThreadPool ioThreadPool,
-        ProducerConfig producerConfig,
-        Map<String, Client> clientPool,
-        RetryQueue retryQueue,
-        BlockingQueue<ProducerBatch> successQueue,
-        BlockingQueue<ProducerBatch> failureQueue,
-        AtomicInteger batchCount) {
-      if (producerBatch == null) {
-        return;
-      }
-      ioThreadPool.submit(
-          new SendProducerBatchTask(
-              producerBatch,
-              producerConfig,
-              clientPool,
-              retryQueue,
-              successQueue,
-              failureQueue,
-              batchCount));
+    ProducerBatch detachProducerBatch() {
+      ProducerBatch batch = producerBatch;
       producerBatch = null;
+      return batch;
     }
 
     void transferProducerBatch(ExpiredBatches expiredBatches) {

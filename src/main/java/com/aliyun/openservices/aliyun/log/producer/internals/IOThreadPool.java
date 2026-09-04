@@ -20,7 +20,7 @@ public class IOThreadPool {
   }
 
   public void submit(SendProducerBatchTask task) {
-    ioThreadPool.submit(task);
+    ioThreadPool.execute(task);
   }
 
   public void shutdown() {
